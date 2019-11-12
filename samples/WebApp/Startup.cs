@@ -33,7 +33,6 @@ namespace WebApp
                     MasterConnectionString = "..."
                 });
             });
-            //services.AddControllersWithViews();
         }
 
         

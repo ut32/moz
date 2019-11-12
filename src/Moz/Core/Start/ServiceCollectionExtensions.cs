@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using AspectCore.Configuration;
+using AspectCore.DynamicProxy.Parameters;
 using AspectCore.Extensions.DependencyInjection;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -44,6 +45,7 @@ namespace Microsoft.Extensions.DependencyInjection
     
     public static class ServiceCollectionExtensions
     {
+
         public static IServiceProvider AddMoz(this IServiceCollection services, Action<MozOptions> configure)
         {
             if (services == null)
@@ -68,10 +70,10 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof (options.Value.EncryptKey));
             
             if(options.Value.EncryptKey.Length!=16)
-                throw new ArgumentException("Encrypt Key's length must equal 16'");
+                throw new ArgumentException("Encrypt Key's length must equal 16");
             
             //check database connection string
-            if (!options.Value.Db.Any(t=>t.Name.Equals("default", StringComparison.OrdinalIgnoreCase)))
+            if (!options.Value.Db.Any(t=> "default".Equals(t.Name, StringComparison.OrdinalIgnoreCase)))
                 throw new ArgumentNullException(nameof(options.Value.Db));
 
             var serviceProvider = ConfigureServices(services,configuration,options.Value); 
