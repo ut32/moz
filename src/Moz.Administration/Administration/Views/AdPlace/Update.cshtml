@@ -1,0 +1,75 @@
+﻿
+
+@model Moz.Administration.Models.AdPlaces.UpdateModel
+@{
+  Layout = null;
+  var guid = Guid.NewGuid().ToString("N");
+}
+<div class="zui-form">
+  <div class="layui-card">
+    <div class="layui-card-body">
+      <form class="layui-form"
+            method="post"
+            action="@Url.Action("Update", "AdPlace")"
+            onBeforePost=""
+            onSuccessCallBack=""
+            lay-filter="form-@guid">
+            
+            <input type="hidden" value="@Model.AdPlace.Id" name="id"/>
+            
+
+                <div class="layui-form-item">
+                  <label class="layui-form-label">title</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="title" value="@Model.AdPlace.Title" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                  </div>
+                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
+                </div>
+             
+                <div class="layui-form-item">
+                  <label class="layui-form-label">code</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="code" value="@Model.AdPlace.Code" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                  </div>
+                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
+                </div>
+             
+                <div class="layui-form-item">
+                  <label class="layui-form-label">desc</label>
+                  <div class="layui-input-block">
+                    <textarea class="editor">@Model.AdPlace.Desc</textarea>
+                  </div>
+                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
+                </div>
+             
+                <div class="layui-form-item">
+                  <label class="layui-form-label">addtime</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="addtime" value="@Model.AdPlace.Addtime" lay-verify="required|date" placeholder="请输入" autocomplete="off" class="layui-date">
+                  </div>
+                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
+                </div>   
+             
+
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="">
+              <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i> 立即提交
+            </button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  layui.use(['form'],
+    function() {
+      var form = layui.form;
+
+      form.render(null, "form-@guid");
+
+    });
+</script>

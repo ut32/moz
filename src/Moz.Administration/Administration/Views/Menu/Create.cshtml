@@ -1,0 +1,66 @@
+@{
+  Layout = null;
+}
+<style>
+  #answers_ul li { padding-top: 10px; }
+</style>
+<div style="padding: 0; height: 100%;">
+  <div style="padding-top: 40px; padding-right: 40px;">
+    <form class="layui-form" method="post"
+          action="@Url.Action("Create", "menu")"
+          class="pageForm"
+          onsubmit="return validateCallback(this, navTabAjaxDone);"
+          novalidate="novalidate">
+      <div class="layui-form-item">
+        <label class="layui-form-label">父菜单</label>
+        <div class="layui-input-block">
+          <div id="cat_ids1"></div>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-block">
+          <input type="text" name="name" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">链接</label>
+        <div class="layui-input-block">
+          <input type="text" name="link" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">图标</label>
+        <div class="layui-input-inline">
+          <input type="text" name="icon" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-input-block">
+          <button class="layui-btn" lay-submit="" lay-filter="">立即提交</button>
+          <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  layui.use(['form', 'selectN', 'selectM'],
+    function() {
+      var form = layui.form, selectN = layui.selectN, selectM = layui.selectM;
+
+      form.render();
+
+      //无限级分类-基本配置
+      var catIns1 = selectN({
+        //元素容器【必填】
+        elem: '#cat_ids1',
+        name:"ParentIdsStr",
+        search: [false, true]
+        //候选数据【必填】
+        ,data:  "@Url.Action("allsubmenus", "menu")"
+        ,field:{idName:'Id',titleName:'Name',childName:'Children'}
+      });
+
+    });
+</script>

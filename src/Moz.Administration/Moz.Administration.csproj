@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    <PreserveCompilationReferences>true</PreserveCompilationReferences>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Moz\Moz.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Administration\Views\**\*.cshtml" />
+    <EmbeddedResource Include="Administration\Assets\**\*.*" />
+  </ItemGroup>
+</Project>

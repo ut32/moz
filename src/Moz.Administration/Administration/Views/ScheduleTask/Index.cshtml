@@ -1,0 +1,167 @@
+﻿@model Moz.Administration.Models.ScheduleTasks.IndexModel
+@{
+    Layout = null;
+    var guid = Guid.NewGuid().ToString("N");
+}
+<style>
+    .task_status {
+        border-radius: 50%;
+        display: inline-block;
+        height: 10px;
+        overflow: hidden;
+        width: 10px;
+    }
+
+    .task_status_1 { background: #dddddd; }
+
+    .task_status_2 { background: #3cb371; }
+
+    .task_status_4 { background: #00bfff; }
+
+    .task_status_8 { background: #ff0000; }
+
+    .task_status_disabled { background: #dddddd; }
+</style>
+<div class="zui-page layui-form" lay-filter="form-@guid">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <div class="layui-form-item">
+
+                <div class="layui-inline">
+                    <label class="layui-form-label">关键字</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="keyword" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-inline">
+                    <button class="layui-btn" lay-submit="" zui-event="search">
+                        <i class="layui-icon layui-icon-search"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-btn-group">
+                <a class="layui-btn" href="javascript:;" zui-href="@Url.Action("create", "ScheduleTask")" zui-type="dialog" zui-width="600px" zui-height="400px" title="添加"><i class="layui-icon">&#xe654;</i> 添加</a>
+            </div>
+            <table class="layui-hide" id="table_@(guid)" lay-filter="table_@(guid)"></table>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="toolbar_@(guid)">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" href="javascript:;" zui-href="@Url.Action("update", "ScheduleTask")?id={{d.Id}}" zui-type="dialog"  zui-width="600px" zui-height="400px" title="编辑">
+        <i class="layui-icon layui-icon-edit"></i>编辑
+    </a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" href="javascript:;" zui-href="@Url.Action("delete", "ScheduleTask")?id={{d.Id}}" zui-type="ajax" zui-confirm="你确认删除[{{d.Name}}]这条任务吗？">
+        <i class="layui-icon layui-icon-delete"></i>删除
+    </a>
+    <a class="layui-btn layui-btn-xs" href="javascript:;" zui-href="@Url.Action("Execute", "ScheduleTask")?id={{d.Id}}" zui-type="ajax" zui-confirm="你确认立即执行[{{d.Name}}]这条任务吗？">
+        立即执行一次
+    </a>
+</script>
+<script type="text/html" id="activeTpl_@(guid)">
+    {{#
+    var checked = d.IsActive?"checked":"";
+    }}
+</script>
+<script type="text/html" id="statusTpl_@(guid)">
+    {{# if(d.IsEnable) { }}
+    <div class="task_status task_status_{{d.Status}}"></div>
+    {{# } else { }}
+    {{# if(d.Status==8){ }}
+    <div class="task_status task_status_{{d.Status}}"></div>
+    {{# }else{ }}
+    <div class="task_status task_status_disabled"></div>
+    {{# } }}
+    {{# } }}
+</script>
+<script type="text/html" id="eableTpl_@(guid)">
+    {{#
+    var checked = d.IsEnable?"checked":"";
+    }}
+    <input type="checkbox" name="iseable" value="{{d.Id}}" lay-skin="switch" lay-text="是|否" lay-filter="iseable_@(guid)" {{checked}}>
+</script>
+<script>
+    layui.use(['form', 'table', 'jquery','admin'],
+        function() {
+            var form = layui.form, $ = layui.jquery, table = layui.table, admin=layui.admin;
+            
+            form.render(null, "form-@guid");
+
+            table.render({
+                elem: '#table_@(guid)',
+                url: '@Url.Action("PagedList", "ScheduleTask")',
+                method: 'post',
+                response: { statusName: 'Code', msgName: 'Message', countName: 'Total', dataName: 'Data' },
+                request: { limitName: 'pageSize' },
+                cols: [
+                    [
+                        //{ type: 'checkbox' }, 
+                        { field: 'Id', width: 60, title: 'ID' },
+                        { field: 'Name', title: '任务名称'}, 
+                        { field: 'Status', align: "center", width: 70, title: '状态', templet: '#statusTpl_@(guid)' }, 
+                        { field: 'Cron', title: '运行策略', width: 120 }, 
+                        { field: 'LastStartTimeString', title: '最后一次执行', width: 170 }, 
+                        { field: 'LastSuccessTimeString', title: '最后一次成功', width: 170 },
+                        { field: 'IsEnable', width: 90, title: '是否开启', templet: '#eableTpl_@(guid)', unresize: true },
+                        {
+                             title: '操作', width: 250, toolbar: '#toolbar_@(guid)'
+                        }
+                    ]
+                ],
+                where: {
+                    keyword: ''
+                },
+                page: true
+            });
+
+            //监听操作
+            form.on('switch(iseable_@(guid))',function(obj) {
+                admin.onSwitch("@Url.Action("SetIsEnable", "ScheduleTask")",{ "Id": this.value, "IsEnable": obj.elem.checked },obj,form,"form-@guid");
+            });
+
+            //监听单元格编辑
+            table.on('edit(table_@(guid))',function(obj) {
+                var value = obj.value, data = obj.data, field = obj.field;
+                admin.onCellEdit("@Url.Action("SetOrderIndex", "Permission")",{ "Id": data.Id , "OrderIndex": value });
+            });
+
+            var active = {
+                getCheckData: function() { //获取选中数据
+                    var checkStatus = table.checkStatus('idTest'), data = checkStatus.data;
+                    layer.alert(JSON.stringify(data));
+                },
+                getCheckLength: function() { //获取选中数目
+                    var checkStatus = table.checkStatus('idTest'), data = checkStatus.data;
+                    layer.msg('选中了：' + data.length + ' 个');
+                },
+                isAll: function() { //验证是否全选
+                    var checkStatus = table.checkStatus('idTest');
+                    layer.msg(checkStatus.isAll ? '全选' : '未全选');
+                },
+                search: function() {
+                    //执行重载
+                    table.reload('table_@(guid)',
+                        {
+                            page: {
+                                curr: 1 //重新从第 1 页开始
+                            },
+                            where: {
+                                keyword: $("[lay-filter='form-@guid'] input[name='keyword']").val()
+                            }
+                        });
+                }
+            };
+
+            $("[lay-filter='form-@guid'] .layui-btn[zui-event='search']").on("click",
+                function() {
+                    var event = $(this).attr('zui-event');
+                    if (event) {
+                        active[event] && active[event].call(this);
+                    }
+                });
+        });
+</script>

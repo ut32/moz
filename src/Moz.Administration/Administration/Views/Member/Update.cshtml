@@ -1,0 +1,280 @@
+﻿@using Moz.Bus.Models.Members
+@model Moz.Administration.Models.Members.UpdateModel
+@{
+    Layout = null;
+    var guid = Guid.NewGuid().ToString("N");
+}
+<div class="zui-form">
+<div class="layui-card">
+<div class="layui-card-body">
+<form class="layui-form"
+      method="post"
+      action="@Url.Action("Update", "Member")"
+      onBeforePost=""
+      onSuccessCallBack=""
+      lay-filter="form-@guid">
+
+<input type="hidden" value="@Model.Member.Id" name="id"/>
+
+<fieldset style="margin-top: 0">
+    <legend>
+        <a name="input">个人信息</a>
+    </legend>
+</fieldset>
+<div class="layui-form-item">
+    <div class="layui-inline">
+        <label class="layui-form-label">用户名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="username" value="@Model.Member.Username" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux"></div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-inline">
+            <input type="text" name="password" value="******" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux"></div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">邮件</label>
+        <div class="layui-input-inline">
+            <input type="text" name="email" value="@Model.Member.Email" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux"></div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">手机</label>
+        <div class="layui-input-inline">
+            <input type="text" name="mobile" value="@Model.Member.Mobile" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux"></div>
+    </div>
+    <div class="layui-inline">
+        <label class="layui-form-label">昵称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="nickname" value="@Model.Member.Nickname" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux"></div>
+    </div>
+    <div class="layui-inline">
+        <label class="layui-form-label">头像</label>
+        <div class="layui-input-inline">
+            <input type="text" name="avatar" value="@Model.Member.Avatar" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-input-inline" style="width: auto;">
+            <button class="layui-btn layui-btn-normal">上传图片</button>
+        </div>
+        <div class="layui-form-mid layui-word-aux">300x300</div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">性别</label>
+        <div class="layui-input-inline">
+            <input type="radio" name="gender" value="1" title="男"@(Model.Member.Gender == GenderEnum.Man ?" checked":"")>
+            <input type="radio" name="gender" value="2" title="女"@(Model.Member.Gender == GenderEnum.Woman ?" checked":"")>
+        </div>
+        <div class="layui-form-mid layui-word-aux"></div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">生日</label>
+        <div class="layui-input-inline">
+            <input type="text" id="birthday_@guid" name="birthday" value="@(Model.Member.Birthday?.ToString("yyyy-MM-dd"))" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux"></div>
+    </div>
+</div>
+<fieldset>
+    <legend>
+        <a name="input">注册信息</a>
+    </legend>
+</fieldset>
+<div class="layui-form-item">
+    <div class="layui-inline">
+        <label class="layui-form-label">注册Ip</label>
+        <div class="layui-input-inline">
+            <input type="text" value="@Model.Member.RegisterIp.IfEmptyReturn("0.0.0.0")" class="layui-input" disabled="disabled">
+        </div>
+        <div class="layui-form-mid layui-word-aux"> </div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">注册时间</label>
+        <div class="layui-input-inline">
+            <input type="text" value="@Model.Member.RegisterDatetime" class="layui-input" disabled="disabled">
+        </div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">登陆次数</label>
+        <div class="layui-input-inline">
+            <input type="text" value="@Model.Member.LoginCount" class="layui-input" disabled="disabled">
+        </div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">最后IP</label>
+        <div class="layui-input-inline">
+            <input type="text" value="@Model.Member.LastLoginIp" class="layui-input" disabled="disabled">
+        </div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">最后登录</label>
+        <div class="layui-input-inline">
+            <input type="text" value="@Model.Member.LastLoginDatetime" class="layui-input" disabled="disabled">
+        </div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">屏蔽至</label>
+        <div class="layui-input-inline">
+            <input type="text" value="@Model.Member.CannotLoginUntilDate" class="layui-input" disabled="disabled">
+        </div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">最后在线</label>
+        <div class="layui-input-inline">
+            <input type="text" value="@Model.Member.LastActiveDatetime" class="layui-input" disabled="disabled">
+        </div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">错误登录</label>
+        <div class="layui-input-inline">
+            <input type="text" value="@Model.Member.FailedLoginAttempts" class="layui-input" disabled="disabled">
+        </div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">在线时长</label>
+        <div class="layui-input-inline">
+            <input type="text" value="@Model.Member.OnlineTimeCount" class="layui-input" disabled="disabled">
+        </div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">地址</label>
+        <div class="layui-input-inline">
+            <input type="text" value="@Model.Member.Address" class="layui-input" disabled="disabled">
+        </div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">区域代码</label>
+        <div class="layui-input-inline">
+            <input type="text" value="@Model.Member.RegionCode" class="layui-input" disabled="disabled">
+        </div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">经度</label>
+        <div class="layui-input-inline">
+            <input type="text" value="@Model.Member.Lng" class="layui-input" disabled="disabled">
+        </div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">纬度</label>
+        <div class="layui-input-inline">
+            <input type="text" value="@Model.Member.Lat" class="layui-input" disabled="disabled">
+        </div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">GeoHash</label>
+        <div class="layui-input-inline">
+            <input type="text" value="@Model.Member.Geohash.IfEmptyReturn("-")" class="layui-input" disabled="disabled">
+        </div>
+    </div>
+</div>
+<fieldset>
+    <legend>
+        <a name="input">状态信息</a>
+    </legend>
+</fieldset>
+<div class="layui-form-item">
+
+    <div class="layui-inline">
+        <label class="layui-form-label">是否可用</label>
+        <div class="layui-input-inline">
+            <input type="checkbox" name="yyy" lay-skin="switch" lay-text="是|否" @(Model.Member.IsActive ? "checked" : "") disabled>
+        </div>
+        <div class="layui-form-mid layui-word-aux"></div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">是否删除</label>
+        <div class="layui-input-inline">
+            <input type="checkbox" name="yyy" lay-skin="switch" lay-text="是|否" @(Model.Member.IsDelete ? "checked" : "") disabled>
+        </div>
+        <div class="layui-form-mid layui-word-aux"></div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">邮箱验证</label>
+        <div class="layui-input-inline">
+            <input type="checkbox" name="yyy" lay-skin="switch" lay-text="是|否" @(Model.Member.IsEmailValid ? "checked" : "") disabled>
+        </div>
+        <div class="layui-form-mid layui-word-aux"></div>
+    </div>
+
+    <div class="layui-inline">
+        <label class="layui-form-label">手机验证</label>
+        <div class="layui-input-inline">
+            <input type="checkbox" name="yyy" lay-skin="switch" lay-text="是|否" @(Model.Member.IsMobileValid ? "checked" : "") disabled>
+        </div>
+        <div class="layui-form-mid layui-word-aux"></div>
+    </div>
+
+
+</div>
+<fieldset>
+    <legend>
+        <a name="input">角色信息</a>
+    </legend>
+</fieldset>
+<div class="layui-form-item">
+    <label class="layui-form-label">设置角色 </label>
+    <div class="layui-input-block">
+        @foreach (var role in Model.Roles)
+        {
+            var isChecked = "";
+            if (Model.Member.Roles.Contains(role.Id))
+            {
+                isChecked = " checked";
+            }
+            <input type="checkbox" value="@role.Id" name="Roles" title="@role.Name" @isChecked>
+        }
+    </div>
+</div>
+
+<div class="layui-form-item">
+    <div class="layui-input-block">
+        <button class="layui-btn" lay-submit="">
+            <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i> 立即提交
+        </button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</div>
+
+</form>
+</div>
+</div>
+</div>
+<script>
+  layui.use(['form','laydate'], function() {
+      var form = layui.form,laydate = layui.laydate;
+
+      form.render(null, "form-@guid");
+      laydate.render({
+          elem: '#birthday_@guid'
+      });
+
+  });
+</script>

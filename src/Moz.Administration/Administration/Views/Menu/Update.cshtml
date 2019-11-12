@@ -1,0 +1,71 @@
+@model Moz.Administration.Models.AdminMenus.UpdateModel
+@{
+  Layout = null;
+  var index = 0;
+}
+<style>
+  #answers_ul li { padding-top: 10px; }
+</style>
+<div style="padding: 0; height: 100%; overflow-y: scroll">
+  <div style="padding-top: 20px; padding-right: 20px;">
+    <form class="layui-form" method="post"
+          action="@Url.Action("update","menu")"
+          class="pageForm"
+          onsubmit="return validateCallback(this, navTabAjaxDone);"
+          novalidate="novalidate">
+      <input type="hidden" value="@Model.Detail.Id" name="id"/>
+      <div class="layui-form-item">
+        <label class="layui-form-label">父菜单</label>
+        <div class="layui-input-block">
+          <div id="cat_ids1"></div>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-block">
+          <input type="text" name="name" value="@Model.Detail.Name" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">链接</label>
+        <div class="layui-input-block">
+          <input type="text" name="link" value="@Model.Detail.Link" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">图标</label>
+        <div class="layui-input-inline">
+          <input type="text" name="icon" value="@Model.Detail.Icon" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-input-block">
+          <button class="layui-btn" lay-submit="" lay-filter="">立即提交</button>
+          <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  layui.use(['form', 'selectN', 'selectM'],
+    function() {
+      var form = layui.form, selectN = layui.selectN, selectM = layui.selectM;
+
+      form.render();
+
+      //无限级分类-基本配置
+      var catIns1 = selectN({
+        //元素容器【必填】
+        elem: '#cat_ids1',
+        name: "ParentIdsStr",
+        search: [false, true],
+        //候选数据【必填】
+        selected:[@Model.Detail.ParentId]
+        ,
+        data: "@Url.Action("allsubmenus", "menu")",
+        field: { idName: 'Id', titleName: 'Name', childName: 'Children' }
+      });
+
+    });
+</script>

@@ -1,0 +1,248 @@
+﻿@model Moz.Administration.Models.Members.CreateModel
+@{
+    Layout = null;
+    var guid = Guid.NewGuid().ToString("N");
+}
+<div class="zui-form">
+<div class="layui-card">
+<div class="layui-card-body">
+<form class="layui-form"
+      method="post"
+      action="@Url.Action("Create", "Member")"
+      onBeforePost=""
+      onSuccessCallBack=""
+      lay-filter="form-@guid">
+
+<div class="layui-form-item">
+    <div class="layui-inline">
+        <label class="layui-form-label">用户名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="username" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux"></div>
+    </div>
+    <div class="layui-inline">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-inline">
+            <input type="text" name="password" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux"></div>
+    </div>
+</div>
+<div class="layui-form-item">
+<div class="layui-inline">
+    <label class="layui-form-label">邮件</label>
+    <div class="layui-input-inline">
+        <input type="text" name="email" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux"></div>
+</div>
+
+<div class="layui-inline">
+    <label class="layui-form-label">手机</label>
+    <div class="layui-input-inline">
+        <input type="text" name="mobile" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux"></div>
+</div>
+</div>
+<div class="layui-form-item">
+    <label class="layui-form-label">avatar</label>
+    <div class="layui-input-inline">
+        <input type="text" name="avatar" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+        <button class="layui-btn layui-btn-normal">上传图片</button>
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">gender</label>
+    <div class="layui-input-inline">
+        <input type="text" name="gender" lay-verify="required|number" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">birthday</label>
+    <div class="layui-input-inline">
+        <input type="text" name="birthday" lay-verify="required|date" placeholder="请输入" autocomplete="off" class="layui-date">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">registerip</label>
+    <div class="layui-input-inline">
+        <input type="text" name="registerip" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">registerdatetime</label>
+    <div class="layui-input-inline">
+        <input type="text" name="registerdatetime" lay-verify="required|date" placeholder="请输入" autocomplete="off" class="layui-date">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">logincount</label>
+    <div class="layui-input-inline">
+        <input type="text" name="logincount" lay-verify="required|number" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">lastloginip</label>
+    <div class="layui-input-inline">
+        <input type="text" name="lastloginip" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">lastlogindatetime</label>
+    <div class="layui-input-inline">
+        <input type="text" name="lastlogindatetime" lay-verify="required|date" placeholder="请输入" autocomplete="off" class="layui-date">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">cannotloginuntildate</label>
+    <div class="layui-input-inline">
+        <input type="text" name="cannotloginuntildate" lay-verify="required|date" placeholder="请输入" autocomplete="off" class="layui-date">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">lastactivedatetime</label>
+    <div class="layui-input-inline">
+        <input type="text" name="lastactivedatetime" lay-verify="required|date" placeholder="请输入" autocomplete="off" class="layui-date">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">failedloginattempts</label>
+    <div class="layui-input-inline">
+        <input type="text" name="failedloginattempts" lay-verify="required|number" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">onlinetimecount</label>
+    <div class="layui-input-inline">
+        <input type="text" name="onlinetimecount" lay-verify="required|number" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">address</label>
+    <div class="layui-input-inline">
+        <input type="text" name="address" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">regioncode</label>
+    <div class="layui-input-inline">
+        <input type="text" name="regioncode" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">lng</label>
+    <div class="layui-input-inline">
+        <input type="text" name="lng" lay-verify="required|number" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">lat</label>
+    <div class="layui-input-inline">
+        <input type="text" name="lat" lay-verify="required|number" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">geohash</label>
+    <div class="layui-input-inline">
+        <input type="text" name="geohash" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">isactive</label>
+    <div class="layui-input-inline">
+        <input type="text" name="isactive" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">isdelete</label>
+    <div class="layui-input-inline">
+        <input type="text" name="isdelete" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">isemailvalid</label>
+    <div class="layui-input-inline">
+        <input type="text" name="isemailvalid" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">ismobilevalid</label>
+    <div class="layui-input-inline">
+        <input type="text" name="ismobilevalid" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+<div class="layui-form-item">
+    <label class="layui-form-label">nickname</label>
+    <div class="layui-input-inline">
+        <input type="text" name="nickname" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-word-aux">辅助文字</div>
+</div>
+
+
+<div class="layui-form-item">
+    <div class="layui-input-block">
+        <button class="layui-btn" lay-submit="">
+            <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i> 立即提交
+        </button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</div>
+
+</form>
+</div>
+</div>
+</div>
+<script>
+  layui.use(['form'],
+    function() {
+      var form = layui.form;
+
+      form.render(null, "form-@guid");
+
+    });
+</script>

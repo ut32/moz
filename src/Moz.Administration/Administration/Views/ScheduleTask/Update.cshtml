@@ -1,0 +1,58 @@
+﻿
+
+@model Moz.Administration.Models.ScheduleTasks.UpdateModel
+@{
+  Layout = null;
+  var guid = Guid.NewGuid().ToString("N");
+}
+<div class="zui-form">
+  <div class="layui-card">
+    <div class="layui-card-body">
+      <form class="layui-form"
+            method="post"
+            action="@Url.Action("Update", "ScheduleTask")"
+            onBeforePost=""
+            onSuccessCallBack=""
+            lay-filter="form-@guid">
+            
+            <input type="hidden" value="@Model.ScheduleTask.Id" name="id"/>
+            
+
+                <div class="layui-form-item">
+                  <label class="layui-form-label">任务名称</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="name" value="@Model.ScheduleTask.Name" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                  </div>
+                  <div class="layui-form-mid layui-word-aux"></div>
+                </div>
+             
+                <div class="layui-form-item">
+                  <label class="layui-form-label">CRON</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="cron" value="@Model.ScheduleTask.Cron" lay-verify="required" placeholder="请输入CRON表达式" autocomplete="off" class="layui-input">
+                  </div>
+                  <div class="layui-form-mid layui-word-aux">在线cron生成 <a href="http://cron.qqe2.com/" target="_blank">http://cron.qqe2.com/</a></div>
+                </div> 
+
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="">
+              <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i> 立即提交
+            </button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  layui.use(['form'],
+    function() {
+      var form = layui.form;
+
+      form.render(null, "form-@guid");
+
+    });
+</script>

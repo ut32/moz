@@ -1,0 +1,62 @@
+﻿@model Moz.Administration.Models.Members.CreateModel
+@{
+    Layout = null;
+    var guid = Guid.NewGuid().ToString("N");
+}
+<div class="zui-form">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form"
+                  method="post"
+                  action="@Url.Action("ChangePwd", "Member")"
+                  onBeforePost=""
+                  onSuccessCallBack=""
+                  lay-filter="form-@guid">
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">原密码</label>
+                    <div class="layui-input-inline">
+                        <input type="password" name="oldpassword" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux"></div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">新密码</label>
+                    <div class="layui-input-inline">
+                        <input type="password" name="newpassword" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux"></div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">确认一次</label>
+                    <div class="layui-input-inline">
+                        <input type="password" name="confirmpassword" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux"></div>
+                </div>
+
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="">
+                            <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i> 立即提交
+                        </button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+  layui.use(['form'],
+    function() {
+      var form = layui.form;
+
+      form.render(null, "form-@guid");
+
+    });
+</script>

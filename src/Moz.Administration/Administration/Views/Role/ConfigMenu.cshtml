@@ -1,0 +1,70 @@
+@using Moz.Administration.Models.Roles
+@using Newtonsoft.Json
+@model Moz.Administration.Models.Roles.ConfigMenuModel
+@{
+  Layout = null;
+  var guid = Guid.NewGuid().ToString("N");
+}
+<form class="layui-form zui-classic-form"
+      method="post"
+      action="@Url.Action("ConfigMenu", "Role")"
+      onBeforePost="SetSelectedMenus"
+      onSuccessCallBack="none"
+      lay-filter="form-@guid">
+
+	<div class="body">
+		<input type="hidden" value="@Model.RoleId" name="RoleId"/>
+		<div style="display: none" treedata></div>
+		<ul id="tree-@guid" class="ztree"></ul>
+	</div>
+	
+    <div class="footer">
+        <button class="layui-btn" lay-submit="">
+            <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i> 保存
+        </button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</form>
+<script>
+	layui.use(['form','jquery'],function() {
+			var form = layui.form,
+				$ = layui.jquery;
+		
+			form.render(null, "form-@guid");
+
+		var setting = {
+			data: {
+				simpleData: {
+					enable: true
+				}
+			},
+			check: {
+				enable: true
+			}
+		};
+		var zNodes = @(Html.Raw(JsonConvert.SerializeObject(Model.Menus)));
+		var ztree = $.fn.zTree.init($("#tree-@guid"), setting, zNodes);
+
+	    window.SetSelectedMenus = function(next,$form) {
+		    /*
+		    layer.confirm('确定提交吗', {icon: 3, title:'提示'}, function(index){
+			    layer.close(index);
+			    next($form);
+		    });
+		    */
+		    try {
+			    $form.find('[treedata]').html('');
+			    var nodes = ztree.getCheckedNodes(true);
+			    for (var i = 0; i < nodes.length; i++) {
+				    var $p = $('<input type="hidden" value="' + nodes[i].id + '" name="ConfigedMenus[' + i + '].Id"/>');
+				    $form.find('[treedata]').append($p);
+			    }
+			    next($form);
+		    } catch (ex) {
+			    console.log(ex);
+		    }
+		    
+	    }
+
+    });
+</script>

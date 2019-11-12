@@ -1,0 +1,211 @@
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>图片管理器</title>
+    <link href="/Administration/Assets/fileman/css/jqueryui1.10.4.custom.min.css" rel="stylesheet" type="text/css" />
+    <link href="/Administration/Assets/fileman/css/main.css" rel="stylesheet" type="text/css" />
+    <link href="/Administration/Assets/layui/css/layui.css" rel="stylesheet" type="text/css" media="all" />
+    <script type="text/javascript" src="/Administration/Assets/fileman/js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="/Administration/Assets/fileman/js/jqueryui1.10.4.custom.min.js"></script>
+    <script type="text/javascript" src="/Administration/Assets/fileman/js/custom.js"></script>
+    <script type="text/javascript" src="/Administration/Assets/fileman/js/utils.js"></script>
+    <script type="text/javascript" src="/Administration/Assets/fileman/js/filetypes.js"></script>
+    <script type="text/javascript" src="/Administration/Assets/fileman/js/file.js"></script>
+    <script type="text/javascript" src="/Administration/Assets/fileman/js/directory.js"></script>
+    <script type="text/javascript" src="/Administration/Assets/fileman/js/main.js"></script>
+    <script type="text/javascript" src="/Administration/Assets/fileman/js/jquerydateFormat.min.js"></script>
+    <style>
+        #wraper {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .leftbar {
+            width: 255px;
+            background: #f9f9f9;
+            border-right: #eee 1px solid;
+            height: 100%;
+        }
+
+        .rightbar {
+            flex: 1;
+            height: 100%;
+        }
+
+            .rightbar .cont {
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                height: 100%;
+                box-sizing: border-box;
+            }
+
+        #fileActions {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .rightbar .cont > .status {
+            height: 30px;
+        }
+
+        .rightbar .cont, .leftbar .cont {
+            padding: 15px;
+        }
+
+        #pnlStatus {
+            height: 30px;
+            line-height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div id="wraper">
+        <div class="leftbar">
+            <div class="cont">
+                <div id="dirActions">
+                    <div class="layui-btn-group">
+                        <button class="layui-btn layui-btn-sm" type="button" id="btnAddDir" value="Create" title="Create new directory" onclick="addDir()">
+                            新建
+                        </button>
+                        <button class="layui-btn layui-btn-sm" type="button" id="btnRenameDir" value="Rename" title="Rename directory" onclick="renameDir()">
+                            重命名
+                        </button>
+                        <button class="layui-btn layui-btn-sm" type="button" id="btnDeleteDir" value="Delete" title="Delete selected directory" onclick="deleteDir()">
+                            删除
+                        </button>
+                    </div>
+                </div>
+                <div id="pnlLoadingDirs">
+                    <span>Loading directories...</span><br>
+                    <img src="/Administration/Assets/fileman/images/loading.gif" title="Loading directory tree, please wait...">
+                </div>
+                <div class="scrollPane">
+                    <ul id="pnlDirList"></ul>
+                </div>
+            </div>
+        </div>
+        <div class="rightbar">
+            <div class="cont">
+                <div id="fileActions">
+                    <input type="hidden" id="hdViewType" value="list">
+                    <input type="hidden" id="hdOrder" value="asc">
+                    <div class="toolbar">
+                        <div class="upload">
+                            <button class="layui-btn layui-btn-normal" id="btnAddFile" value="Add file" title="Upload files" onclick="addFileClick()">
+                                <i class="layui-icon"></i>
+                                上传文件
+                            </button>
+                        </div>
+                        <div class="layui-btn-group" style="margin-right: 10px">
+                            <button class="layui-btn layui-btn-sm" type="button" id="btnPreviewFile" title="Preview selected file" onclick="previewFile()">
+                                预览
+                            </button>
+                            <button class="layui-btn layui-btn-sm" type="button" id="btnRenameFile" title="Rename selected file" onclick="renameFile()">
+                                重命名
+                            </button>
+                            <button class="layui-btn layui-btn-sm" type="button" id="btnDownloadFile" title="Download selected file" onclick="downloadFile()">
+                                下载
+                            </button>
+                            <button class="layui-btn layui-btn-sm" type="button" id="btnDeleteFile" value="Delete" title="Delete selected file" onclick="deleteFile()" data-lang-v="DeleteFile" data-lang-t="T_DeleteFile">
+                                删除
+                            </button>
+                        </div>
+
+
+                        @if (HttpContextAccessor.HttpContext.Request.Query["multiimage"].Equals("yes"))
+                        { 
+                        <button class="layui-btn layui-btn-sm" type="button" id="btnSelectAllFile" value="SelectAll" title="Select highlighted file" onclick="selectAllFile()">
+                            全选
+                        </button>
+                        }
+
+
+                        <button class="layui-btn layui-btn-warm layui-btn-sm" type="button" id="btnSelectFile" value="Select" title="Select highlighted file" onclick="setFile()">
+                            插入
+                        </button>
+
+                        <div class="toolbar_right">
+                            <div class="layui-btn-group" style="margin-right: 10px">
+                                <button type="button" id="btnListView" class="layui-btn layui-btn-xs layui-btn-primary" value=" " title="List view" onclick="switchView('list')" data-lang-t="T_ListView">
+                                    <i class="layui-icon layui-icon-list"></i>
+                                </button>
+                                <button type="button" id="btnThumbView" class="layui-btn layui-btn-xs layui-btn-primary" value=" " title="Thumbnails view" onclick="switchView('thumb')" data-lang-t="T_ThumbsView">
+                                    <i class="layui-icon layui-icon-picture"></i>
+                                </button>
+                            </div>
+                            <div style="display: none">
+                                <span data-lang="OrderBy">Order by</span>:
+                                <select id="ddlOrder" onchange="sortFiles()">
+                                    <option value="name" data-lang="Name_asc">&uarr;&nbsp;&nbsp;Name</option>
+                                    <option value="size" data-lang="Size_asc">&uarr;&nbsp;&nbsp;Size</option>
+                                    <option value="time" data-lang="Date_asc">&uarr;&nbsp;&nbsp;Date</option>
+                                    <option value="name_desc" data-lang="Name_desc">&darr;&nbsp;&nbsp;Name</option>
+                                    <option value="size_desc" data-lang="Size_desc">&darr;&nbsp;&nbsp;Size</option>
+                                    <option value="time_desc" data-lang="Date_desc">&darr;&nbsp;&nbsp;Date</option>
+                                </select>&nbsp;&nbsp;
+                            </div>
+                            <input type="text" id="txtSearch" onkeyup="filterFiles()" onchange="filterFiles()" />
+                        </div>
+                    </div>
+                    <div style="border-bottom: #ededed 1px solid; margin-bottom: 15px; margin-top: 5px;">
+                    </div>
+                    <div class="pnlFiles">
+                        <div class="scrollPane">
+                            <div id="pnlLoading">
+                                <span data-lang="LoadingFiles">Loading files...</span><br>
+                                <img src="/Administration/Assets/fileman/images/loading.gif" title="Loading files, please wait...">
+                            </div>
+                            <div id="pnlEmptyDir" data-lang="DirIsEmpty">
+                                目录为空
+                            </div>
+                            <div id="pnlSearchNoFiles" data-lang="NoFilesFound">
+                                未找到文件
+                            </div>
+                            <ul id="pnlFileList"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="status">
+                    <div id="pnlStatus" style="font-size: 12px; color: #555555;">状态栏</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <iframe name="frmUploadFile" width="0" height="0" style="display: none; border: 0;"></iframe>
+    <div id="dlgAddFile">
+        <form name="addfile" id="frmUpload" method="post" target="frmUploadFile" enctype="multipart/form-data">
+            <input type="hidden" name="d" id="hdDir" />
+            <div class="form">
+                <br />
+                <input type="file" name="files[]" id="fileUploads" onchange="listUploadFiles(this.files)" multiple="multiple" />
+                <div id="uploadResult"></div>
+                <div class="uploadFilesList">
+                    <div id="uploadFilesList"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="pnlRenameFile" class="dialog">
+        <span class="name"></span>
+        <br>
+        <input type="text" id="txtFileName">
+    </div>
+    <div id="pnlDirName" class="dialog">
+        <span class="name"></span>
+        <br>
+        <input type="text" id="txtDirName">
+    </div>
+</body>
+
+</html>

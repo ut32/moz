@@ -1,0 +1,135 @@
+﻿@model Moz.Administration.Models.Ads.IndexModel
+@{
+    Layout = null;
+    var guid = Guid.NewGuid().ToString("N");
+}
+<div class="zui-page layui-form" lay-filter="form-@guid">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <div class="layui-form-item">
+
+                <div class="layui-inline">
+                    <label class="layui-form-label">关键字</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="keyword" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-inline">
+                    <button class="layui-btn" lay-submit="" zui-event="search">
+                        <i class="layui-icon layui-icon-search"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-btn-group">
+                <a class="layui-btn" href="javascript:;" zui-href="@Url.Action("create", "Ad",new { AdPlaceId = @Model.AdPlaceId })" zui-type="dialog" zui-width="800px" zui-height="400px" title="添加"><i class="layui-icon">&#xe654;</i> 添加</a>
+            </div>
+            <table class="layui-hide" id="table_@(guid)" lay-filter="table_@(guid)"></table>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="toolbar_@(guid)">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" href="javascript:;" zui-href="@Url.Action("update", "Ad")?id={{d.Id}}" zui-type="dialog"  zui-width="800px" zui-height="400px" title="编辑">
+        <i class="layui-icon layui-icon-edit"></i>编辑
+    </a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" href="javascript:;" zui-href="@Url.Action("delete", "Ad")?id={{d.Id}}" zui-type="ajax" zui-confirm="你确认删除此条信息(ID={{d.Id}})吗？">
+        <i class="layui-icon layui-icon-delete"></i>删除
+    </a>
+</script>
+<script type="text/html" id="showTpl_@(guid)">
+    {{# 
+        var checked = d.IsShow?"checked":"";
+    }}
+    <input type="checkbox" name="isShow" value="{{d.Id}}" lay-skin="switch" lay-text="是|否" lay-filter="isShow_@(guid)" {{checked}}>
+</script>
+<script type="text/html" id="imageTpl_@(guid)">
+    <a href="{{d.ImagePath}}" target="_blank">
+        <img src="{{d.ImagePath}}" style="height: 30px;width: auto;" alt=""/>
+    </a>
+</script>
+<script>
+    layui.use(['form', 'table', 'jquery','admin'],
+        function() {
+            var form = layui.form, $ = layui.jquery, table = layui.table, admin=layui.admin;
+            
+            form.render(null, "form-@guid");
+
+            table.render({
+                elem: '#table_@(guid)',
+                url: '@Url.Action("PagedList", "Ad")',
+                method: 'post',
+                response: { statusName: 'Code', msgName: 'Message', countName: 'Total', dataName: 'Data' },
+                request: { limitName: 'pageSize' },
+                cols: [
+                    [
+                        { type: 'checkbox' }, 
+                        { field: 'Id', width: 80, title: 'ID', sort: true },
+                        { field: 'Title', title: '标题' }, 
+                        { field: 'ImagePath', title: '图片', width: 80, templet:'#imageTpl_@(guid)' }, 
+                        { field: 'TargetUrl', title: '目标地址', width: 300 }, 
+                        { field: 'Order', title: '排序', width: 60, edit: 'text',style: 'box-shadow:0px 0px 8px #ddd inset;' }, 
+                        { field: 'IsShow', title: '是否显示', width: 100, templet: '#showTpl_@(guid)'}, 
+                        {
+                             title: '操作', width: 160, toolbar: '#toolbar_@(guid)'
+                        }
+                    ]
+                ],
+                where: {
+                    keyword: '',
+                    adPlaceId: @Model.AdPlaceId
+                },
+                page: true
+            });
+
+            //监听操作
+            form.on('switch(isShow_@(guid))',function(obj) {
+                admin.onSwitch("@Url.Action("SetIsShow", "Ad")",{ "Id": this.value, "IsShow": obj.elem.checked },obj,form,"form-@guid");
+            });
+
+            //监听单元格编辑
+            table.on('edit(table_@(guid))',function(obj) {
+                var value = obj.value, data = obj.data, field = obj.field;
+                admin.onCellEdit("@Url.Action("SetOrderIndex", "Ad")",{ "Id": data.Id , "OrderIndex": value });
+            });
+
+            var active = {
+                getCheckData: function() { //获取选中数据
+                    var checkStatus = table.checkStatus('idTest'), data = checkStatus.data;
+                    layer.alert(JSON.stringify(data));
+                },
+                getCheckLength: function() { //获取选中数目
+                    var checkStatus = table.checkStatus('idTest'), data = checkStatus.data;
+                    layer.msg('选中了：' + data.length + ' 个');
+                },
+                isAll: function() { //验证是否全选
+                    var checkStatus = table.checkStatus('idTest');
+                    layer.msg(checkStatus.isAll ? '全选' : '未全选');
+                },
+                search: function() {
+                    //执行重载
+                    table.reload('table_@(guid)',
+                        {
+                            page: {
+                                curr: 1 //重新从第 1 页开始
+                            },
+                            where: {
+                                keyword: $("[lay-filter='form-@guid'] input[name='keyword']").val(),
+                                adPlaceId:@Model.AdPlaceId
+                            }
+                        });
+                }
+            };
+
+            $("[lay-filter='form-@guid'] .layui-btn[zui-event='search']").on("click",
+                function() {
+                    var event = $(this).attr('zui-event');
+                    if (event) {
+                        active[event] && active[event].call(this);
+                    }
+                });
+        });
+</script>

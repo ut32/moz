@@ -1,0 +1,82 @@
+﻿
+@model Moz.Administration.Models.Ads.CreateModel
+@{
+  Layout = null;
+  var guid = Guid.NewGuid().ToString("N");
+}
+<div class="zui-form">
+  <div class="layui-card">
+    <div class="layui-card-body">
+      <form class="layui-form"
+            method="post"
+            action="@Url.Action("Create", "Ad")"
+            onBeforePost=""
+            onSuccessCallBack=""
+            lay-filter="form-@guid">
+                <input type="hidden" name="AdPlaceId" value="@Model.AdPlaceId"/>
+
+                <div class="layui-form-item">
+                  <label class="layui-form-label">标题</label>
+                  <div class="layui-input-block">
+                    <input type="text" name="title" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                  </div>
+                  <div class="layui-form-mid layui-word-aux"></div>
+                </div>
+             
+                <div class="layui-form-item">
+                  <label class="layui-form-label">图片</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="ImagePath" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input" /> 
+                  </div>
+                  <a class="layui-btn" href="javascript:;" id="btn_upload_imagePath" rel="ImagePath"><i class="layui-icon">&#xe681;</i> 选择图片</a>
+                </div>
+             
+                <div class="layui-form-item">
+                  <label class="layui-form-label">目标地址</label>
+                  <div class="layui-input-inline">
+                    <input type="text" name="targeturl" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input"/>
+                  </div>
+                  <div class="layui-form-mid layui-word-aux"></div>
+                </div>
+
+
+                <div class="layui-form-item">
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="">
+                      <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i> 立即提交
+                    </button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                  </div>
+                </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  layui.use(['form','upload','layer'],function() {
+      var form   = layui.form
+         ,upload = layui.upload
+         ,layer  = layui.layer;
+
+      form.render(null, "form-@guid");
+      
+      upload.render({ //允许上传的文件后缀
+        elem: '#btn_upload_imagePath'
+        ,url: '@Url.Action("index","upload")'
+        ,field:'file'
+        ,accept: 'file' //普通文件
+        ,exts: 'jpg|png|jpeg' //只允许上传压缩文件
+        ,done: function(res) {
+          if (res.Code === 0) {
+            var $this = this.item;
+            var rel = $this.attr("rel");
+            $('input[name=' + rel + ']').val(res.Data.RelativePath);
+          } else {
+            layer.alert(res.Message);
+          }
+        }
+      });
+
+  });
+</script>

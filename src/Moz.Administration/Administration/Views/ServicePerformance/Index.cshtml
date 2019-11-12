@@ -1,0 +1,123 @@
+﻿@model Moz.Administration.Models.ServicePerformances.IndexModel
+@{
+    Layout = null;
+    var guid = Guid.NewGuid().ToString("N");
+}
+<div class="zui-page layui-form" lay-filter="form-@guid">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <div class="layui-form-item">
+
+                <div class="layui-inline">
+                    <label class="layui-form-label">关键字</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="keyword" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn" lay-submit="" zui-event="search">
+                        <i class="layui-icon layui-icon-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <a class="layui-btn  layui-btn-danger" href="javascript:;" zui-href="@Url.Action("deleteall", "ServicePerformance")" zui-type="ajax" zui-confirm="你确定删除全部记录吗？" title="清空">
+                <i class="layui-icon layui-icon-delete"></i>
+                一键清空
+            </a>
+            <table class="layui-hide" id="table_@(guid)" lay-filter="table_@(guid)"></table>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="activeTpl_@(guid)">
+    {{#
+    var checked = d.IsActive?"checked":"";
+    }}
+</script>
+<script type="text/html" id="elapsedMsTpl_@(guid)">
+    {{# if(d.ElapsedMs < 200){ }}
+    <span class="zui-tag zui-tag-success zui-tag-mini">{{d.ElapsedMs}}毫秒</span>
+    {{# }else if(d.ElapsedMs < 400){ }}
+    <span class="zui-tag zui-tag-warning zui-tag-mini">{{d.ElapsedMs}}毫秒</span>
+    {{# }else{ }}
+    <span class="zui-tag zui-tag-danger zui-tag-mini">{{d.ElapsedMs}}毫秒</span>
+    {{# } }}
+</script>
+<script>
+    layui.use(['form', 'table', 'jquery','admin'],
+        function() {
+            var form = layui.form, $ = layui.jquery, table = layui.table, admin=layui.admin;
+            
+            form.render(null, "form-@guid");
+
+            table.render({
+                elem: '#table_@(guid)',
+                url: '@Url.Action("PagedList", "ServicePerformance")',
+                method: 'post',
+                response: { statusName: 'Code', msgName: 'Message', countName: 'Total', dataName: 'Data' },
+                request: { limitName: 'pageSize' },
+                cols: [
+                    [
+                        { type: 'checkbox' }, 
+                        { field: 'Id', width: 80, title: 'ID', sort: true },
+                        { field: 'Name', title: '服务名称' }, 
+                        { field: 'ElapsedMs', title: '耗时', width: 100, templet: '#elapsedMsTpl_@(guid)' }, 
+                        { field: 'HttpRequestId', title: '请求Id', width: 300 }, 
+                        { field: 'AddTimeString', title: '时间', width: 160 }
+                    ]
+                ],
+                where: {
+                    keyword: ''
+                },
+                page: true
+            });
+
+            //监听操作
+            form.on('switch(isActive_@(guid))',function(obj) {
+                admin.onSwitch("@Url.Action("SetIsActive", "Permission")",{ "Id": this.value, "IsActive": obj.elem.checked },obj,form,"form-@guid");
+            });
+
+            //监听单元格编辑
+            table.on('edit(table_@(guid))',function(obj) {
+                var value = obj.value, data = obj.data, field = obj.field;
+                admin.onCellEdit("@Url.Action("SetOrderIndex", "Permission")",{ "Id": data.Id , "OrderIndex": value });
+            });
+
+            var active = {
+                getCheckData: function() { //获取选中数据
+                    var checkStatus = table.checkStatus('idTest'), data = checkStatus.data;
+                    layer.alert(JSON.stringify(data));
+                },
+                getCheckLength: function() { //获取选中数目
+                    var checkStatus = table.checkStatus('idTest'), data = checkStatus.data;
+                    layer.msg('选中了：' + data.length + ' 个');
+                },
+                isAll: function() { //验证是否全选
+                    var checkStatus = table.checkStatus('idTest');
+                    layer.msg(checkStatus.isAll ? '全选' : '未全选');
+                },
+                search: function() {
+                    //执行重载
+                    table.reload('table_@(guid)',
+                        {
+                            page: {
+                                curr: 1 //重新从第 1 页开始
+                            },
+                            where: {
+                                keyword: $("[lay-filter='form-@guid'] input[name='keyword']").val()
+                            }
+                        });
+                }
+            };
+
+            $("[lay-filter='form-@guid'] .layui-btn[zui-event='search']").on("click",
+                function() {
+                    var event = $(this).attr('zui-event');
+                    if (event) {
+                        active[event] && active[event].call(this);
+                    }
+                });
+        });
+</script>

@@ -1,0 +1,131 @@
+@{
+    Layout = null;
+    var guid = Guid.NewGuid().ToString("N");
+}
+<div class="zui-page">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">关键字</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="id" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn layuiadmin-btn-list" lay-submit="" lay-filter="LAY-app-contlist-search">
+                        <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-btn-group">
+                <a class="layui-btn" href="javascript:;" zui-href="@Url.Action("add", "category")" zui-type="dialog" zui-width="800px" zui-height="400px" title="添加分类"><i class="layui-icon">&#xe654;</i> 添加</a>
+                <!--<a class="layui-btn" href="@Url.Action("", "")"  rel="ids" posttype="string" target="selectedTodo" title="确定要删除这些吗?"><i class="layui-icon">&#xe640;</i> 删除</a>-->
+            </div>
+            <table id="table_@(guid)" lay-filter="table_@(guid)"></table>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="toolbar_@(guid)">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" href="javascript:;" zui-href="@Url.Action("update", "category")?id={{d.Id}}" zui-type="dialog" zui-width="800px" zui-height="400px" title="编辑">
+        <i class="layui-icon layui-icon-edit"></i>编辑
+    </a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" href="javascript:;" zui-href="@Url.Action("delete", "category")?id={{d.Id}}" zui-type="ajax" zui-confirm="你确认删除(id={{d.Id}})吗？">
+        <i class="layui-icon layui-icon-delete"></i>删除
+    </a>
+</script>
+<script>
+    layui.use(['form', 'treetable'],
+        function() {
+            var form = layui.form;
+            form.render();
+
+
+            var treetable = layui.treetable;
+
+            // 渲染表格
+            treetable.render({
+                id: 'tb_@(guid)',
+                treeColIndex: 1, // treetable新增参数
+                treeSpid: null, // treetable新增参数
+                treeIdName: 'Id', // treetable新增参数
+                treePidName: 'ParentId', // treetable新增参数
+                treeDefaultClose: false, // treetable新增参数
+                treeLinkage: true, // treetable新增参数
+                elem: '#table_@(guid)',
+                url: '@Url.Action("List", "Category")',
+                limit:1000,
+                cols: [
+                    [
+                        { field: 'id', width: 50, title: 'Id' },
+                        { field: 'Name', title: '名称' },
+                        {
+                            field:'Alias',title:'别名',width:200
+                        },
+                        {
+                            field: 'OrderIndex',
+                            width: 80,
+                            title: '排序',
+                            edit: 'text',
+                            style: 'box-shadow:0px 0px 8px #ddd inset;'
+                        },
+                        { title: '操作', width: 160, toolbar: '#toolbar_@(guid)' }
+                    ]
+                ]
+            });
+
+            //监听单元格编辑
+            treetable.on('edit(table_@(guid))',
+                function(obj) {
+                    var value = obj.value, data = obj.data;
+                    $.post("@Url.Action("SetOrderIndex", "Category")",
+                        { "Id": data.Id, "OrderIndex": value },
+                        function(data) {
+                            if (data.Code > 0) {
+                                layer.msg(data.Message);
+                            } else {
+                                layer.msg("设置成功");
+                                navTab.reloadCurrentTab();
+                            }
+                        },
+                        "json");
+                });
+
+            var $ = layui.$,
+                active = {
+                    getCheckData: function() { //获取选中数据
+                        var checkStatus = table.checkStatus('idTest'), data = checkStatus.data;
+                        layer.alert(JSON.stringify(data));
+                    },
+                    getCheckLength: function() { //获取选中数目
+                        var checkStatus = table.checkStatus('idTest'), data = checkStatus.data;
+                        layer.msg('选中了：' + data.length + ' 个');
+                    },
+                    isAll: function() { //验证是否全选
+                        var checkStatus = table.checkStatus('idTest');
+                        layer.msg(checkStatus.isAll ? '全选' : '未全选');
+                    },
+                    search: function() {
+                        //执行重载
+                        table.reload('tb_@(guid)',
+                            {
+                                page: {
+                                    curr: 1 //重新从第 1 页开始
+                                },
+                                where: {
+                                    keyword: $("#search_form_@(guid) input[name='name']").val()
+                                }
+                            });
+                    }
+                };
+
+            $('#search_form_@(guid) .layui-btn').on('click',
+                function() {
+                    var type = $(this).data('type');
+                    active[type] ? active[type].call(this) : '';
+                });
+        });
+</script>

@@ -1,0 +1,84 @@
+@{
+    Layout = null;
+    var guid = Guid.NewGuid().ToString("N");
+}
+<div class="zui-page layui-form" lay-filter="form-@guid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <div style="height: 5px"></div>
+            <div class="layui-btn-group">
+                <a class="layui-btn" href="javascript:;" zui-href="@Url.Action("create", "Menu")" zui-type="dialog" zui-width="800px" zui-height="400px" title="添加"><i class="layui-icon">&#xe654;</i> 添加</a>
+            </div>
+            <table class="layui-hide" id="table_@(guid)" lay-filter="table_@(guid)"></table>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="toolbar_@(guid)">
+    {{# if(d.IsSystem){ }}
+    <a class="layui-btn layui-btn-normal layui-btn-disabled layui-btn-xs" href="javascript:;" title="编辑">
+        <i class="layui-icon layui-icon-edit"></i>编辑
+    </a>
+    <a class="layui-btn layui-btn-danger layui-btn-disabled layui-btn-xs" href="javascript:;">
+        <i class="layui-icon layui-icon-delete"></i>删除
+    </a>
+    {{# }else{ }}
+    <a class="layui-btn layui-btn-normal layui-btn-xs" href="javascript:;" zui-href="@Url.Action("update", "menu")?id={{d.Id}}" zui-type="dialog" zui-width="800px" zui-height="400px" title="编辑">
+        <i class="layui-icon layui-icon-edit"></i>编辑
+    </a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" href="javascript:;" zui-href="@Url.Action("delete", "menu")?id={{d.Id}}" zui-type="ajax" zui-confirm="你确认删除此条信息(ID={{d.Id}})吗？">
+        <i class="layui-icon layui-icon-delete"></i>删除
+    </a>
+    
+    {{# } }}
+</script>
+
+<script>
+    layui.use(['form', 'treetable','admin','jquery'],
+        function() {
+            var form = layui.form,admin=layui.admin,$ = layui.jquery;
+            
+            form.render(null, "form-@guid");
+            
+            var treetable = layui.treetable;
+
+            // 渲染表格
+            treetable.render({
+                id: 'table_@(guid)',
+                treeColIndex: 1, // treetable新增参数
+                treeSpid: null, // treetable新增参数
+                treeIdName: 'Id', // treetable新增参数
+                treePidName: 'ParentId', // treetable新增参数
+                treeDefaultClose: true, // treetable新增参数
+                treeLinkage: true, // treetable新增参数
+                elem: '#table_@(guid)',
+                url: '@Url.Action("PagedList", "Menu")',
+                limit:10000,
+                cols: [
+                    [
+                        { field: 'id', width: 50, title: 'Id' },
+                        { field: 'Name', title: '名称'},
+                        {
+                            field: 'Link',
+                            width: 250,
+                            title: '链接'
+                        },
+                        {
+                            field: 'OrderIndex',
+                            width: 80,
+                            title: '排序',
+                            edit: 'text',
+                            style: 'box-shadow:0px 0px 8px #ddd inset;'
+                        },
+                        { title: '操作', width: 160, toolbar: '#toolbar_@(guid)' }
+                    ]
+                ]
+            });
+
+            //监听单元格编辑
+            treetable.on('edit(table_@(guid))',function(obj) {
+                var value = obj.value, data = obj.data, field = obj.field;
+                admin.onCellEdit("@Url.Action("SetOrderIndex", "Menu")",{ "Id": data.Id, "OrderIndex": value });
+            });
+        });
+</script>

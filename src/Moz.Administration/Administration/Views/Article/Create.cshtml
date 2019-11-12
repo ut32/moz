@@ -1,0 +1,133 @@
+﻿@using Moz.Bus.Models.Articles
+@model Moz.Administration.Models.Articles.CreateModel
+@{
+    Layout = null;
+    var guid = Guid.NewGuid().ToString("N");
+    var list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ArticleConfiguration>>(Model.ArticleModel.Configuration) ?? new List<ArticleConfiguration>();
+}
+<div class="zui-form">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form"
+                  method="post"
+                  action="@Url.Action("Create", "Article")"
+                  onBeforePost=""
+                  onSuccessCallBack=""
+                  lay-filter="form-@guid">
+
+                <input type="hidden" name="ArticleTypeId" value="@Model.Type"/>
+                
+                @if (Model.ArticleModel.CategoryId != null)
+                {
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">分类</label>
+                        <div class="layui-input-inline" style="width: auto;">
+                            <div id="infinite_select_@guid"></div>
+                        </div>
+                        <div class="layui-form-mid layui-word-aux"></div>
+                    </div>
+                }
+
+                @foreach (var item in list.OrderBy(t => t.OrderIndex))
+                {
+                    if (item.IsEnable)
+                    {
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">@item.DisplayName</label>
+                            @if (item.DisplayType == FieldTypeEnum.SingleRowTextInput)
+                            {
+                                <div class="layui-input-inline">
+                                    <input type="text" name="@item.FiledName" value="@item.DefaultValue" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                                </div>
+                            }
+                            else if (item.DisplayType == FieldTypeEnum.UploadSingleFile)
+                            {
+                                <div class="layui-input-inline">
+                                    <input type="text" name="@item.FiledName" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input"/>
+                                </div>
+                                <a class="layui-btn upload_imagePath" href="javascript:;" rel="@item.FiledName"><i class="layui-icon">&#xe681;</i> 选择文件</a>
+                            }
+                            else if (item.DisplayType == FieldTypeEnum.DateTimeInput)
+                            {
+                                <div class="layui-input-inline">
+                                    <input type="text" name="@item.FiledName" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input datetimeinput"/>
+                                </div>
+                            }
+                            else if (item.DisplayType == FieldTypeEnum.Editor)
+                            {
+                                <div class="layui-input-block">
+                                    <textarea name="@item.FiledName" class="editor" rows="10">@item.DefaultValue</textarea>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(item.Description))
+                            {
+                                <div class="layui-form-mid layui-word-aux">@item.Description</div>
+                            }
+                        </div>
+                    }
+                }
+
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="">
+                            <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i> 立即提交
+                        </button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+  layui.use(['form','upload','layer','laydate','selectN'],
+    function() {
+      var form = layui.form,
+      upload = layui.upload,
+      layer  = layui.layer,
+      laydate = layui.laydate,
+      selectN = layui.selectN;
+
+      form.render(null, "form-@guid");
+      
+      upload.render({ //允许上传的文件后缀
+          elem: '.upload_imagePath'
+          ,url: '@Url.Action("index", "upload")'
+          ,field:'file'
+          ,accept: 'file' //普通文件
+          ,exts: 'jpg|png|jpeg' //只允许上传压缩文件
+          ,done: function(res) {
+            if (res.Code === 0) {
+              var $this = this.item;
+              var rel = $this.attr("rel");
+              $('input[name=' + rel + ']').val(res.Data.RelativePath);
+            } else {
+              layer.alert(res.Message);
+            }
+          }
+        });
+      
+      laydate.render({ 
+        elem: '.datetimeinput'
+        ,type: 'datetime'
+      });
+      
+      @if (Model.ArticleModel.CategoryId != null)
+      {
+          <text>
+          //无限级分类-基本配置
+          var catIns1 = selectN({
+              //元素容器【必填】
+              elem: '#infinite_select_@guid',
+              name:"ParentIdsStr",
+              search: [false, true]
+                  //候选数据【必填】
+              ,data:  "@Url.Action("allsubmenus", "Category",new{ parentId = @Model.ArticleModel.CategoryId })"
+              ,field:{idName:'Id',titleName:'Name',childName:'Children'}
+          });
+          </text>
+      }
+    });
+</script>
