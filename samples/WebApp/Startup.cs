@@ -25,7 +25,7 @@ namespace WebApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMoz(options =>
-            {
+            { 
                 options.EncryptKey = "jEeESr7VySYru5c2";
                 options.Admin.Path = "myadmin";
                 options.Db.Add(new DbOptions
