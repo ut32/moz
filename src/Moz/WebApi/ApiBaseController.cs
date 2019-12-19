@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Moz.Validation;
 
 namespace Moz.WebApi
 {
     //[ExceptionHandler(typeof(MyExceptionHandler))] 
     //[ValidationFilter]
+    //[ServiceFilter]
     [ApiController]
     [Route("[controller]")]
     public class ApiBaseController : ControllerBase
@@ -17,5 +19,6 @@ namespace Moz.WebApi
         {
             return new ApiOkResult();
         }
+        
     }
 }
