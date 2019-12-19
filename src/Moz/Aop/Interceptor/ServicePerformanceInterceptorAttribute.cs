@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using AspectCore.DynamicProxy;
-using AspectCore.Injector;
 using Microsoft.AspNetCore.Http;
 using Moz.Bus.Models.Common;
 using Moz.Core;
@@ -14,7 +13,7 @@ namespace Moz.Aop.Interceptor
     public class ServicePerformanceInterceptorAttribute : AbstractInterceptorAttribute
     {
 
-        [FromContainer] private IHttpContextAccessor HttpContextAccessor { get; set; }
+        private IHttpContextAccessor HttpContextAccessor { get; set; }
 
         public override async Task Invoke(AspectContext context, AspectDelegate next)
         {

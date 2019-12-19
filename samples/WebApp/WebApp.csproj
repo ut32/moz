@@ -8,8 +8,14 @@
 
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\Moz.Admin.Api\Moz.Admin.Api.csproj" />
       <ProjectReference Include="..\..\src\Moz.Admin.Layui\Moz.Admin.Layui.csproj" />
       <ProjectReference Include="..\..\src\Moz\Moz.csproj" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc5" />
     </ItemGroup>
 
 </Project>
