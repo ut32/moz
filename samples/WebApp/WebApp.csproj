@@ -8,7 +8,7 @@
 
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Moz.Administration\Moz.Administration.csproj" />
+      <ProjectReference Include="..\..\src\Moz.Admin.Layui\Moz.Admin.Layui.csproj" />
       <ProjectReference Include="..\..\src\Moz\Moz.csproj" />
     </ItemGroup>
 

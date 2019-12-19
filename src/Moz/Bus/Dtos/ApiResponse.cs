@@ -1,8 +1,6 @@
 ﻿// ReSharper disable InconsistentNaming
 
-using Moz.Bus.Dtos;
-
-namespace Moz.CMS.Dtos
+namespace Moz.Bus.Dtos
 {
     public class ApiResponse<T> where T : IRespData
     {
