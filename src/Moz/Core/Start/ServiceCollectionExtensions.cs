@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -188,6 +189,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddRazorRuntimeCompilation()
                 .AddJsonOptions(options =>
                 {
+                    options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                     //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                     //options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
                 })

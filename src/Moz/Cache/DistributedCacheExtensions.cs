@@ -15,6 +15,7 @@ namespace Microsoft.Extensions.Caching.Distributed
                 if (result == null) return default(T);
                 if (options == null)
                 {
+                    //cache.SetString(key,System.Text.Json.JsonSerializer.Serialize(result));
                     cache.SetString(key,Newtonsoft.Json.JsonConvert.SerializeObject(result)); 
                 }
                 else
@@ -24,7 +25,9 @@ namespace Microsoft.Extensions.Caching.Distributed
                 
                 return result;
             }
+
             return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(value);
+            //return System.Text.Json.JsonSerializer.Deserialize<T>(value);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Moz.Utils.FileManager
         public FileManager(CommonSettings commonSettings)
         {
             _commonSettings = commonSettings; 
-            _fileManager = new AliyunOssManager();
+            //_fileManager = new AliyunOssManager();
         }
 
         public UploadResult Upload(UploadFile file)

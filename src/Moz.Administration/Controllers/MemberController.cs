@@ -190,7 +190,8 @@ namespace Moz.Administration.Controllers
             };
             */
 
-            return View("~/Administration/Views/Member/PermissionList.cshtml", null);
+            //return View("~/Administration/Views/Member/PermissionList.cshtml", null);
+            return null;
         }
 
 
