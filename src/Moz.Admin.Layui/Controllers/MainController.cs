@@ -2,13 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Moz.Administration.Common;
 using Moz.Administration.Models.Main;
-using Moz.CMS.Model.Configuration;
 using Moz.Configuration;
 using Moz.Core;
-using Moz.Domain;
 using Moz.Utils.Types;
 
-namespace Moz.Administration.Controllers
+namespace Moz.Admin.Layui.Controllers
 {
     public class MainController : AdminAuthBaseController
     {

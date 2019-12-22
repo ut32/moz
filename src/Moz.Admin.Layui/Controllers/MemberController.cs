@@ -5,18 +5,13 @@ using Moz.Administration.Common;
 using Moz.Administration.Models.Members;
 using Moz.Bus.Dtos.Members;
 using Moz.Bus.Dtos.Members.Roles;
-using Moz.Bus.Models.Members;
 using Moz.Bus.Services.Members;
-using Moz.CMS.Models.Members;
 using Moz.Configuration;
 using Moz.Core;
-using Moz.Core.Service.Members;
-using Moz.Domain.Dtos.Members.Roles;
-using Moz.Domain.Services.Members;
 using Moz.Exceptions;
 using Moz.Presentation.Administration.Models.Articles;
 
-namespace Moz.Administration.Controllers
+namespace Moz.Admin.Layui.Controllers
 {
     //[Permission(Name = "MEMBER_MANAGE")]
     public class MemberController : AdminAuthBaseController

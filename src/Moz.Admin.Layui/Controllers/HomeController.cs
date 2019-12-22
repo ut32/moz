@@ -5,15 +5,10 @@ using Moz.Administration.Common;
 using Moz.Administration.Models.Members;
 using Moz.Auth;
 using Moz.Bus.Dtos.Auth;
-using Moz.CMS.Dtos;
-using Moz.CMS.Dtos;
 using Moz.Core.Options;
-using Moz.Core.Service.Members;
-using Moz.Domain.Dtos;
-using Moz.Domain.Services.Members;
 using Moz.Exceptions;
 
-namespace Moz.Administration.Controllers
+namespace Moz.Admin.Layui.Controllers
 {
     public class HomeController : AdminBaseController
     {

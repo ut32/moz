@@ -1,12 +1,19 @@
 using System;
-using FluentValidation;
-using FluentValidation.Attributes;
 using Moz.Bus.Models.Members;
-using Moz.Validation;
 
-namespace Moz.Bus.Dtos.Auth
+namespace Moz.Auth
 {
-    [Validator(typeof(ExternalAuthValidator))]
+    public class LoginAuthResult
+    {
+        public string AccessToken { get; set; }
+    }
+
+    public class LoginWithUsernamePasswordRequest
+    {
+        public string Username { get; set; }
+        public string Password { get; set; } 
+    }
+    
     public class ExternalAuthRequest 
     {
         /// <summary>
@@ -61,19 +68,5 @@ namespace Moz.Bus.Dtos.Auth
         /// 性别 1:男 0:女
         /// </summary>
         public int Gender { get; set; }
-    }
-
-    public class ExternalAuthValidator : MozValidator<ExternalAuthRequest>
-    {
-        public ExternalAuthValidator()
-        {
-            RuleFor(x => x.OpenId).NotEmpty().WithMessage("openid不能为空");
-        }
-    }
-
-    public class ExternalAuthResponse:BaseRespData
-    {
-        public long MemberId { get; set; }
-        public string Token { get; set; } 
     }
 }

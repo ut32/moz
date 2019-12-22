@@ -19,6 +19,7 @@ using Moz.Core.Options;
 using Moz.DataBase;
 using Moz.Exceptions;
 using Moz.Service.Security;
+using Moz.WebApi;
 
 namespace Moz.Auth.Impl
 {
@@ -29,19 +30,20 @@ namespace Moz.Auth.Impl
         private readonly IEncryptionService _encryptionService;
         private readonly IOptions<MozOptions> _mozOptions;
         private readonly IDistributedCache _distributedCache;
+        private readonly IJwtService _jwtService;
 
         public AuthService(IHttpContextAccessor httpContextAccessor,
             IMemberService memberService,
             IEncryptionService encryptionService,
             IOptions<MozOptions> mozOptions,
-            IDistributedCache distributedCache
-            )
+            IDistributedCache distributedCache, IJwtService jwtService)
         { 
             _httpContextAccessor = httpContextAccessor;
             _memberService = memberService;
             _encryptionService = encryptionService;
             _mozOptions = mozOptions;
             _distributedCache = distributedCache;
+            _jwtService = jwtService;
         }
         
         #region Utils
@@ -53,26 +55,6 @@ namespace Moz.Auth.Impl
                 return false;
             var savedPassword = _encryptionService.CreatePasswordHash(enteredPassword, salt,"SHA512");
             return passwordInDb.Equals(savedPassword, StringComparison.OrdinalIgnoreCase);
-        }
-        private string GenerateJwtToken(long memberId)
-        {
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Jti,memberId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Exp,DateTime.Now.AddDays(90).ToUniversalTime().ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64)
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_mozOptions.Value.EncryptKey));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
-
-            var token = new JwtSecurityToken(
-                "https://136cc.com",
-                "moz_application",
-                claims,
-                expires: DateTime.Now.AddDays(90),
-                signingCredentials: credentials);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         private string GenerateRefreshToken()
@@ -141,20 +123,18 @@ namespace Moz.Auth.Impl
         }
 
         /// <summary>
-        /// 用户密码登录
+        /// 用户名密码登录
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public LoginWithPasswordResponse LoginWithPassword(LoginWithPasswordRequest request)
+        public ApiResult<LoginAuthResult> LoginWithUsernamePassword(LoginWithUsernamePasswordRequest request)
         {
-            var response = new LoginWithPasswordResponse();
-            try
+            static LoginWithUsernamePasswordQueryableItem GetMember(string username)
             {
-                Member GetMember(string username)
+                using (var client = DbFactory.GetClient())
                 {
-                    using var client = DbFactory.GetClient();
                     return client.Queryable<Member>()
-                        .Select(it=>new Member
+                        .Select(it => new LoginWithUsernamePasswordQueryableItem
                         {
                             Id = it.Id,
                             UId = it.UId,
@@ -167,149 +147,149 @@ namespace Moz.Auth.Impl
                         })
                         .Single(t => t.Username.Equals(username));
                 }
-
-                var member = GetMember(request.Username);
-                if (member == null)
-                {
-                    response.Code = 1001;
-                    response.Message = "用户不存在";
-                    return response;
-                }
-
-                if (member.IsDelete)
-                {
-                    response.Code = 1002;
-                    response.Message = "用户已删除";
-                    return response;
-                }
-                
-                if (!member.IsActive)
-                {
-                    response.Code = 1003;
-                    response.Message = "用户被屏蔽";
-                    return response;
-                }
-                
-                if (member.CannotLoginUntilDate.HasValue && member.CannotLoginUntilDate.Value > DateTime.UtcNow)
-                {
-                    response.Code = 1005;
-                    response.Message = "用户未解封，请等待";
-                    return response;
-                }
-                
-                if (!PasswordsMatch(member.Password, member.PasswordSalt, request.Password))
-                {
-                    response.Code = 1006;
-                    response.Message = "密码错误";
-                    return response;
-                }
-
-
-                return new LoginWithPasswordResponse
-                {
-                    MemberId = member.Id,
-                    AccessToken = GenerateJwtToken(member.Id)
-                };
             }
-            catch (Exception e)
+            
+            if (request.Username.IsNullOrEmpty())
             {
-                response.Code = 999;
-                response.Message = e.Message;
+                return new ApiErrorResult("用户名不能为空");
+            }
+            
+            if (request.Password.IsNullOrEmpty())
+            {
+                return new ApiErrorResult("密码不能为空");
             }
 
-            return response;
+            var member = GetMember(request.Username);
+            if (member == null)
+            {
+                return new ApiErrorResult("用户不存在");
+            }
+
+            if (member.IsDelete)
+            {
+                return new ApiErrorResult("用户已删除");
+            }
+
+            if (!member.IsActive)
+            {
+                return new ApiErrorResult("用户未激活");
+            }
+
+            if (member.CannotLoginUntilDate != null && member.CannotLoginUntilDate.Value > DateTime.UtcNow)
+            {
+                return new ApiErrorResult("用户未解封，请等待");
+            }
+
+            if (!PasswordsMatch(member.Password, member.PasswordSalt, request.Password))
+            {
+                return new ApiErrorResult("密码错误");
+            }
+
+            var accessToken = _jwtService.GenerateJwtToken(member.UId);
+            return new LoginAuthResult
+            {
+                AccessToken = accessToken
+            };
         }
 
         /// <summary>
-        /// 三方登录
+        /// 三方平台登录
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ExternalAuthResponse ExternalAuth(ExternalAuthRequest request)
+        public ApiResult<LoginAuthResult> ExternalAuth(ExternalAuthRequest request)
         {
-            ExternalAuthentication externalAuthentication;
+            ExternalAuthentication externalAuthentication; 
+            var memberUId = string.Empty;
             var memberId = 0L;
             using (var db = DbFactory.GetClient())
             {
-                externalAuthentication = db.Queryable<ExternalAuthentication>().Single(t => t.Openid.Equals(request.OpenId) && t.Provider == request.Provider);
+                externalAuthentication = db.Queryable<ExternalAuthentication>()
+                    .Single(t => t.Openid.Equals(request.OpenId) && t.Provider == request.Provider);
             }
 
             if (externalAuthentication == null)
             {
-                using var db = DbFactory.GetClient();
-                memberId = db.UseTran(tran =>
+                using (var db = DbFactory.GetClient())
                 {
-                    var identify = tran.Insertable(new Identify()).ExecuteReturnBigIdentity();
-                    return tran.Insertable(new Member
+                    memberId = db.UseTran(tran =>
                     {
-                        UId = Guid.NewGuid().ToString("N"),
-                        Address = null,
-                        Avatar = request?.UserInfo?.Avatar,
-                        Nickname = request?.UserInfo?.Nickname,
-                        Birthday = null,
-                        CannotLoginUntilDate = null,
-                        Email = null,
-                        FailedLoginAttempts = 0,
-                        Gender = null,
-                        Geohash = null,
-                        IsActive = true,
-                        IsDelete = false,
-                        IsEmailValid = false,
-                        IsMobileValid = false,
-                        LastActiveDatetime = DateTime.UtcNow,
-                        LastLoginDatetime = DateTime.UtcNow,
-                        LastLoginIp = null,
-                        Lat = null,
-                        Lng = null,
-                        LoginCount = 0,
-                        Mobile = null,
-                        OnlineTimeCount = 0,
-                        Password = _encryptionService.CreateSaltKey(10),
-                        PasswordSalt =  _encryptionService.CreateSaltKey(6),
-                        RegionCode = null,
-                        RegisterDatetime = DateTime.UtcNow,
-                        RegisterIp = null,
-                        Username = $"{request?.UserInfo?.Nickname}_{identify}"
-                    }).ExecuteReturnBigIdentity();
-                });
+                        var identify = tran.Insertable(new Identify()).ExecuteReturnBigIdentity();
+                        memberUId = Guid.NewGuid().ToString("N");
+                        return tran.Insertable(new Member
+                        {
+                            UId = memberUId,
+                            Address = null,
+                            Avatar = request?.UserInfo?.Avatar,
+                            Nickname = request?.UserInfo?.Nickname,
+                            Birthday = null,
+                            CannotLoginUntilDate = null,
+                            Email = null,
+                            FailedLoginAttempts = 0,
+                            Gender = null,
+                            Geohash = null,
+                            IsActive = true,
+                            IsDelete = false,
+                            IsEmailValid = false,
+                            IsMobileValid = false,
+                            LastActiveDatetime = DateTime.UtcNow,
+                            LastLoginDatetime = DateTime.UtcNow,
+                            LastLoginIp = null,
+                            Lat = null,
+                            Lng = null,
+                            LoginCount = 0,
+                            Mobile = null,
+                            OnlineTimeCount = 0,
+                            Password = _encryptionService.CreateSaltKey(10),
+                            PasswordSalt = _encryptionService.CreateSaltKey(6),
+                            RegionCode = null,
+                            RegisterDatetime = DateTime.UtcNow,
+                            RegisterIp = null,
+                            Username = $"{request?.UserInfo?.Nickname}_{identify}"
+                        }).ExecuteReturnBigIdentity();
+                    });
+                }
             }
             else
             {
                 memberId = externalAuthentication.MemberId;
-                using var db = DbFactory.GetClient();
-                var id = memberId;
-                var member = db.Queryable<Member>()
-                    .Select(it => new {it.Id, it.Avatar})
-                    .Single(it => it.Id == id);
-                    
-                externalAuthentication.AccessToken = request.AccessToken;
-                externalAuthentication.ExpireDt = request.ExpireDt;
-                externalAuthentication.RefreshToken = request.RefreshToken;
-
-                db.UseTran(tran =>
+                using (var db = DbFactory.GetClient())
                 {
-                    tran.Updateable(externalAuthentication).ExecuteCommand();
+                    var id = memberId;
+                    var member = db.Queryable<Member>()
+                        .Select(it => new {it.Id, it.UId, it.Avatar })
+                        .Single(it => it.Id == id);
 
-                    if (member.Avatar.IsNullOrEmpty() && !(request?.UserInfo?.Avatar?.IsNullOrEmpty() ?? true))
+                    externalAuthentication.AccessToken = request.AccessToken;
+                    externalAuthentication.ExpireDt = request.ExpireDt;
+                    externalAuthentication.RefreshToken = request.RefreshToken;
+
+                    db.UseTran(tran =>
                     {
-                        tran.Updateable<Member>()
-                            .UpdateColumns(it => new Member()
-                            {
-                                Avatar = request.UserInfo.Avatar
-                            })
-                            .Where(it => it.Id == id)
-                            .ExecuteCommand();
-                    }
+                        tran.Updateable(externalAuthentication).ExecuteCommand();
 
-                    return 0;
-                });
+                        if (member.Avatar.IsNullOrEmpty() && !(request?.UserInfo?.Avatar?.IsNullOrEmpty() ?? true))
+                        {
+                            tran.Updateable<Member>()
+                                .SetColumns(it => new Member()
+                                {
+                                    Avatar = request.UserInfo.Avatar
+                                })
+                                .Where(it => it.Id == id)
+                                .ExecuteCommand();
+                        }
+
+                        return 0;
+                    });
+
+                    memberUId = member.UId;
+                }
             }
             
-            var token = GenerateJwtToken(memberId);
-            return new ExternalAuthResponse
+            var accessToken = _jwtService.GenerateJwtToken(memberUId);
+            return new LoginAuthResult
             {
-                MemberId = memberId,
-                Token = token
+                AccessToken = accessToken
             };
         }
         
@@ -341,5 +321,17 @@ namespace Moz.Auth.Impl
         {
             _httpContextAccessor.HttpContext?.Response?.Cookies?.Delete("__moz__token");
         }
+    }
+    
+    internal class LoginWithUsernamePasswordQueryableItem
+    {
+        public long Id { get; set; }
+        public string UId { get; set; }
+        public string Username { get; set; }
+        public string Password{ get; set; }
+        public string PasswordSalt { get; set; }
+        public bool IsDelete{ get; set; }
+        public bool IsActive { get; set; }
+        public DateTime? CannotLoginUntilDate{ get; set; }
     }
 }

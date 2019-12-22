@@ -1,7 +1,7 @@
 ﻿using System;
-using Moz.Bus.Dtos.Auth;
 using Moz.Bus.Models.Members;
 using Moz.CMS.Models.Members;
+using Moz.WebApi;
 
 namespace Moz.Auth
 {
@@ -26,20 +26,20 @@ namespace Moz.Auth
         /// <returns>true 成功, false 失败</returns>
         bool AddRoleToMemberId(long memberId, long roleId, DateTime? expDatetime = null);
 
-        
+
         /// <summary>
         /// 用户名密码登录
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        LoginWithPasswordResponse LoginWithPassword(LoginWithPasswordRequest request);
+        ApiResult<LoginAuthResult> LoginWithUsernamePassword(LoginWithUsernamePasswordRequest request);
 
         /// <summary>
         /// 三方授权登录
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        ExternalAuthResponse ExternalAuth(ExternalAuthRequest request);
+        ApiResult<LoginAuthResult> ExternalAuth(ExternalAuthRequest request);
 
 
         void SetAuthCookie(string token);
