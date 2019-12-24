@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Moz.Administration.Common;
 using Moz.Administration.Models.Members;
 using Moz.Auth;
-using Moz.Bus.Dtos.Auth;
 using Moz.Core.Options;
 using Moz.Exceptions;
 
@@ -36,7 +35,8 @@ namespace Moz.Admin.Layui.Controllers
                 : _mozOptions.Value.Admin.LoginView;           
             return View(path);
         }
-
+        
+        /*
         [HttpPost]
         public IActionResult Index(LoginModel model)
         {
@@ -54,6 +54,7 @@ namespace Moz.Admin.Layui.Controllers
             _passportService.SetAuthCookie(resp.AccessToken);
             return RespJson(new{});
         }
+        */
 
         [HttpGet]
         public IActionResult Logout()
