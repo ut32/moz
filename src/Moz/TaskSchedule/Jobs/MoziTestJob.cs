@@ -9,10 +9,10 @@ namespace Moz.TaskSchedule.Jobs
     [Description("测试定时任务")]
     public class MozTestJob : IJob
     {
-        public async Task Execute(IJobExecutionContext context)
+        public Task Execute(IJobExecutionContext context)
         {
-            await Task.Delay(1000);
             Console.WriteLine("测试定时任务");
+            return Task.CompletedTask;
         }
     }
 }

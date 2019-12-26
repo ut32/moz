@@ -5,15 +5,15 @@ using Moz.Core.Options;
 
 namespace Moz.Admin.Api.Common
 {
-    public class AdminApiRouteAttribute:RouteAttribute
+    public class ApiAdminRouteAttribute:RouteAttribute
     {
         private static readonly string AdminPath;
-        public AdminApiRouteAttribute() :  
+        public ApiAdminRouteAttribute() :  
             base($"{AdminPath}/api/v{{version:apiVersion}}/[controller]") 
         {
         }
 
-        static AdminApiRouteAttribute()
+        static ApiAdminRouteAttribute()
         {
             AdminPath = EngineContext.Current.Resolve<IOptions<MozOptions>>()?.Value?.Admin.Path ?? "myadmin";
         }

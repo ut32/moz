@@ -35,6 +35,7 @@ namespace WebApp
                 });
             });
 
+            
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "My API", Version = "v1"}); });
         }
 
@@ -54,7 +55,7 @@ namespace WebApp
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
             
             // Enable middleware to serve generated Swagger as a JSON endpoint.
