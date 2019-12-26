@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Moz.Administration.Common;
 using Moz.Administration.Models.Members;
 using Moz.Auth;
-using Moz.Bus.Dtos.Auth;
 using Moz.Core.Options;
 using Moz.Exceptions;
 
@@ -40,18 +39,14 @@ namespace Moz.Admin.Layui.Controllers
         [HttpPost]
         public IActionResult Index(LoginModel model)
         {
-
-
-            var request = new LoginWithPasswordRequest
+            var resp = _passportService.LoginWithUsernamePassword(new LoginWithUsernamePasswordRequest()
             {
                 Username = model.Username,
                 Password = model.Password
-            };
-            
-            var resp = _passportService.LoginWithPassword(request);
+            });
             if(resp.Code!=0)
                 throw new MozException(resp.Message);
-            _passportService.SetAuthCookie(resp.AccessToken);
+            _passportService.SetAuthCookie(resp.Data.AccessToken);
             return RespJson(new{});
         }
 

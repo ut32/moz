@@ -333,3 +333,7 @@ ASALocalRun/
 
 # 本地配置文件
 *.Development.json
+
+# 日志
+[Ll]ogs/
+[Ll]og/

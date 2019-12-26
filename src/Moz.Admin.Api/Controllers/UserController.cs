@@ -18,7 +18,11 @@ namespace Moz.Admin.Api.Controllers
         [Route("Insert")]public ApiResult<string> Insert() => "添加成功";
         [Route("Update")]public ApiResult Update()  => ApiOk();
         [Route("Delete")]public ApiResult Delete()  => ApiError("删除失败");
-        [Route("Get")]public ApiResult<int> Get()  => 0;
+        
+        
+        [Route("Get")]
+        [ApiActionFilter]
+        public ApiResult<int> Get()  => 0;
 
     }
 }
