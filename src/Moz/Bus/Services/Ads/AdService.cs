@@ -3,14 +3,14 @@ using System.Linq;
 using Microsoft.Extensions.Caching.Distributed;
 using Moz.Biz.Dtos.AdPlaces;
 using Moz.Biz.Dtos.Ads;
-using Moz.Biz.Services.Ads;
+using Moz.Bus.Dtos.Ads;
 using Moz.CMS.Model.Ad;
 using Moz.DataBase;
 using Moz.Events;
 using Moz.Exceptions;
 using SqlSugar;
 
-namespace Moz.CMS.Services.Ads
+namespace Moz.Bus.Services.Ads
 {
     public partial class AdService : IAdService
     {
@@ -238,7 +238,6 @@ namespace Moz.CMS.Services.Ads
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
         public GetAdsByCodeResponse GetAdsByCode(GetAdsByCodeRequest request)
         {
             using (var client = DbFactory.GetClient())

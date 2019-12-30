@@ -8,6 +8,7 @@ namespace Moz.WebApi
     //[ValidationFilter]
     //[ServiceFilter]
     [ApiController]
+    [TypeFilter(typeof(ApiActionFilterAttribute))]
     [Route("[controller]")]
     public class ApiBaseController : ControllerBase
     {

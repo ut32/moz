@@ -1,9 +1,8 @@
-﻿using System;
-using System.Linq;
-using Moz.Biz.Dtos.AdPlaces;
+﻿using Moz.Biz.Dtos.AdPlaces;
 using Moz.Biz.Dtos.Ads;
+using Moz.Bus.Dtos.Ads;
 
-namespace Moz.Biz.Services.Ads
+namespace Moz.Bus.Services.Ads
 {
     public interface IAdService
     {
