@@ -2,14 +2,10 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Moz.Bus.Dtos;
-using Moz.CMS.Dtos;
-using Moz.CMS.Dtos;
-using Newtonsoft.Json;
-using Moz.Core.Dtos;
-using Moz.Domain.Dtos;
 using Moz.Exceptions;
+using Newtonsoft.Json;
 
-namespace Moz.Administration.Common
+namespace Moz.Admin.Layui.Common
 {
     public class AdminExceptionHandler : IExceptionHandler
     {

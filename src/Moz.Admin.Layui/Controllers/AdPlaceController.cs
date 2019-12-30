@@ -1,6 +1,6 @@
 ﻿using System;﻿
 using Microsoft.AspNetCore.Mvc;
-using Moz.Administration.Common;
+using Moz.Admin.Layui.Common;
 using Moz.Biz.Services.Ads;
 using Moz.Exceptions;
 

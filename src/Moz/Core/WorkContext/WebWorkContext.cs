@@ -13,7 +13,7 @@ namespace Moz.Core.WorkContext
 {
     public class WebWorkContext : IWorkContext
     {
-        private readonly IAuthService _authenticationService;
+        private readonly IAuthService _authService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDistributedCache _distributedCache;
         private readonly ILanguageService _languageService;
@@ -22,12 +22,12 @@ namespace Moz.Core.WorkContext
         //private SimpleMember _cacheMember;
 
         public WebWorkContext(IHttpContextAccessor httpContextAccessor,
-            IAuthService authenticationService,
+            IAuthService authService,
             IDistributedCache distributedCache,
             ILanguageService languageService)
         {
             _httpContextAccessor = httpContextAccessor;
-            _authenticationService = authenticationService;
+            _authService = authService;
             _distributedCache = distributedCache;
             _languageService = languageService;
         }
@@ -36,9 +36,9 @@ namespace Moz.Core.WorkContext
         {
             get
             {
-                var memberId = _authenticationService.GetAuthenticatedUserId();
-                if (memberId <= 0) return null;
-                var member = _distributedCache.GetOrSet($"cache_member_{memberId}", () => _authenticationService.GetAuthenticatedMember());
+                var uId = _authService.GetAuthenticatedUId();
+                if (uId.IsNullOrEmpty()) return null;
+                var member = _distributedCache.GetOrSet($"cache_member_{uId}", () => _authService.GetAuthenticatedMember());
                 return member;
             }
         }

@@ -6,10 +6,10 @@ using System.DrawingCore.Imaging;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using Moz.Administration.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Moz.Admin.Layui.Common;
 
 namespace Moz.Administration.Controllers
 {

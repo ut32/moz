@@ -3,19 +3,10 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using AspectCore.Configuration;
-using AspectCore.DynamicProxy.Parameters;
-using AspectCore.Extensions.DependencyInjection;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 using Microsoft.Extensions.Configuration;
@@ -23,8 +14,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Moz.Aop.Filters;
-using Moz.Aop.Interceptor;
 using Moz.Auth.Attributes;
 using Moz.Auth.Handlers;
 using Moz.CMS.Services.Settings;
@@ -41,6 +30,7 @@ using Moz.Utils.FileManager;
 using Moz.Utils.Types;
 using Moz.Validation;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
 {
     
@@ -99,40 +89,23 @@ namespace Microsoft.Extensions.DependencyInjection
                     policy => { policy.Requirements.Add(new MemberAuthorizationHandler()); });
             });
 
-            services.AddAuthentication().AddJwtBearer(MozAuthAttribute.MozAuthorizeSchemes, cfg =>
-            {
-                cfg.RequireHttpsMetadata = false;
-                cfg.SaveToken = true;
-
-                cfg.TokenValidationParameters = new TokenValidationParameters
+            services.AddAuthentication()
+                .AddJwtBearer(MozAuthAttribute.MozAuthorizeSchemes, cfg =>
                 {
-                    ValidIssuer = "https://136cc.com",
-                    ValidAudience = "moz_application",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(mozOptions.EncryptKey))
-                };
-                cfg.Events = new JwtBearerEvents
-                {
-                    OnAuthenticationFailed = o => throw new MozException("auth failure", 401)
-                };
-            });
+                    cfg.RequireHttpsMetadata = false;
+                    cfg.SaveToken = true;
 
-
-            //添加分布式缓存
-            //var distributionModel = mozOptions?.DistributionOption?.Model;
-            if (false)
-            {
-                /*
-                services.AddDistributedRedisCache(options =>
-                {
-                    options.Configuration = configuration["redis:connectionString"];
-                    options.InstanceName = configuration["redis:instanceName"];
+                    cfg.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidIssuer = "https://ut32.com",
+                        ValidAudience = "moz_application",
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(mozOptions.EncryptKey))
+                    };
+                    cfg.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = o => throw new AlertException("auth failure")
+                    };
                 });
-                */
-            }
-            else
-            {
-                //services.AddDistributedMemoryCache();
-            }
 
             //Session会话
             services.AddSession(options =>
@@ -142,93 +115,46 @@ namespace Microsoft.Extensions.DependencyInjection
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
             });
 
-            //services.AddSignalR();
-            /*
-            services.AddSwaggerGen(c =>
-            {
-                ///var provider = services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
-
-                c.SwaggerDoc("v1", new Info {Title = "My API", Version = "1.0"});
-                c.SwaggerDoc("v2", new Info {Title = "My API", Version = "2.0"});
-                // add a custom operation filter which sets default values
-                //c.OperationFilter<SwaggerDefaultValues>();
-
-                // integrate xml comments
-                //c.IncludeXmlComments( XmlCommentsFilePath );
-            });
-            
-            services.AddVersionedApiExplorer(
-                options =>
+            //添加MVC
+            services.AddMvc(options =>
                 {
-                    // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
-                    // note: the specified format code will format the version as "'v'major[.minor][-status]"
-                    options.GroupNameFormat = "'v'VVV";
-
-                    // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
-                    // can also be used to control the format of the API version in route templates
-                    //options.SubstituteApiVersionInUrl = true;
-                });
-            services.AddApiVersioning(option =>
-            {
-                //reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
-                option.ReportApiVersions = false;
-                option.AssumeDefaultVersionWhenUnspecified = true;
-                option.DefaultApiVersion = new ApiVersion(1, 0);
-            });
-            */
-
-            services.AddMvc(config =>
-                {
-                    if (mozOptions.IsEnablePerformanceMonitor)
-                    {
-                        config.Filters.Add(typeof(PerformanceMonitorFilter));
-                    }
-
-                    config.Filters.Add(typeof(SearchExceptionHandlerFilter));
+                    
                 })
                 .AddRazorRuntimeCompilation()
                 .AddJsonOptions(options =>
                 {
-                    options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
-                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                    //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-                    //options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+                    options.JsonSerializerOptions.PropertyNamingPolicy = null;
                 })
-                .AddFluentValidation(config =>
+                .AddFluentValidation(options =>
                 {
-                    config.ImplicitlyValidateChildProperties = true;
-                    config.ValidatorFactoryType = typeof(MozValidatorFactory);
-                    config.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+                    options.ImplicitlyValidateChildProperties = true;
+                    options.ValidatorFactoryType = typeof(MozValidatorFactory);
+                    options.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
                 });
-                //.AddMvcRazorRuntimeCompilation()
-                //.SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-                services.AddApiVersioning(o => {
-                    o.ReportApiVersions = true;
-                    o.AssumeDefaultVersionWhenUnspecified = true;
-                    o.DefaultApiVersion = new ApiVersion(1, 0);
-                });
+
+
+            services.AddApiVersioning(o =>
+            {
+                o.ReportApiVersions = true;
+                o.AssumeDefaultVersionWhenUnspecified = true;
+                o.DefaultApiVersion = new ApiVersion(1, 0);
+            });
 
             #region 依赖注入
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.TryAddTransient<IWorkContext, WebWorkContext>();
-            services.TryAddSingleton<IFileManager,FileManager>();
+            services.TryAddSingleton<IFileManager, FileManager>();
             services.TryAddTransient<HttpContextHelper>();
+            services.TryAddSingleton<IEventPublisher, DefaultEventPublisher>();
 
-            if (""?.Equals("redis", StringComparison.OrdinalIgnoreCase) ?? false)
-            {
-                services.TryAddSingleton<IEventPublisher, RedisEventPublisher>();
-            }
-            else
-            {
-                services.TryAddSingleton<IEventPublisher, DefaultEventPublisher>();
-            }
 
             //注入服务类 查找所有Service结尾的类进行注册
             var allServiceInterfaces = TypeFinder.GetAllTypes()
-                .Where(t => (t?.IsInterface ?? false) && !t.IsDefined<IgnoreRegisterAttribute>(false)  && t.Name.EndsWith("Service"));
+                .Where(t => (t?.IsInterface ?? false) && !t.IsDefined<IgnoreRegisterAttribute>(false) &&
+                            t.Name.EndsWith("Service"));
             foreach (var serviceInterface in allServiceInterfaces)
             {
                 var service = TypeFinder.FindClassesOfType(serviceInterface.Type)?.FirstOrDefault();
@@ -243,7 +169,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.TryAddTransient(settingType.Type, o => settingService.LoadSetting(settingType.Type));
 
 
-            //event consumers
+            //事件发布
             var consumerTypes = TypeFinder.FindClassesOfType(typeof(ISubscriber<>)).ToList();
             foreach (var consumerType in consumerTypes)
             {
@@ -265,35 +191,19 @@ namespace Microsoft.Extensions.DependencyInjection
             var startupConfigurations = TypeFinder.FindClassesOfType<IMozStartup>();
 
             //添加嵌入cshtml资源
-            /*
-            services.Configure<RazorViewEngineOptions>(options =>
+            services.Configure<MvcRazorRuntimeCompilationOptions>(options =>
             {
                 foreach (var cfg in startupConfigurations)
                     options.FileProviders.Add(new EmbeddedFileProvider(cfg.Type.GetTypeInfo().Assembly));
-            });
-            */
-            
-            services.Configure<MvcRazorRuntimeCompilationOptions>(options =>
-            {
-               foreach (var cfg in startupConfigurations)
-                  options.FileProviders.Add(new EmbeddedFileProvider(cfg.Type.GetTypeInfo().Assembly));
             });
 
             //执行各个模块的启动类
             var instances = startupConfigurations
                 .Select(startup => (IMozStartup) Activator.CreateInstance(startup.Type))
                 .OrderBy(startup => startup.Order);
-            foreach (var instance in instances) 
+            foreach (var instance in instances)
                 instance.ConfigureServices(services, configuration, mozOptions);
 
-
-            //AOP拦截
-            /*
-            services.ConfigureDynamicProxy(config =>
-            {
-                config.Interceptors.AddTyped<ValidateInterceptorAttribute>(Predicates.ForService("*Service"));
-            });
-            */
             return services.BuildServiceProvider();
         }
     }

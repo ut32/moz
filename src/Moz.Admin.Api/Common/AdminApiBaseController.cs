@@ -7,9 +7,9 @@ namespace Moz.Admin.Api.Common
     //[ExceptionHandler(typeof(MyExceptionHandler))] 
     //[ValidationFilter]
     [ApiAdminRoute]
-    [ApiActionFilter]
+    [TypeFilter(typeof(ApiActionFilterAttribute))]
     public class AdminApiBaseController : ApiBaseController
     {
-        
+
     }
 }

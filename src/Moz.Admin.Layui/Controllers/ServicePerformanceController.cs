@@ -1,7 +1,7 @@
 ﻿using System;﻿
 using Microsoft.AspNetCore.Mvc;
+using Moz.Admin.Layui.Common;
 using Moz.Exceptions;
-using Moz.Administration.Common;
 using Moz.Auth;
 using Moz.Auth.Attributes;
 using Moz.Bus.Models.Common;

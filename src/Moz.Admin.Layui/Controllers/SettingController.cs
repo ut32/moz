@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
-using Moz.Administration.Common;
+using Moz.Admin.Layui.Common;
 using Moz.Administration.Models.Settings;
 using Moz.CMS.Model.Configuration;
 using Moz.CMS.Services.Settings;

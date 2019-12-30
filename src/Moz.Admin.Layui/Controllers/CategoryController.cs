@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Moz.Administration.Common;
+using Moz.Admin.Layui.Common;
 using Moz.Administration.Models.AdminMenus;
 using Moz.Biz.Dtos.Categories;
 using Moz.Biz.Services.Categories;

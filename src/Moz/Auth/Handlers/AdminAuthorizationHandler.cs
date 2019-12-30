@@ -5,8 +5,10 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using Moz.Auth.Attributes;
 using Moz.Bus.Models.Members;
 using Moz.CMS.Models.Members;
@@ -16,44 +18,23 @@ namespace Moz.Auth.Handlers
 {
     internal class AdminAuthorizationHandler : AuthorizationHandler<AdminAuthorizationHandler>, IAuthorizationRequirement
     {
-        private static readonly ConcurrentDictionary<string, List<AdminAuthAttribute>> AllPermissions
-            = new ConcurrentDictionary<string, List<AdminAuthAttribute>>();
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="context"></param>
         /// <param name="requirement"></param>
         /// <returns></returns>
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
-            AdminAuthorizationHandler requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,AdminAuthorizationHandler requirement)
         {
-            //获取所有permission标签
-            if (!((context.Resource as AuthorizationFilterContext)?.ActionDescriptor is ControllerActionDescriptor
-                action))
+            if (!(context.Resource is Endpoint endpoint))
             {
                 context.Fail();
                 return Task.CompletedTask;
             }
 
-            List<AdminAuthAttribute> attributes = null;
-            if (AllPermissions.ContainsKey(action.DisplayName))
-            {
-                attributes = AllPermissions[action.DisplayName];
-            }
-            else
-            {
-                attributes = new List<AdminAuthAttribute>();
-                //从类上读取                                                           
-                var types = new List<Type> {action.ControllerTypeInfo.UnderlyingSystemType};
-                GetAllTypes(action.ControllerTypeInfo.UnderlyingSystemType, types);
-                foreach (var type in types) attributes.AddRange(GetAttributes(type));
-                //从方法上读取
-                attributes.AddRange(GetAttributes(action.MethodInfo));
-                AllPermissions[action.DisplayName] = attributes;
-            }
-
-            if (attributes == null || !attributes.Any())
+            //获取所有permission标签
+            var attributes = endpoint.Metadata.GetOrderedMetadata<AdminAuthAttribute>();
+            if (!attributes.Any())
             {
                 context.Succeed(requirement);
                 return Task.CompletedTask;
@@ -102,38 +83,17 @@ namespace Moz.Auth.Handlers
             return !allRoles.Any() || allRoles.Any(member.InRole);
         }
 
-        private bool CheckPermission(SimpleMember member, IReadOnlyCollection<AdminAuthAttribute> attributes)
+        private bool CheckPermission(SimpleMember member, IEnumerable<AdminAuthAttribute> attributes)
         {
-            var allPermissions = attributes.Where(t => !t.Permissions.IsNullOrEmpty()).SelectMany(t =>
-            {
-                var permissionNameAry = new[] {t.Permissions};
-                if (t.Permissions.Contains(",")) permissionNameAry = t.Permissions.Split(",");
-                return permissionNameAry;
-            }).ToList();
+            var allPermissions = attributes
+                .Where(t => !t.Permissions.IsNullOrEmpty())
+                .SelectMany(t =>
+                {
+                    var permissionNameAry = new[] {t.Permissions};
+                    if (t.Permissions.Contains(",")) permissionNameAry = t.Permissions.Split(",");
+                    return permissionNameAry;
+                }).ToList();
             return allPermissions.All(member.HasPermission);
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="list"></param>
-        private void GetAllTypes(Type type, List<Type> list)
-        {
-            var baseType = type.BaseType;
-            if (baseType != null)
-            {
-                list.Add(baseType);
-                GetAllTypes(baseType, list);
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="memberInfo"></param>
-        /// <returns></returns>
-        private static IEnumerable<AdminAuthAttribute> GetAttributes(MemberInfo memberInfo)
-        {
-            return memberInfo.GetCustomAttributes(typeof(MozAuthAttribute), false).Cast<AdminAuthAttribute>();
         }
     }
 }

@@ -41,9 +41,10 @@ namespace Microsoft.AspNetCore.Builder
             {
                 application.UseExceptionHandler("/error/500");
             }
-
+            
+/*
             application.UseMiddleware<ErrorHandlingMiddleware>();
-            /*
+
             application.UseStatusCodePages(async context =>
             {
                 if (context.HttpContext.Request.IsAjaxRequest()
@@ -82,6 +83,7 @@ namespace Microsoft.AspNetCore.Builder
                 }
             });
             */
+            
             application.UseMiddleware<JwtInHeaderMiddleware>();
             
             
@@ -90,43 +92,36 @@ namespace Microsoft.AspNetCore.Builder
                 application.UseTaskSchedule();
             
             application.UseMozStaticFiles();
+            
             application.UseAuthentication();
+            
+            application.UseSession();
 
-            //注入自定义startup
-            //获取所有的 IMozStartup
+            application.UseRouting();
+
+            application.UseAuthorization();
+
+            //获取所有的 IMozStartup,执行各个模块的启动类
             var startupConfigurations = TypeFinder.FindClassesOfType<IMozStartup>();
-
-            //执行各个模块的启动类
             var instances = startupConfigurations
                 .Select(startup => (IMozStartup)Activator.CreateInstance(startup.Type))
                 .OrderBy(startup => startup.Order);
-            foreach (var instance in instances) instance.Configure(application, env);
-
-            //application.UseCors("AllowAll");
-            application.UseSession();
-            //application.UseSignalR(routes => { routes.MapHub<GameHub>("/gameHub"); });
-            /*
-            application.UseSwagger();
-            application.UseSwaggerUI(t =>
+            foreach (var instance in instances) 
+                instance.Configure(application, env);
+            
+            application.UseEndpoints(endpoints =>
             {
-                //t.RoutePrefix = "api";
-                var provider = EngineContext.Current.Resolve<IApiVersionDescriptionProvider>();
-                 
-                // build a swagger endpoint for each discovered API version
-                foreach ( var description in provider.ApiVersionDescriptions )
-                {
-                    t.SwaggerEndpoint( $"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant() );
-                }
+                endpoints.MapControllerRoute("area", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
-            */
-            //application.UseMozMvc();
-            /*
+            
             application.Run(context =>
             {
                 context.Response.StatusCode = 404;
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             });
-            */
         }
 
         private static void UseTaskSchedule(this IApplicationBuilder application)
@@ -136,44 +131,17 @@ namespace Microsoft.AspNetCore.Builder
 
         private static void UseMozStaticFiles(this IApplicationBuilder application)
         {
-            application.UseStaticFiles(new StaticFileOptions
-            {
-                OnPrepareResponse = context =>
-                {
-                    if (!string.IsNullOrEmpty(context.Context.Request.Query["v"]))
-                    {
-                        var headers = context.Context.Response.GetTypedHeaders();
-                        headers.CacheControl = new CacheControlHeaderValue()
-                        {
-                            Public = true,
-                            MaxAge = TimeSpan.FromSeconds(31536000)
-                        };
-                        headers.Expires = DateTime.UtcNow.AddYears(1);
-                    }
-                }
-            });
-
-            var assemblies = DependencyContext.Default.RuntimeLibraries
-                .Where(t => t.Dependencies.Any(x => x.Name.Equals("Moz", StringComparison.OrdinalIgnoreCase)))
+            application.UseStaticFiles();
+  
+            var assemblies = DependencyContext.Default.CompileLibraries
+                .Where(t => t.Dependencies.Any(x => "moz".Equals(x.Name, StringComparison.OrdinalIgnoreCase)))
                 .Select(t => Assembly.Load(t.Name)).ToList();
             foreach (var assembly in assemblies)
             {
-                IFileProvider fileProvider = new EmbeddedFileProvider(assembly);
+                var fileProvider = new EmbeddedFileProvider(assembly);
                 application.UseStaticFiles(new StaticFileOptions {FileProvider = fileProvider});
             }
         }
-
-        private static void UseMozMvc(this IApplicationBuilder application)
-        {
-            application.UseMvc(routes =>
-            {
-                routes.MapRoute("areaRoute",
-                    "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-
-                routes.MapRoute(
-                    "default",
-                    "{controller=Home}/{action=Index}/{id?}");
-            });
-        }
+        
     }
 }

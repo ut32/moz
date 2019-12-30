@@ -8,13 +8,17 @@ namespace Moz.Auth
     public interface IAuthService
     {
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         SimpleMember GetAuthenticatedMember();
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        long GetAuthenticatedUserId();
+        string GetAuthenticatedUId();
 
 
         /// <summary>
@@ -32,14 +36,14 @@ namespace Moz.Auth
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        ApiResult<LoginAuthResult> LoginWithUsernamePassword(LoginWithUsernamePasswordRequest request);
+        MemberLoginResult LoginWithUsernamePassword(MemberLoginRequest request);
 
         /// <summary>
         /// 三方授权登录
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        ApiResult<LoginAuthResult> ExternalAuth(ExternalAuthRequest request);
+        MemberLoginResult ExternalAuth(ExternalAuthRequest request);
 
 
         void SetAuthCookie(string token);

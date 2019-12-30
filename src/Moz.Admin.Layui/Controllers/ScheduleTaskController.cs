@@ -2,7 +2,7 @@
 using System.Dynamic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Moz.Administration.Common;
+using Moz.Admin.Layui.Common;
 using Moz.Auth;
 using Moz.Auth.Attributes;
 using Moz.Biz.Dtos.ScheduleTasks;

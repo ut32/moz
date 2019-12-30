@@ -2,14 +2,23 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
+using Moz.Exceptions;
 
 namespace Moz.WebApi
 {
     public class ApiActionFilterAttribute:ActionFilterAttribute
     {
+        private readonly ILogger<ApiActionFilterAttribute> _logger;
+        public ApiActionFilterAttribute(ILogger<ApiActionFilterAttribute> logger)
+        {
+            _logger = logger;
+        }
+
         public override void OnActionExecuted(ActionExecutedContext context)
         {
-            if (context.Exception == null)
+            var exception = context.Exception;
+            if (exception == null)
             {
                 if (context.Result is ObjectResult result)
                 {
@@ -29,41 +38,35 @@ namespace Moz.WebApi
             }
             else
             {
+                var errorCode = 600;
+                string errorMessage;
+                switch (exception)
+                {
+                    case AlertException alertException:
+                        errorCode = alertException.ErrorCode;
+                        errorMessage = alertException.Message;
+                        break;
+                    case FatalException fatalException:
+                        errorCode = fatalException.ErrorCode;
+                        errorMessage = fatalException.Message;
+                        _logger.LogError(errorMessage,exception);
+                        break;
+                    default:
+                        errorCode = 20000;
+                        errorMessage = context.Exception.Message;
+                        _logger.LogError(errorMessage,exception);
+                        break;
+                }
+                
                 context.Result = new JsonResult(new
                 {
-                    Code = 1000,
-                    Message = context.Exception.Message
+                    Code = errorCode,
+                    Message = errorMessage
                 });
                 context.ExceptionHandled = true;
             }
             base.OnActionExecuted(context);
         }
-
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            Console.WriteLine($"ApiActionFilterAttribute:OnActionExecuting:{context==null}");
-            base.OnActionExecuting(context);
-        }
-
-        public override void OnResultExecuting(ResultExecutingContext context)
-        {
-            Console.WriteLine($"ApiActionFilterAttribute:OnResultExecuting:{context}");
-
-            base.OnResultExecuting(context);
-        }
-
-        public override void OnResultExecuted(ResultExecutedContext context)
-        {
-            Console.WriteLine($"ApiActionFilterAttribute:OnResultExecuted:{context.Exception==null}");
-            base.OnResultExecuted(context);
-        }
-
-        public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
-        {
-            Console.WriteLine($"ApiActionFilterAttribute:OnActionExecutionAsync : ");
-            
-
-            return base.OnActionExecutionAsync(context, next);
-        }
+        
     }
 }

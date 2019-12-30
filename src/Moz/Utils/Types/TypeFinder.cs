@@ -52,31 +52,17 @@ namespace Moz.Utils.Types
 
                 var dc = DependencyContext.Default;
                 var libs = dc.CompileLibraries
-                    .Where(lib=> !lib.Type.Equals("package") && 
-                                 (("project".Equals(lib.Type) && !lib.Serviceable) || 
-                                 ("referenceassembly".Equals(lib.Type) 
-                                  && !lib.Serviceable 
-                                  && (lib.Name.Equals("Moz") || lib.Name.StartsWith("Moz."))))).ToList();
-                    
+                    .Where(lib=>
+                        "moz".Equals(lib.Name, StringComparison.OrdinalIgnoreCase) 
+                        || lib.Dependencies.Any(it=> "moz".Equals(it.Name, StringComparison.OrdinalIgnoreCase))).ToList();
                 
-
                 var entryReferencedAssembliesTypes = libs
                     .Select(t => Assembly.Load(t.Name))
                     .SelectMany(t => t.GetTypes())
-                    .Select(o => new TypeInfo {Guid = o.FullName.GetHashCode().ToString(), Type = o})
+                    .Select(o => new TypeInfo {Guid = o?.FullName?.GetHashCode().ToString(), Type = o})
                     .ToList();
-
-                //var ut = entryReferencedAssembliesTypes.Where(it => it.FullName.Contains("MingShiHui.Service")).ToList();
-
-                /*
-                var types = Assembly.Load("Moz")
-                    .GetTypes()
-                    .Select(o => new TypeInfo {Guid = o.FullName.GetHashCode().ToString(), Type = o})
-                    .ToList();
-                    */
 
                 result.AddRange(entryReferencedAssembliesTypes);
-                //result.AddRange(types);
 
                 GenericCache<TypeInfosList>.Instance = result;
             }

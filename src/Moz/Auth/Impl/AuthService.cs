@@ -68,13 +68,13 @@ namespace Moz.Auth.Impl
 
         public SimpleMember GetAuthenticatedMember()
         {
-            var uid = GetAuthenticatedUserId();
-            if (uid == 0)
+            var uid = GetAuthenticatedUId();
+            if (uid.IsNullOrEmpty())
             {
                 return null;
             }
             
-            var member = _memberService.GetSimpleMemberById(uid);
+            var member = _memberService.GetSimpleMemberByUId(uid);
             if (member == null) return null;
 
             if (!member.IsActive) return null;
@@ -85,21 +85,19 @@ namespace Moz.Auth.Impl
             return member;
         }
 
-        public long GetAuthenticatedUserId()
+        public string GetAuthenticatedUId()
         {
             var result = _httpContextAccessor
                 .HttpContext
                 .AuthenticateAsync(MozAuthAttribute.MozAuthorizeSchemes)
                 .GetAwaiter()
                 .GetResult();
-            if (!result?.Principal?.Identity?.IsAuthenticated??false) return 0;
+            if (!result?.Principal?.Identity?.IsAuthenticated??false) return null;
             
             var claim = result?.Principal?.Claims?.FirstOrDefault(o => o.Type == "jti");
-            if (claim == null || claim.Value.IsNullOrEmpty()) return 0;
+            if (claim == null || claim.Value.IsNullOrEmpty()) return null;
 
-            long.TryParse(claim.Value,out var uid);
-
-            return uid;
+            return claim.Value;
         }
 
         public bool AddRoleToMemberId(long memberId, long roleId, DateTime? expDatetime=null) 
@@ -126,10 +124,11 @@ namespace Moz.Auth.Impl
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ApiResult<LoginAuthResult> LoginWithUsernamePassword(LoginWithUsernamePasswordRequest request)
+        public MemberLoginResult LoginWithUsernamePassword(MemberLoginRequest request)
         {
             static LoginWithUsernamePasswordQueryableItem GetMember(string username)
             {
+                // ReSharper disable once ConvertToUsingDeclaration
                 using (var client = DbFactory.GetClient())
                 {
                     return client.Queryable<Member>()
@@ -148,44 +147,58 @@ namespace Moz.Auth.Impl
                 }
             }
             
-            if (request.Username.IsNullOrEmpty())
+            var memberLoginResult = new MemberLoginResult();
+            if (request.Username.IsNullOrEmpty()) 
             {
-                return new ApiErrorResult("用户名不能为空");
+                memberLoginResult.AddError("用户名不能为空");
+                return memberLoginResult;
             }
             
             if (request.Password.IsNullOrEmpty())
             {
-                return new ApiErrorResult("密码不能为空");
+                memberLoginResult.AddError("密码不能为空");
+                return memberLoginResult;
             }
 
             var member = GetMember(request.Username);
             if (member == null)
             {
-                return new ApiErrorResult("用户不存在");
+                memberLoginResult.AddError("用户不存在");
+                return memberLoginResult;
+            }
+
+            if (member.UId.IsNullOrEmpty())
+            {
+                memberLoginResult.AddError("用户UID为空");
+                return memberLoginResult;
             }
 
             if (member.IsDelete)
             {
-                return new ApiErrorResult("用户已删除");
+                memberLoginResult.AddError("用户已删除");
+                return memberLoginResult;
             }
 
             if (!member.IsActive)
             {
-                return new ApiErrorResult("用户未激活");
+                memberLoginResult.AddError("用户未激活");
+                return memberLoginResult;
             }
 
             if (member.CannotLoginUntilDate != null && member.CannotLoginUntilDate.Value > DateTime.UtcNow)
             {
-                return new ApiErrorResult("用户未解封，请等待");
+                memberLoginResult.AddError("用户未解封，请等待");
+                return memberLoginResult;
             }
 
             if (!PasswordsMatch(member.Password, member.PasswordSalt, request.Password))
             {
-                return new ApiErrorResult("密码错误");
+                memberLoginResult.AddError("密码错误");
+                return memberLoginResult;
             }
 
             var accessToken = _jwtService.GenerateJwtToken(member.UId);
-            return new LoginAuthResult
+            return new MemberLoginResult
             {
                 AccessToken = accessToken
             };
@@ -196,7 +209,7 @@ namespace Moz.Auth.Impl
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ApiResult<LoginAuthResult> ExternalAuth(ExternalAuthRequest request)
+        public MemberLoginResult ExternalAuth(ExternalAuthRequest request)
         {
             ExternalAuthentication externalAuthentication; 
             var memberUId = string.Empty;
@@ -270,7 +283,7 @@ namespace Moz.Auth.Impl
                         if (member.Avatar.IsNullOrEmpty() && !(request?.UserInfo?.Avatar?.IsNullOrEmpty() ?? true))
                         {
                             tran.Updateable<Member>()
-                                .SetColumns(it => new Member()
+                                .UpdateColumns(it => new Member()
                                 {
                                     Avatar = request.UserInfo.Avatar
                                 })
@@ -286,7 +299,7 @@ namespace Moz.Auth.Impl
             }
             
             var accessToken = _jwtService.GenerateJwtToken(memberUId);
-            return new LoginAuthResult
+            return new MemberLoginResult
             {
                 AccessToken = accessToken
             };

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Moz.Administration.Common;
 using Moz.Domain.Dtos.Members.Permissions;
 using Moz.Domain.Services.Members;
 using Microsoft.AspNetCore.Mvc;
+using Moz.Admin.Layui.Common;
 using Moz.Auth;
 using Moz.Auth.Attributes;
 using Moz.Bus.Services.Members;

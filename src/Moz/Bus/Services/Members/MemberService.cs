@@ -177,11 +177,11 @@ namespace Moz.Bus.Services.Members
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="uid"></param>
         /// <returns></returns>
-        public SimpleMember GetSimpleMemberById(long id)
+        public SimpleMember GetSimpleMemberByUId(string uid)
         {
-            SimpleMember GetSimpleMember(long newid)
+            SimpleMember GetSimpleMember(string newuid) 
             {
                 using (var client = DbFactory.GetClient())
                 {
@@ -197,7 +197,7 @@ namespace Moz.Bus.Services.Members
                         t.IsDelete,
                         t.Avatar,
                         t.CannotLoginUntilDate
-                    }).Single(t => t.Id == newid);
+                    }).Single(t => t.UId == newuid);
 
                     if (member == null)
                         return null;
@@ -217,14 +217,14 @@ namespace Moz.Bus.Services.Members
                     };
                 }
             }
-
-            var t1 = Task.Run(() => GetSimpleMember(id));
-            var t2 = Task.Run(() => GetAvailablePermissionsByMemeberId(id));
-            var t3 = Task.Run(() => GetAvailableRolesByMemberId(id));
-            Task.WaitAll(t1, t2, t3);
-
-            var simpleMember = t1.Result;
+            
+            var simpleMember =  GetSimpleMember(uid);
             if (simpleMember == null) return null;
+
+            var t2 = Task.Run(() => GetAvailablePermissionsByMemberId(simpleMember.Id));
+            var t3 = Task.Run(() => GetAvailableRolesByMemberId(simpleMember.Id));
+            Task.WaitAll(t2, t3);
+
             simpleMember.Roles = t3.Result ?? new List<Role>();
             simpleMember.Permissions = t2.Result ?? new List<Permission>();
 
@@ -426,17 +426,32 @@ namespace Moz.Bus.Services.Members
                         mr.MemberId == memberId
                         && (mr.ExpireDate == null || mr.ExpireDate != null && mr.ExpireDate > dt)
                         && r.IsActive)
-                    .Select((mr, r) => new Role
-                        {Id = r.Id, Code = r.Code, IsActive = r.IsActive, Name = r.Name, IsAdmin = r.IsAdmin})
-                    .ToList();
+                    .Select((mr, r) => new 
+                    {
+                        r.Id,
+                        r.Code,
+                        r.IsActive,
+                        r.Name,
+                        r.IsAdmin
+                    })
+                    .ToList()
+                    .Select(it=> new Role()
+                    {
+                        Code = it.Code,
+                        Id = it.Id,
+                        Name = it.Name,
+                        IsActive = it.IsActive,
+                        IsAdmin = it.IsAdmin
+                    });
             }
         }
+        
 
         /// <summary>
         /// </summary>
         /// <param name="memberId"></param>
         /// <returns></returns>
-        public IEnumerable<Permission> GetAvailablePermissionsByMemeberId(long memberId)
+        public IEnumerable<Permission> GetAvailablePermissionsByMemberId(long memberId)
         {
             var dt = DateTime.UtcNow;
             using (var client = DbFactory.GetClient())
@@ -452,7 +467,10 @@ namespace Moz.Bus.Services.Members
                         && (mr.ExpireDate == null || mr.ExpireDate != null && mr.ExpireDate > dt)
                         && p.IsActive)
                     .Select((mr, rp, p) =>
-                        new Permission {Id = p.Id, Code = p.Code, IsActive = p.IsActive, Name = p.Name})
+                        new
+                        {
+                            Id = p.Id, Code = p.Code, IsActive = p.IsActive, Name = p.Name
+                        })
                     .ToList();
 
                 var permissionsFromMember = client.Queryable<MemberPermission, Permission>((mp, p) =>
@@ -462,13 +480,24 @@ namespace Moz.Bus.Services.Members
                         })
                     .Where((mp, p) => mp.MemberId == memberId && p.IsActive)
                     .Select((mp, p) =>
-                        new Permission {Id = p.Id, Code = p.Code, IsActive = p.IsActive, Name = p.Name})
+                        new
+                        {
+                            p.Id, p.Code, p.IsActive, p.Name
+                        })
                     .ToList();
 
                 permissionsFromRoles.AddRange(permissionsFromMember);
-                return permissionsFromRoles.Distinct(new PermissionComparer()).ToList();
+                return permissionsFromRoles.Select(it => new Permission
+                {
+                    Code = it.Code,
+                    Id = it.Id,
+                    Name = it.Name,
+                    IsActive = it.IsActive
+                }).Distinct(new PermissionComparer()).ToList();
             }
         }
+
+        //GetAvailablePermissionsByMemberId
 
         /// <summary>
         /// </summary>

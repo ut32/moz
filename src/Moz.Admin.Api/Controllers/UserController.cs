@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Api.Common;
 using Moz.Admin.Api.Models.User;
+using Moz.Exceptions;
 using Moz.WebApi;
 
 namespace Moz.Admin.Api.Controllers
@@ -11,33 +12,10 @@ namespace Moz.Admin.Api.Controllers
     public class UserController:AdminApiBaseController
     {
 
-        [Route("login")]
-        [HttpPost]
-        public ApiResult<string> Login(ApiRequest<LoginReqModel> param)
-        {
-            return "登录成功";
-        }
-
-        [ApiActionFilter]
-        [Route("get")]
-        [ApiVersion("1")]
-        public ApiResult<int> Get()
-        {
-            throw new Exception("ss");
-        }
-        
-        
-        [Route("get")]
-        [ApiVersion("2")]
-        public ApiResult<string> GetV2()
-        {
-            return "v2";
-        }
-        
         [Route("get1")]
         public string GetName()
         {
-
+            throw Alert("没毛病");
             return "草了";
         }
         

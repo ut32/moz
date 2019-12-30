@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moz.Exceptions;
 using Moz.Validation;
 
-namespace Moz.Administration.Common
+namespace Moz.Admin.Layui.Common
 {
     [AdminArea]
     [ExceptionHandler(typeof(AdminExceptionHandler))]

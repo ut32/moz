@@ -1,8 +1,6 @@
-﻿using Moz.Auth;
-using Moz.Auth.Attributes;
-using Moz.Common;
+﻿using Moz.Auth.Attributes;
 
-namespace Moz.Administration.Common
+namespace Moz.Admin.Layui.Common
 {
     [AdminAuth(Permissions = "admin.access")]
     public class AdminAuthBaseController : AdminBaseController

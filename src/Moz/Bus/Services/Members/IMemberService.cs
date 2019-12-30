@@ -17,13 +17,13 @@ namespace Moz.Bus.Services.Members
         #region 会员管理
 
         /// <summary>
-        /// 获取用户信息
+        /// 
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="uid"></param>
         /// <returns></returns>
-        SimpleMember GetSimpleMemberById(long id);
+        SimpleMember GetSimpleMemberByUId(string uid); 
 
-        /// <summary>
+        /// <summary> 
         /// 重置密码
         /// </summary>
         /// <param name="request"></param>

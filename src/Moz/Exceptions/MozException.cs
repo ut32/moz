@@ -4,17 +4,12 @@ namespace Moz.Exceptions
 {
     public class MozException : Exception
     {
-        public MozException(string errorMessage)
-            : this(errorMessage, 1000)
-        {
-        }
-
         public MozException(string errorMessage, Exception innerException)
-            : this(errorMessage, 1000, innerException)
+            : this(errorMessage, 600, innerException)
         {
         }
 
-        public MozException(string errorMessage, int errorCode, Exception innerException = null)
+        public MozException(string errorMessage, int errorCode = 600, Exception innerException = null)
             : base(errorMessage, innerException)
         {
             ErrorCode = errorCode;

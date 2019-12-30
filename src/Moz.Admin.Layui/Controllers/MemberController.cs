@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc;
-using Moz.Administration.Common;
+using Moz.Admin.Layui.Common;
 using Moz.Administration.Models.Members;
 using Moz.Bus.Dtos.Members;
 using Moz.Bus.Dtos.Members.Roles;

@@ -1,14 +1,9 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Moz.Common;
-using Moz.Configuration;
 using Moz.Core;
 using Moz.Core.Options;
-using Moz.Utils;
 
-namespace Moz.Administration.Common
+namespace Moz.Admin.Layui.Common
 {
     public class AdminAreaAttribute : AreaAttribute
     {

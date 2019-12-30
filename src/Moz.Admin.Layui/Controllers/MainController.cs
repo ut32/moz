@@ -1,7 +1,8 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Moz.Administration.Common;
+using Moz.Admin.Layui.Common;
 using Moz.Administration.Models.Main;
+using Moz.Auth.Attributes;
 using Moz.Configuration;
 using Moz.Core;
 using Moz.Utils.Types;
@@ -16,7 +17,7 @@ namespace Moz.Admin.Layui.Controllers
         {
             _workContext = workContext;
         }
-
+        
         public IActionResult Index()
         {
             var settingTypeInfos = TypeFinder.FindClassesOfType<ISettings>();

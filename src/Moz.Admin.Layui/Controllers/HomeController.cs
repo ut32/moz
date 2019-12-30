@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Moz.Administration.Common;
+using Moz.Admin.Layui.Common;
 using Moz.Administration.Models.Members;
 using Moz.Auth;
 using Moz.Core.Options;
@@ -36,21 +37,21 @@ namespace Moz.Admin.Layui.Controllers
             return View(path);
         }
         
-        /*
+        
         [HttpPost]
         public IActionResult Index(LoginModel model)
         {
-            var resp = _passportService.LoginWithUsernamePassword(new LoginWithUsernamePasswordRequest()
+            var resp = _passportService.LoginWithUsernamePassword(new MemberLoginRequest()
             {
                 Username = model.Username,
                 Password = model.Password
             });
-            if(resp.Code!=0)
-                throw new MozException(resp.Message);
-            _passportService.SetAuthCookie(resp.Data.AccessToken);
+            if(resp.IsError)
+                throw new MozException(resp.Errors.FirstOrDefault());
+            _passportService.SetAuthCookie(resp.AccessToken);
             return RespJson(new{});
         }
-        */
+        
 
         [HttpGet]
         public IActionResult Logout()

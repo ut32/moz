@@ -5,6 +5,7 @@ using Moz.Core.Options;
 
 namespace Moz.Admin.Api.Common
 {
+    
     public class ApiAdminRouteAttribute:RouteAttribute
     {
         private static readonly string AdminPath;

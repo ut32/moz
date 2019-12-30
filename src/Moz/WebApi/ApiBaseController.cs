@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Moz.Exceptions;
 using Moz.Validation;
 
 namespace Moz.WebApi
@@ -10,15 +11,24 @@ namespace Moz.WebApi
     [Route("[controller]")]
     public class ApiBaseController : ControllerBase
     {
-        protected ApiErrorResult ApiError(string message = "发生错误",int code = 500)
+        /// <summary>
+        /// 常规错误
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        protected AlertException Alert(string message)
         {
-            return new ApiErrorResult(message,code); 
-        }
-
-        protected ApiOkResult ApiOk()
-        {
-            return new ApiOkResult();
+            return new AlertException(message);
         }
         
+        /// <summary>
+        /// 致命错误
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        protected FatalException Fatal(string message)
+        {
+            return new FatalException(message);
+        }
     }
 }
