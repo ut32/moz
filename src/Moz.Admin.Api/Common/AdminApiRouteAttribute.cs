@@ -7,7 +7,7 @@ namespace Moz.Admin.Api.Common
 {
     
     public class ApiAdminRouteAttribute:RouteAttribute
-    {
+    {  
         private static readonly string AdminPath;
         public ApiAdminRouteAttribute() :  
             base($"{AdminPath}/api/v{{version:apiVersion}}/[controller]") 
