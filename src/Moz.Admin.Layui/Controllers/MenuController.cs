@@ -4,8 +4,7 @@ using Moz.Admin.Layui.Common;
 using Moz.Administration.Models.AdminMenus;
 using Moz.Auth;
 using Moz.Auth.Attributes;
-using Moz.CMS.Dtos.AdminMenus;
-using Moz.Domain.Dtos.AdminMenus;
+using Moz.Bus.Dtos.AdminMenus;
 using Moz.Domain.Services.AdminMenus;
 using Moz.Exceptions;
 
@@ -57,7 +56,7 @@ namespace Moz.Administration.Controllers
         }
         
         [AdminAuth(Permissions = "admin.menu.update")]
-        public IActionResult Update(Moz.Domain.Dtos.AdminMenus.GetAdminMenuDetailRequest request)
+        public IActionResult Update(GetAdminMenuDetailRequest request)
         {
             var adminMenu = _adminMenuService.GetAdminMenuDetail(request);
             if (adminMenu == null)
@@ -75,7 +74,7 @@ namespace Moz.Administration.Controllers
 
         [HttpPost]
         [AdminAuth(Permissions = "admin.menu.update")]
-        public IActionResult Update(Moz.Domain.Dtos.AdminMenus.UpdateAdminMenuRequest request)
+        public IActionResult Update(UpdateAdminMenuRequest request)
         {
             var resp = _adminMenuService.UpdateAdminMenu(request); 
             return RespJson(resp);
@@ -83,7 +82,7 @@ namespace Moz.Administration.Controllers
         
         [HttpPost]
         [AdminAuth(Permissions = "admin.menu.delete")]
-        public IActionResult Delete(Moz.Domain.Dtos.AdminMenus.DeleteAdminMenuRequest request)
+        public IActionResult Delete(DeleteAdminMenuRequest request)
         {
             var resp = _adminMenuService.DeleteAdminMenu(request);
             return RespJson(resp);

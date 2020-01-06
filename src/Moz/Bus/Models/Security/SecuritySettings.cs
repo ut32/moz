@@ -1,5 +1,4 @@
-﻿using Moz.CMS.Model.Configuration;
-using Moz.Configuration;
+﻿using Moz.Configuration;
 
 namespace Moz.Domain.Models.Security
 {

@@ -1,4 +1,4 @@
-﻿namespace Moz.CMS.Model.Localization
+﻿namespace Moz.Bus.Models.Localization
 {
     public interface ILocalizedEnum
     {

@@ -9,7 +9,6 @@ namespace Moz.Exceptions
         {
             ExceptionHandlerType = exceptionHandlerType;
         }
-
         public Type ExceptionHandlerType { get; }
     }
 }

@@ -2,7 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Moz.Biz.Dtos.ScheduleTasks;
-using Moz.Biz.Models.ScheduleTasks;
+using Moz.Bus.Dtos.ScheduleTasks;
+using Moz.Bus.Models.ScheduleTasks;
 using Moz.DataBase;
 using Moz.Events;
 using Moz.Exceptions;

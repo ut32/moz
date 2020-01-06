@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Moz.Bus.Models.Members;
-using Moz.CMS.Models.Members;
-using Moz.Models.Members;
 
 namespace Moz.Service.Messages
 {

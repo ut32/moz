@@ -118,7 +118,7 @@ namespace Microsoft.Extensions.DependencyInjection
             //添加MVC
             services.AddMvc(options =>
                 {
-                    
+                   
                 })
                 .AddRazorRuntimeCompilation()
                 .AddJsonOptions(options =>
@@ -150,7 +150,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<HttpContextHelper>();
             services.TryAddSingleton<IEventPublisher, DefaultEventPublisher>();
 
-
             //注入服务类 查找所有Service结尾的类进行注册
             var allServiceInterfaces = TypeFinder.GetAllTypes()
                 .Where(t => (t?.IsInterface ?? false) && !t.IsDefined<IgnoreRegisterAttribute>(false) &&
@@ -168,7 +167,18 @@ namespace Microsoft.Extensions.DependencyInjection
             foreach (var settingType in settingTypes)
                 services.TryAddTransient(settingType.Type, o => settingService.LoadSetting(settingType.Type));
 
-
+            //注入 ExceptionHandler
+            var exceptionHandlers = TypeFinder.FindClassesOfType(typeof(IExceptionHandler))
+                .Where(it=>it.Type!=typeof(ErrorHandlingMiddleware))
+                .ToList();
+            foreach (var exceptionHandler in exceptionHandlers)
+                services.TryAddSingleton(exceptionHandler.Type);
+            
+            //注入 StatusCodePageHandler
+            var statusCodePageHandlers = TypeFinder.FindClassesOfType(typeof(IStatusCodePageHandler)).ToList();
+            foreach (var statusCodePageHandler in statusCodePageHandlers)
+                services.TryAddSingleton(statusCodePageHandler.Type);
+            
             //事件发布
             var consumerTypes = TypeFinder.FindClassesOfType(typeof(ISubscriber<>)).ToList();
             foreach (var consumerType in consumerTypes)

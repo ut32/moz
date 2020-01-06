@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using Moz.Models.Common;
+using Moz.Bus.Models.Common;
 
 namespace Moz.Configuration
 {

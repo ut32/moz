@@ -1,15 +1,8 @@
-﻿using System;
-using System.Linq;
-using FluentValidation;
-using FluentValidation.Attributes;
-using Moz.Bus.Dtos;
+﻿using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
-using Moz.Domain.Dtos;
-using Moz.CMS.Dtos;
-using Moz.CMS.Dtos;
 using Moz.Validation;
 
-namespace Moz.Domain.Dtos.ServicePerformances
+namespace Moz.Bus.Dtos.ServicePerformances
 {
     /// <summary>
     /// tab_service_performance
@@ -25,7 +18,7 @@ namespace Moz.Domain.Dtos.ServicePerformances
     }
     
     
-    public class PagedQueryServicePerformanceResponse: PagedResult<QueryServicePerformanceItem>
+    public class PagedQueryServicePerformanceResponse: PagedList<QueryServicePerformanceItem>
     {
     
     }

@@ -3,15 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Caching.Distributed;
 using Moz.Bus.Models;
-using Moz.CMS.Models;
-using Moz.CMS.Model;
-using Moz.CMS.Model.Common;
-using Moz.CMS.Models;
+using Moz.Bus.Models.Common;
 using Moz.Events;
-using Moz.Service.Common;
 using Moz.Utils;
 
-namespace Moz.CMS.Services.Common
+namespace Moz.Bus.Services.Common
 {
     public class GenericAttributeService : IGenericAttributeService
     {

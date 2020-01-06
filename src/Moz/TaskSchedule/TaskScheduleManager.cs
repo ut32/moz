@@ -2,7 +2,7 @@
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
-using Moz.Biz.Models.ScheduleTasks;
+using Moz.Bus.Models.ScheduleTasks;
 using Moz.DataBase;
 using Quartz;
 using Quartz.Impl;

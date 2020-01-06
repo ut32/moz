@@ -1,13 +1,8 @@
 ﻿using System.Collections.Generic;
 using Moz.Bus.Models;
-using Moz.CMS.Models;
-using Moz.CMS.Model;
-using Moz.CMS.Model.Common;
-using Moz.CMS.Models;
-using Moz.Domain.Models;
-using Moz.Models.Common;
+using Moz.Bus.Models.Common;
 
-namespace Moz.Service.Common
+namespace Moz.Bus.Services.Common
 {
     public interface IGenericAttributeService
     {

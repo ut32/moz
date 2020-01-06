@@ -7,8 +7,7 @@ namespace Microsoft.AspNetCore.Http
     {
         public static bool IsAjaxRequest(this HttpRequest request)
         {
-            return request?.Headers != null 
-                   && "XMLHttpRequest".Equals(request.Headers["X-Requested-With"], StringComparison.OrdinalIgnoreCase);
+            return "XMLHttpRequest".Equals(request?.Headers["X-Requested-With"], StringComparison.OrdinalIgnoreCase);
         }
 
         public static bool IsJwtRequest(this HttpRequest request)

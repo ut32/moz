@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Moz.CMS.Dtos.AdminMenus
+namespace Moz.Bus.Dtos.AdminMenus
 {
     public class QueryChildrenByParentIdRequest
     {

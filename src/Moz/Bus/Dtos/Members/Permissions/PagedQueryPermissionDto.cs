@@ -1,11 +1,8 @@
 ﻿using FluentValidation.Attributes;
-using Moz.Bus.Dtos;
 using Moz.Bus.Services.Localization;
-using Moz.CMS.Dtos;
-using Moz.CMS.Dtos;
 using Moz.Validation;
 
-namespace Moz.Domain.Dtos.Members.Permissions
+namespace Moz.Bus.Dtos.Members.Permissions
 {
     /// <summary>
     /// tab_permission
@@ -21,7 +18,7 @@ namespace Moz.Domain.Dtos.Members.Permissions
     }
     
     
-    public class PagedQueryPermissionResponse: PagedResult<QueryPermissionItem>
+    public class PagedQueryPermissionResponse: PagedList<QueryPermissionItem>
     {
     
     }

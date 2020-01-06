@@ -1,6 +1,7 @@
 ﻿using System;﻿
 using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
+using Moz.Bus.Dtos.AdPlaces;
 using Moz.Bus.Services.Ads;
 using Moz.Exceptions;
 
@@ -23,7 +24,7 @@ namespace Moz.Administration.Controllers
         }
         
         //[AdminAuthorize(Permissions = "admin.adPlace.index")]
-        public IActionResult PagedList(Moz.Biz.Dtos.AdPlaces.PagedQueryAdPlaceRequest request)
+        public IActionResult PagedList(PagedQueryAdPlaceRequest request)
         {
             var list = _adService.PagedQueryAdPlaces(request);
             var result = new

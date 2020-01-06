@@ -1,10 +1,7 @@
-﻿using Moz.Bus.Models;
-using Moz.CMS.Models;
-using Moz.CMS.Model.Localization;
-using Moz.CMS.Models;
+﻿using Moz.Bus.Models.Localization;
 using SqlSugar;
 
-namespace Moz.CMS.Model.Configuration
+namespace Moz.Bus.Models.Configuration
 {
     /// <summary>
     ///     setting

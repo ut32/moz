@@ -7,7 +7,6 @@ using System.Xml;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Moz.Bus.Models.Localization;
-using Moz.CMS.Model.Localization;
 using Moz.Configuration;
 using Moz.Core;
 using Moz.DataBase;

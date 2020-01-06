@@ -1,4 +1,4 @@
-﻿namespace Moz.Models.Members
+﻿namespace Moz.Bus.Models.Members
 {
     public enum MemberLoginResults
     {

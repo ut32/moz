@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using FluentValidation.Attributes;
-using Moz.Biz.Models.ScheduleTasks;
 using Moz.Bus.Services.Localization;
 using Moz.Validation;
 

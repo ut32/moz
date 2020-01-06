@@ -14,6 +14,8 @@ namespace Moz.WebApi
         {
             _logger = logger;
         }
+        
+        
 
         public override void OnActionExecuted(ActionExecutedContext context)
         {

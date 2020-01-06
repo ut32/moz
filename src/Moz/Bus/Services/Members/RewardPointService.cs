@@ -1,9 +1,7 @@
 ﻿using System;
 using Moz.Bus.Models.Members;
-using Moz.CMS.Models.Members;
 using Moz.Common;
 using Moz.Events;
-using Moz.Models.Members;
 using Moz.Utils;
 
 namespace Moz.Core.Service.Members

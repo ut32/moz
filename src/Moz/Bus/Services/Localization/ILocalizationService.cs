@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Moz.Bus.Models.Localization;
-using Moz.CMS.Model.Localization;
 
 namespace Moz.Bus.Services.Localization
 {

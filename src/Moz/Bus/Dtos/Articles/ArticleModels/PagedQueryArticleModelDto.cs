@@ -1,11 +1,8 @@
 ﻿using FluentValidation.Attributes;
-using Moz.Bus.Dtos;
 using Moz.Bus.Services.Localization;
-using Moz.CMS.Dtos;
-using Moz.CMS.Dtos;
 using Moz.Validation;
 
-namespace Moz.Domain.Dtos.Articles.ArticleModels
+namespace Moz.Bus.Dtos.Articles.ArticleModels
 {
     /// <summary>
     /// tab_article_model
@@ -21,7 +18,7 @@ namespace Moz.Domain.Dtos.Articles.ArticleModels
     }
     
     
-    public class PagedQueryArticleModelResponse: PagedResult<QueryArticleModelItem>
+    public class PagedQueryArticleModelResponse: PagedList<QueryArticleModelItem>
     {
     
     }

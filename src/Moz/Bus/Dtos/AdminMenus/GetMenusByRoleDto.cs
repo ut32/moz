@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using FluentValidation;
-using Moz.Biz.Models.AdminMenus;
+using Moz.Bus.Models.AdminMenus;
 using Moz.Bus.Services.Localization;
 using Moz.Validation;
 
-namespace Moz.Domain.Dtos.AdminMenus
+namespace Moz.Bus.Dtos.AdminMenus
 {
     public class GetMenusByRoleRequest
     {

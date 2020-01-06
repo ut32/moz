@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Moz.Auth.Attributes;
 using Moz.Bus.Models.Members;
-using Moz.CMS.Models.Members;
 using Moz.Core;
 
 namespace Moz.Auth.Handlers

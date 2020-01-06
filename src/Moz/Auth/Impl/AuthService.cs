@@ -13,7 +13,6 @@ using Moz.Auth.Attributes;
 using Moz.Bus.Models.Common;
 using Moz.Bus.Models.Members;
 using Moz.Bus.Services.Members;
-using Moz.CMS.Models.Members;
 using Moz.Core.Options;
 using Moz.DataBase;
 using Moz.Exceptions;

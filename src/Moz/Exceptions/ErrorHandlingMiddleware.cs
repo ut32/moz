@@ -1,67 +1,60 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Moz.Bus.Dtos;
-using Moz.CMS.Dtos;
-using Moz.CMS.Dtos;
 using Moz.Exceptions;
 using Newtonsoft.Json;
 
 namespace Moz.Exceptions
 {
-    public class ErrorHandlingMiddleware
+    public class ErrorHandlingMiddleware:AbstractExceptionHandler<ErrorHandlingMiddleware>
     {
-        private readonly RequestDelegate next;
+        private readonly RequestDelegate _next;
+        private readonly ILogger<ErrorHandlingMiddleware> _logger;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ErrorHandlingMiddleware(RequestDelegate next)
+        public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger, IServiceProvider serviceProvider, IWebHostEnvironment webHostEnvironment)
+            :base(logger,webHostEnvironment)
         {
-            this.next = next;
+            _next = next;
+            _logger = logger;
+            _serviceProvider = serviceProvider;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public async Task Invoke(HttpContext context)
         {
             try
             {
-                await next(context);
+                await _next(context);
             }
             catch (System.Exception ex)
             {
-                await HandleExceptionAsync(context, ex);
+                var isExceptionHandled = await HandleExceptionAsync(context, ex);
+                if(isExceptionHandled == IsExceptionHandled.No)
+                   throw;
             }
         }
 
-        private Task HandleExceptionAsync(HttpContext context, System.Exception exception)
+        private new async Task<IsExceptionHandled> HandleExceptionAsync(HttpContext context, System.Exception exception)
         {
-            //context.Request.
-            var handler = context?.GetRouteData()?.Values["custom_exception_handler"];
-            if (handler != null && handler is IExceptionHandler exceptionHandler)
-                return exceptionHandler.HandleExceptionAsync(next, context, exception);
-
-            if ((context?.Request?.IsAjaxRequest() ?? false)
-                || (context?.Request?.Headers["Accept"].ToString()?.ToLower()?.Contains("application/json") ?? false))
+            var endpoint = context.GetEndpoint();
+            var exceptionHandlerAttribute = endpoint.Metadata.GetOrderedMetadata<ExceptionHandlerAttribute>().FirstOrDefault();
+            if (exceptionHandlerAttribute != null
+                && _serviceProvider.GetService(exceptionHandlerAttribute.ExceptionHandlerType) is IExceptionHandler exceptionHandler)
             {
-                var response = new BaseRespData();
-                if (exception is MozException myException)
-                {
-                    response.Code = myException.ErrorCode;
-                    response.Message = myException.Message;
-                }
-                else if (exception is MozAspectInvocationException aspectInvocationException)
-                {
-                    response.Code = aspectInvocationException.ErrorCode;
-                    response.Message = aspectInvocationException.ErrorMessage;
-                }
-                else
-                {
-                    response.Code = 999;
-                    response.Message = exception.Message;
-                }
-                var result = JsonConvert.SerializeObject(response);
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = 200;
-                return context.Response.WriteAsync(result);
+                return await exceptionHandler.HandleExceptionAsync(context, exception);
             }
-            return next(context);
+            else
+            {
+                return await base.HandleExceptionAsync(context, exception);
+            }
         }
     }
 }

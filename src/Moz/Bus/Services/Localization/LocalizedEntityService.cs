@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.Extensions.Caching.Distributed;
 using Moz.Bus.Models;
-using Moz.CMS.Model.Localization;
+using Moz.Bus.Models.Localization;
 using Moz.DataBase;
 using Moz.Utils;
 

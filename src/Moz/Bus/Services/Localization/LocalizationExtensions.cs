@@ -2,8 +2,8 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Moz.Bus.Models;
+using Moz.Bus.Models.Localization;
 using Moz.Bus.Models.Members;
-using Moz.CMS.Model.Localization;
 using Moz.CMS.Services.Settings;
 using Moz.Configuration;
 using Moz.Core;

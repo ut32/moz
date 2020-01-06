@@ -1,6 +1,5 @@
 ﻿using System;
 using Moz.Bus.Models.Members;
-using Moz.CMS.Models.Members;
 using Moz.WebApi;
 
 namespace Moz.Auth

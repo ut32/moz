@@ -1,9 +1,6 @@
-﻿using Moz.Bus.Models;
-using Moz.CMS.Model;
-using Moz.CMS.Models;
-using SqlSugar;
+﻿using SqlSugar;
 
-namespace Moz.Biz.Models.AdminMenus
+namespace Moz.Bus.Models.AdminMenus
 {
     [SugarTable("tab_admin_menu")]
     public class AdminMenu : BaseModel

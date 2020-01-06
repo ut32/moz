@@ -1,11 +1,9 @@
 ﻿using FluentValidation.Attributes;
-using Moz.Biz.Models.ScheduleTasks;
-using Moz.Bus.Dtos;
+using Moz.Bus.Models.ScheduleTasks;
 using Moz.Bus.Services.Localization;
-using Moz.CMS.Dtos;
 using Moz.Validation;
 
-namespace Moz.Biz.Dtos.ScheduleTasks
+namespace Moz.Bus.Dtos.ScheduleTasks
 {
     /// <summary>
     /// tab_schedule_task
@@ -21,7 +19,7 @@ namespace Moz.Biz.Dtos.ScheduleTasks
     }
     
     
-    public class PagedQueryScheduleTaskResponse: PagedResult<QueryScheduleTaskItem>
+    public class PagedQueryScheduleTaskResponse: PagedList<QueryScheduleTaskItem>
     {
     
     }

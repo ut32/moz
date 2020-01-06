@@ -1,4 +1,5 @@
 ﻿using Moz.Biz.Dtos.ScheduleTasks;
+using Moz.Bus.Dtos.ScheduleTasks;
 
 namespace Moz.CMS.Services.ScheduleTasks
 {

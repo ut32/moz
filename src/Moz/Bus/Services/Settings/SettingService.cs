@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Caching.Distributed;
-using Moz.CMS.Model.Configuration;
+using Moz.Bus.Models.Configuration;
 using Moz.Configuration;
 using Moz.DataBase;
 using Moz.Events;

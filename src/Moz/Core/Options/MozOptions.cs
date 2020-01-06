@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+using Moz.Exceptions;
 
 namespace Moz.Core.Options
 {
@@ -10,7 +13,7 @@ namespace Moz.Core.Options
             {
                 Path = "admin",
                 LoginView = "",
-                WelcomeView = ""
+                WelcomeView = "" 
             };
             
             Db = new List<DbOptions>();
@@ -41,5 +44,20 @@ namespace Moz.Core.Options
         /// 后台配置
         /// </summary>
         public AdminOptions Admin { get; }
+        
+        /// <summary>
+        /// 异常Http Code处理
+        /// </summary>
+        public Type StatusCodePageHandlerType { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void RegisterStatusCodePageHandler<T>()
+            where T:IStatusCodePageHandler
+        { 
+            StatusCodePageHandlerType = typeof(T);
+        }
+        
     }
 }

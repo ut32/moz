@@ -1,4 +1,4 @@
-﻿namespace Moz.Models.Common
+﻿namespace Moz.Bus.Models.Common
 {
     public enum FulltextSearchMode
     {

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using AspectCore.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -13,8 +14,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Moz.Aop.Middlewares;
 using Moz.Bus.Dtos;
-using Moz.CMS.Dtos;
-using Moz.CMS.Dtos;
 using Moz.Core;
 using Moz.Core.Options;
 using Moz.Exceptions;
@@ -29,8 +28,8 @@ namespace Microsoft.AspNetCore.Builder
     {
         public static void UseMoz(this IApplicationBuilder application,IWebHostEnvironment env)
         {
-            var options = EngineContext.Current.Resolve<IOptions<MozOptions>>()?.Value;
-            if(options==null)
+            var options = (application.ApplicationServices.GetService(typeof(IOptions<MozOptions>)) as IOptions<MozOptions>)?.Value;
+            if(options == null)
                 throw new ArgumentNullException(nameof (options));
             
             if (env.IsDevelopment())
@@ -41,51 +40,27 @@ namespace Microsoft.AspNetCore.Builder
             {
                 application.UseExceptionHandler("/error/500");
             }
-            
-/*
+
             application.UseMiddleware<ErrorHandlingMiddleware>();
 
             application.UseStatusCodePages(async context =>
             {
-                if (context.HttpContext.Request.IsAjaxRequest()
-                    || (context.HttpContext.Request.Headers["Accept"].ToString()?.ToLower()?.Contains("application/json") ?? false))
+                var registerType = options.StatusCodePageHandlerType;
+                if (registerType != null &&
+                    application.ApplicationServices.GetService(registerType) is IStatusCodePageHandler handler)
                 {
-                    var response = new BaseRespData()
-                    {
-                        Code = context.HttpContext.Response.StatusCode,
-                        Message = "发生错误"
-                    };
-                    var result = JsonConvert.SerializeObject(response);
-                    context.HttpContext.Response.ContentType = "application/json";
-                    context.HttpContext.Response.StatusCode = 200;
-                    await context.HttpContext.Response.WriteAsync(result);
+                    await handler.Process(context.HttpContext);
                 }
                 else
                 {
-                    var code = context.HttpContext.Response.StatusCode;
-                    context.HttpContext.Response.StatusCode = 200;
-                    var path = context.HttpContext.Request.Path.Value;
-                    if (code == 401 && "/chat".Equals(path, StringComparison.OrdinalIgnoreCase))
+                    if (application.ApplicationServices.GetService(typeof(MozStatusCodePageHandler)) is IStatusCodePageHandler mozHandler)
                     {
-                        context.HttpContext.Response.StatusCode = 401;
-                        var response = new BaseRespData()
-                        {
-                            Code = 401
-                        };
-                        context.HttpContext.Response.ContentType = "application/json";
-                        var result = JsonConvert.SerializeObject(response);
-                        await context.HttpContext.Response.WriteAsync(result);
-                    }
-                    else
-                    {
-                        context.HttpContext.Response.Redirect($"/error?code={code}&path={path}");
+                        await mozHandler.Process(context.HttpContext);
                     }
                 }
             });
-            */
             
             application.UseMiddleware<JwtInHeaderMiddleware>();
-            
             
             //定时任务
             if(options.IsEnableScheduling)

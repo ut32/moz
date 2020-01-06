@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Moz.Biz.Models.ScheduleTasks;
+using Moz.Bus.Models.ScheduleTasks;
 using Moz.DataBase;
 using Quartz;
 

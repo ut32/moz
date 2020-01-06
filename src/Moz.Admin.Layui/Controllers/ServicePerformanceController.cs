@@ -4,6 +4,7 @@ using Moz.Admin.Layui.Common;
 using Moz.Exceptions;
 using Moz.Auth;
 using Moz.Auth.Attributes;
+using Moz.Bus.Dtos.ServicePerformances;
 using Moz.Bus.Models.Common;
 using Moz.Bus.Services.ServicePerformances;
 using Moz.DataBase;
@@ -27,7 +28,7 @@ namespace Moz.Administration.Controllers
         }
         
         [AdminAuth(Permissions = "admin.performanceMonitor.index")]
-        public IActionResult PagedList(Moz.Domain.Dtos.ServicePerformances.PagedQueryServicePerformanceRequest request)
+        public IActionResult PagedList(PagedQueryServicePerformanceRequest request)
         {
             var list = _servicePerformanceService.PagedQueryServicePerformances(request);
             var result = new

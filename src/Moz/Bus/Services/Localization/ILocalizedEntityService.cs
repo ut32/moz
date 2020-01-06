@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using Moz.Bus.Models;
-using Moz.CMS.Model.Localization;
+using Moz.Bus.Models.Localization;
 
 namespace Moz.Bus.Services.Localization
 {

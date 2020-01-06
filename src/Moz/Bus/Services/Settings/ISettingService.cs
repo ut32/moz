@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Moz.CMS.Model.Configuration;
+using Moz.Bus.Models.Configuration;
 using Moz.Configuration;
 
 namespace Moz.CMS.Services.Settings

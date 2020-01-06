@@ -1,9 +1,6 @@
-using Moz.Bus.Models;
-using Moz.CMS.Models;
-using Moz.CMS.Models;
 using SqlSugar;
 
-namespace Moz.CMS.Model.Ad
+namespace Moz.Bus.Models.Ads
 {
     [SugarTable("tab_ad")]
     public class Ad:BaseModel

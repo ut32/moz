@@ -1,6 +1,4 @@
 ﻿using System;
-using Moz.CMS.Models;
-using Moz.CMS.Models.Members;
 using SqlSugar;
 
 namespace Moz.Bus.Models.Members

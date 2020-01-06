@@ -1,8 +1,7 @@
 ﻿using System;
-using Moz.Bus.Models;
 using SqlSugar;
 
-namespace Moz.CMS.Models.Members
+namespace Moz.Bus.Models.Members
 {
     /// <summary>
     ///     member_role

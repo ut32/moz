@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq.Expressions;
-using Moz.CMS.Model.Configuration;
 using Moz.CMS.Services.Settings;
 using Moz.Configuration;
 

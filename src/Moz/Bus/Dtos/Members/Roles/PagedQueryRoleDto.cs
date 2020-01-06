@@ -1,6 +1,5 @@
 ﻿using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
-using Moz.CMS.Dtos;
 using Moz.Validation;
 
 namespace Moz.Bus.Dtos.Members.Roles
@@ -19,7 +18,7 @@ namespace Moz.Bus.Dtos.Members.Roles
     }
     
     
-    public class PagedQueryRoleResponse: PagedResult<QueryRoleItem>
+    public class PagedQueryRoleResponse: PagedList<QueryRoleItem>
     {
     
     }

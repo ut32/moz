@@ -1,10 +1,7 @@
 ﻿using System;
-using Moz.Bus.Models;
-using Moz.CMS.Model;
-using Moz.CMS.Models;
 using SqlSugar;
 
-namespace Moz.Biz.Models.ScheduleTasks
+namespace Moz.Bus.Models.ScheduleTasks
 {
     public enum TaskRunningStatus
     {

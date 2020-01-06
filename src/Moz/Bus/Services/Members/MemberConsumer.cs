@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using Moz.Bus.Models.Members;
-using Moz.CMS.Models.Members;
 using Moz.Events;
 
 namespace Moz.Domain.Services.Members

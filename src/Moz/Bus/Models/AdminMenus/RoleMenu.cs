@@ -1,9 +1,6 @@
-﻿using Moz.Bus.Models;
-using Moz.CMS.Models;
-using Moz.CMS.Models;
-using SqlSugar;
+﻿using SqlSugar;
 
-namespace Moz.CMS.Model.AdminMenus
+namespace Moz.Bus.Models.AdminMenus
 {
     /// <summary>
     ///     role_permisson

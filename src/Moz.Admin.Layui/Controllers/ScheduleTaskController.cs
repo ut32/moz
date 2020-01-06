@@ -6,6 +6,7 @@ using Moz.Admin.Layui.Common;
 using Moz.Auth;
 using Moz.Auth.Attributes;
 using Moz.Biz.Dtos.ScheduleTasks;
+using Moz.Bus.Dtos.ScheduleTasks;
 using Moz.CMS.Services.ScheduleTasks;
 using Moz.Exceptions;
 using Moz.Utils.Types;

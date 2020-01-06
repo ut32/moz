@@ -1,9 +1,6 @@
-﻿using Moz.Bus.Models;
-using Moz.CMS.Model;
-using Moz.CMS.Models;
-using SqlSugar;
+﻿using SqlSugar;
 
-namespace Moz.Biz.Models.Categories
+namespace Moz.Bus.Models.Categories
 {
     [SugarTable("tab_category")]
     public class Category : BaseModel

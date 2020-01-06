@@ -1,6 +1,6 @@
 ﻿using Moz.Configuration;
 
-namespace Moz.CMS.Model.Localization
+namespace Moz.Bus.Models.Localization
 {
     public class LocalizationSettings : ISettings
     {

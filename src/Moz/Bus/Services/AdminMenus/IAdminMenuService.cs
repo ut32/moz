@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Moz.CMS.Dtos.AdminMenus;
+using Moz.Bus.Dtos.AdminMenus;
 using Moz.Common;
-using Moz.Domain.Dtos.AdminMenus;
 
 namespace Moz.Domain.Services.AdminMenus
 {

@@ -1,9 +1,8 @@
 using System;
-using Moz.Bus.Dtos;
 
-namespace Moz.CMS.Dtos
+namespace Moz.Bus.Dtos
 {
-    public class PagedResultBase : BaseRespData
+    public class PagedListBase
     {
         public int Page { get; set; }
         public int PageSize { get; set; }

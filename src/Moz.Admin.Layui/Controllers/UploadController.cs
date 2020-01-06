@@ -7,14 +7,14 @@ using Moz.Administration.Models;
 using Moz.Core;
 using Moz.Exceptions;
 
-namespace Moz.Administration.Controllers
+namespace Moz.Admin.Layui.Controllers
 {
     public class UploadController : AdminAuthBaseController
     {
-        private readonly IHostingEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
         private readonly IWorkContext _workContext;
 
-        public UploadController(IHostingEnvironment env, IWorkContext workContext)
+        public UploadController(IWebHostEnvironment env, IWorkContext workContext)
         {
             this._environment = env;
             this._workContext = workContext;

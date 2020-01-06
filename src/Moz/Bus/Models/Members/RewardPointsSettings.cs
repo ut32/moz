@@ -1,6 +1,6 @@
 ﻿using Moz.Configuration;
 
-namespace Moz.CMS.Models.Members
+namespace Moz.Bus.Models.Members
 {
     public class RewardPointsSettings : ISettings
     {

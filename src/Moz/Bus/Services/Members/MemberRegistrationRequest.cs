@@ -1,5 +1,4 @@
 ﻿using Moz.Bus.Models.Members;
-using Moz.CMS.Models.Members;
 
 namespace Moz.Core.Service.Members
 {

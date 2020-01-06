@@ -7,6 +7,8 @@ using Moz.Biz.Dtos.Articles;
 using Moz.Biz.Dtos.Articles.ArticleModels;
 using Moz.Biz.Services.Articles;
 using Moz.Biz.Services.Categories;
+using Moz.Bus.Dtos.Articles;
+using Moz.Bus.Dtos.Articles.ArticleModels;
 using Moz.Bus.Models.Articles;
 using Moz.DataBase;
 using Moz.Domain.Dtos.Articles.ArticleModels;

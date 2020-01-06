@@ -1,5 +1,6 @@
 ﻿using System;
 using AspectCore.DynamicProxy;
+using Moz.Bus.Dtos.ServicePerformances;
 using Moz.Bus.Models.Common;
 using Moz.DataBase;
 using Moz.Domain.Dtos.ServicePerformances;

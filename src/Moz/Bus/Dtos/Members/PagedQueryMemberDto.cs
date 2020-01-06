@@ -2,7 +2,6 @@
 using FluentValidation.Attributes;
 using Moz.Bus.Models.Members;
 using Moz.Bus.Services.Localization;
-using Moz.CMS.Dtos;
 using Moz.Validation;
 
 namespace Moz.Bus.Dtos.Members
@@ -21,7 +20,7 @@ namespace Moz.Bus.Dtos.Members
     }
     
     
-    public class PagedQueryMemberResponse: PagedResult<QueryMemberItem>
+    public class PagedQueryMemberResponse: PagedList<QueryMemberItem>
     {
     
     }

@@ -2,7 +2,6 @@
 using FluentValidation;
 using Moz.Bus.Models.Members;
 using Moz.Bus.Services.Localization;
-using Moz.CMS.Models.Members;
 using Moz.Validation;
 
 namespace Moz.Domain.Dtos.Members.Roles

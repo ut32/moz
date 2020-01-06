@@ -1,11 +1,9 @@
-﻿using System;
-using System.Linq;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
 using Moz.Validation;
 
-namespace Moz.Domain.Dtos.AdminMenus
+namespace Moz.Bus.Dtos.AdminMenus
 {
     /// <summary>
     /// tab_admin_menu

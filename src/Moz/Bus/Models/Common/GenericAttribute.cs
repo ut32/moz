@@ -1,9 +1,6 @@
-﻿using Moz.Bus.Models;
-using Moz.CMS.Models;
-using Moz.CMS.Models;
-using SqlSugar;
+﻿using SqlSugar;
 
-namespace Moz.CMS.Model.Common
+namespace Moz.Bus.Models.Common
 {
     /// <summary>
     ///     generic_attribute

@@ -1,7 +1,4 @@
 ﻿using Moz.Bus.Models;
-using Moz.CMS.Models;
-using Moz.CMS.Model;
-using Moz.CMS.Models;
 using Moz.Domain.Models;
 
 namespace Moz.Events

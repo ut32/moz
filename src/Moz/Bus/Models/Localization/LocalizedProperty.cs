@@ -1,9 +1,6 @@
-﻿using Moz.Bus.Models;
-using Moz.CMS.Models;
-using Moz.CMS.Models;
-using SqlSugar;
+﻿using SqlSugar;
 
-namespace Moz.CMS.Model.Localization
+namespace Moz.Bus.Models.Localization
 {
     /// <summary>
     ///     localized_property

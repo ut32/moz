@@ -4,7 +4,7 @@ using FluentValidation;
 using FluentValidation.Attributes;
 using Moz.Validation;
 
-namespace Moz.Domain.Dtos.AdminMenus
+namespace Moz.Bus.Dtos.AdminMenus
 {
     [Validator(typeof(CreateAdminMenuRequestValidator))]
     public class CreateAdminMenuRequest

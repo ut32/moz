@@ -1,15 +1,8 @@
-﻿using System;
-using System.Linq;
-using FluentValidation;
-using FluentValidation.Attributes;
-using Moz.Bus.Dtos;
+﻿using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
-using Moz.CMS.Dtos;
-using Moz.CMS.Dtos;
-using Moz.Domain.Dtos;
 using Moz.Validation;
 
-namespace Moz.Domain.Dtos.AdminMenus
+namespace Moz.Bus.Dtos.AdminMenus
 {
     /// <summary>
     /// tab_admin_menu
@@ -25,7 +18,7 @@ namespace Moz.Domain.Dtos.AdminMenus
     }
     
     
-    public class PagedQueryAdminMenuResponse: PagedResult<QueryAdminMenuItem>
+    public class PagedQueryAdminMenuResponse: PagedList<QueryAdminMenuItem>
     {
     
     }

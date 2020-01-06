@@ -1,7 +1,7 @@
 ﻿@using Microsoft.Extensions.Options
+@using Moz.Bus.Dtos.AdminMenus
 @using Moz.Core
 @using Moz.Core.Options
-@using Moz.Domain.Dtos.AdminMenus
 @using Moz.Domain.Services.AdminMenus
 @model Moz.Administration.Models.Main.IndexRspModel
 @inject IWorkContext WorkContext
@@ -86,6 +86,12 @@
                             <a href="javascript:;" zui-href="@Url.Action("index", "permission")" title="权限管理" zui-type="tab">
                                 <i class="layui-icon layui-icon-password"></i>
                                 <cite>权限管理</cite>
+                            </a>
+                        </dd>
+                        <dd>
+                            <a href="javascript:;" zui-href="@Url.Action("index", "member")" title="用户管理" zui-type="tab">
+                                <i class="layui-icon layui-icon-password"></i>
+                                <cite>用户管理</cite>
                             </a>
                         </dd>
                         <dd>

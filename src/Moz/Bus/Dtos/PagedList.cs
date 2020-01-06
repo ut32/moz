@@ -1,16 +1,14 @@
 using System.Collections.Generic;
-using Moz.CMS.Dtos;
 
 namespace Moz.Bus.Dtos
 {
-    public class PagedResult<T>:PagedResultBase
+    public class PagedList<T>:PagedListBase
     {
         public IList<T> List { get; set; }
 
-        public PagedResult()
+        public PagedList()
         {
             List = new List<T>();
         }
-        
     }
 }

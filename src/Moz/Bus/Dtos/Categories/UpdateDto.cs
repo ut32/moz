@@ -1,6 +1,6 @@
 using FluentValidation;
 using FluentValidation.Attributes;
-using Moz.Domain.Dtos.AdminMenus;
+using Moz.Bus.Dtos.AdminMenus;
 using Moz.Validation;
 
 namespace Moz.Biz.Dtos.Categories

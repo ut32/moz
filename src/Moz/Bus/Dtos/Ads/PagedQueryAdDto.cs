@@ -1,14 +1,8 @@
-﻿using System;
-using System.Linq;
-using FluentValidation;
-using FluentValidation.Attributes;
-using Moz.Bus.Dtos;
+﻿using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
-using Moz.CMS.Dtos;
-using Moz.CMS.Dtos;
 using Moz.Validation;
 
-namespace Moz.Biz.Dtos.Ads
+namespace Moz.Bus.Dtos.Ads
 {
     /// <summary>
     /// tab_ad
@@ -27,7 +21,7 @@ namespace Moz.Biz.Dtos.Ads
     }
     
     
-    public class PagedQueryAdResponse: PagedResult<QueryAdItem>
+    public class PagedQueryAdResponse: PagedList<QueryAdItem>
     {
     
     }

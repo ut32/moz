@@ -6,8 +6,6 @@ using Moz.Auth;
 using Moz.Bus.Models.Localization;
 using Moz.Bus.Models.Members;
 using Moz.Bus.Services.Localization;
-using Moz.CMS.Model.Localization;
-using Moz.CMS.Models.Members;
 
 namespace Moz.Core.WorkContext
 {

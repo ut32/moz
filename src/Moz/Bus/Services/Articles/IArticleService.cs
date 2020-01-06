@@ -1,5 +1,7 @@
 ﻿using Moz.Biz.Dtos.Articles;
 using Moz.Biz.Dtos.Articles.ArticleModels;
+using Moz.Bus.Dtos.Articles;
+using Moz.Bus.Dtos.Articles.ArticleModels;
 using Moz.Domain.Dtos.Articles;
 using Moz.Domain.Dtos.Articles.ArticleModels;
 

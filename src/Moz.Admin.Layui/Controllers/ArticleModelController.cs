@@ -6,6 +6,7 @@ using Moz.Auth;
 using Moz.Auth.Attributes;
 using Moz.Biz.Dtos.Articles.ArticleModels;
 using Moz.Biz.Services.Articles;
+using Moz.Bus.Dtos.Articles.ArticleModels;
 
 namespace Moz.Administration.Controllers
 {
@@ -26,7 +27,7 @@ namespace Moz.Administration.Controllers
         }
         
         [AdminAuth(Permissions = "admin.article.model.index")]
-        public IActionResult PagedList(Moz.Domain.Dtos.Articles.ArticleModels.PagedQueryArticleModelRequest request)
+        public IActionResult PagedList(PagedQueryArticleModelRequest request)
         {
             var list = _articleModelService.PagedQueryArticleModels(request);
             var result = new

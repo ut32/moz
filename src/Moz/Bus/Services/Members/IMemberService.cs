@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Moz.Biz.Dtos.Members;
 using Moz.Bus.Dtos.Members;
+using Moz.Bus.Dtos.Members.Permissions;
 using Moz.Bus.Dtos.Members.Roles;
 using Moz.Bus.Models.Members;
 using Moz.Domain.Dtos.Members.Permissions;

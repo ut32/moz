@@ -1,4 +1,5 @@
-﻿using Moz.Domain.Dtos.ServicePerformances;
+﻿using Moz.Bus.Dtos.ServicePerformances;
+using Moz.Domain.Dtos.ServicePerformances;
 
 namespace Moz.Bus.Services.ServicePerformances
 {

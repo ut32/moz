@@ -1,5 +1,6 @@
 ﻿using Moz.Biz.Dtos.AdPlaces;
 using Moz.Biz.Dtos.Ads;
+using Moz.Bus.Dtos.AdPlaces;
 using Moz.Bus.Dtos.Ads;
 
 namespace Moz.Bus.Services.Ads

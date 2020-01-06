@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
 using Moz.Auth;
 using Moz.Auth.Attributes;
+using Moz.Bus.Dtos.Members.Permissions;
 using Moz.Bus.Services.Members;
 using Moz.Exceptions;
 
@@ -30,7 +31,7 @@ namespace Moz.Administration.Controllers
         }
         
         [AdminAuth(Permissions = "admin.permission.index")]
-        public IActionResult PagedList(Moz.Domain.Dtos.Members.Permissions.PagedQueryPermissionRequest request)
+        public IActionResult PagedList(PagedQueryPermissionRequest request)
         {
             var list = _memberService.PagedQueryPermissions(request);
             var result = new

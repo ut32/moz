@@ -1,21 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
-using Newtonsoft.Json;
-using Moz.Administration.Models.Article.Model;
-using Moz.Auth;
 using Moz.Auth.Attributes;
-using Moz.CMS.Dtos;
 using Moz.Biz.Dtos.Articles;
 using Moz.Biz.Services.Articles;
-using Moz.Domain.Dtos;
+using Moz.Bus.Dtos.Articles;
 using Moz.Exceptions;
-using Moz.Presentation.Administration.Models.Articles;
 
-namespace Moz.Administration.Controllers
+namespace Moz.Admin.Layui.Controllers
 {
     public class ArticleController : AdminAuthBaseController
     {

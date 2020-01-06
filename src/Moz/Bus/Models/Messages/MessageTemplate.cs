@@ -1,11 +1,7 @@
-﻿using Moz.Bus.Models;
-using Moz.CMS.Models;
-using Moz.CMS.Model;
-using Moz.CMS.Model.Localization;
-using Moz.CMS.Models;
-using Moz.Domain.Models;
+﻿using Moz.Bus.Models.Localization;
+using Moz.Models.Messages;
 
-namespace Moz.Models.Messages
+namespace Moz.Bus.Models.Messages
 {
     public class MessageTemplate : BaseModel, ILocalizedEntity
     {
