@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 using Moz.Bus.Dtos;
 using Moz.Exceptions;
 using Newtonsoft.Json;
@@ -28,33 +31,82 @@ namespace Moz.Exceptions
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task Invoke(HttpContext context)
+        public Task Invoke(HttpContext context)
         {
+            ExceptionDispatchInfo edi;
             try
             {
-                await _next(context);
+                var task = _next(context);
+                if (!task.IsCompletedSuccessfully)
+                {
+                    return Awaited(this, context, task);
+                }
+                return Task.CompletedTask;
             }
             catch (System.Exception ex)
             {
-                var isExceptionHandled = await HandleExceptionAsync(context, ex);
-                if(isExceptionHandled == IsExceptionHandled.No)
-                   throw;
+                edi = ExceptionDispatchInfo.Capture(ex);
+            }
+            return HandleException(context, edi);
+
+            static async Task Awaited(ErrorHandlingMiddleware middleware, HttpContext context, Task task)
+            {
+                ExceptionDispatchInfo edi = null;
+                try
+                {
+                    await task;
+                }
+                catch (Exception exception)
+                {
+                    edi = ExceptionDispatchInfo.Capture(exception);
+                }
+
+                if (edi != null)
+                {
+                    await middleware.HandleException(context, edi);
+                }
             }
         }
-
-        private new async Task<IsExceptionHandled> HandleExceptionAsync(HttpContext context, System.Exception exception)
+        
+        private async Task HandleException(HttpContext context, ExceptionDispatchInfo edi)
         {
-            var endpoint = context.GetEndpoint();
-            var exceptionHandlerAttribute = endpoint.Metadata.GetOrderedMetadata<ExceptionHandlerAttribute>().FirstOrDefault();
-            if (exceptionHandlerAttribute != null
-                && _serviceProvider.GetService(exceptionHandlerAttribute.ExceptionHandlerType) is IExceptionHandler exceptionHandler)
+            if (context.Response.HasStarted)
             {
-                return await exceptionHandler.HandleExceptionAsync(context, exception);
+                edi.Throw();
             }
-            else
+            try
             {
-                return await base.HandleExceptionAsync(context, exception);
+                context.Response.Clear();
+                context.Response.OnStarting(ClearCacheHeaders, context.Response);
+
+                var endpoint = context.GetEndpoint();
+                var exceptionHandlerAttribute = endpoint.Metadata.GetOrderedMetadata<ExceptionHandlerAttribute>().FirstOrDefault();
+                if (exceptionHandlerAttribute != null
+                    && _serviceProvider.GetService(exceptionHandlerAttribute.ExceptionHandlerType) is IExceptionHandler exceptionHandler)
+                {
+                    await exceptionHandler.HandleExceptionAsync(context, edi.SourceException);
+                }
+                else
+                {
+                    await base.HandleExceptionAsync(context, edi.SourceException);
+                }
+                return;
             }
+            catch (Exception ex2)
+            {
+                // ignored
+            }
+            edi.Throw();
+        }
+
+        private static Task ClearCacheHeaders(object state)
+        {
+            var headers = ((HttpResponse)state).Headers;
+            headers[HeaderNames.CacheControl] = "no-cache";
+            headers[HeaderNames.Pragma] = "no-cache";
+            headers[HeaderNames.Expires] = "-1";
+            headers.Remove(HeaderNames.ETag);
+            return Task.CompletedTask;
         }
     }
 }

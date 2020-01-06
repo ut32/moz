@@ -36,10 +36,6 @@ namespace Microsoft.AspNetCore.Builder
             {
                 application.UseDeveloperExceptionPage();
             }
-            else
-            {
-                application.UseExceptionHandler("/error/500");
-            }
 
             application.UseMiddleware<ErrorHandlingMiddleware>();
 

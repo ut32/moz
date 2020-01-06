@@ -20,7 +20,7 @@ namespace Moz.Exceptions
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<IsExceptionHandled> HandleExceptionAsync(HttpContext context, Exception exception)
+        public async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             var isAjaxRequest = context.Request.IsAjaxRequest();
             var isAcceptJson = context.Request.Headers["Accept"]
@@ -56,30 +56,30 @@ namespace Moz.Exceptions
                 
             if (isAjaxRequest || isAcceptJson)
             {
-                return await this.OnApiCallAsync(context, res);
+                await this.OnApiCallAsync(context, res);
             }
             else
             {
-                return await this.OnPageCallAsync(context, res);
+                if (_webHostEnvironment.IsDevelopment())
+                {
+                    throw exception;
+                }
+                await OnPageCallAsync(context, res);
             }
         }
 
-        protected virtual async Task<IsExceptionHandled> OnApiCallAsync(HttpContext context, ExceptionResult result)
+        protected virtual async Task OnApiCallAsync(HttpContext context, ExceptionResult result)
         {
             context.Response.ContentType = "application/json;charset=utf-8"; 
             context.Response.StatusCode = 200;
             await context.Response.WriteAsync(JsonConvert.SerializeObject(result));
-            return IsExceptionHandled.Yes;
         }
         
-        protected virtual async Task<IsExceptionHandled> OnPageCallAsync(HttpContext context, ExceptionResult result)
+        protected virtual async Task OnPageCallAsync(HttpContext context, ExceptionResult result)
         {
-            if (_webHostEnvironment.IsDevelopment()) return IsExceptionHandled.No;
-            
             context.Response.ContentType = "text/html;charset=utf-8";
             context.Response.StatusCode = 200;
             await context.Response.WriteAsync($"错误:{result.Message}({result.Code})");
-            return IsExceptionHandled.Yes;
         }
     }
 }

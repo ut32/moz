@@ -6,6 +6,6 @@ namespace Moz.Exceptions
 {
     public interface IExceptionHandler
     {
-        Task<IsExceptionHandled> HandleExceptionAsync(HttpContext context, Exception exception);
+        Task HandleExceptionAsync(HttpContext context, Exception exception);
     }
 } 
