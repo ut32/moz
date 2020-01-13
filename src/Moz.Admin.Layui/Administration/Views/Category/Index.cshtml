@@ -21,7 +21,7 @@
         </div>
         <div class="layui-card-body">
             <div class="layui-btn-group">
-                <a class="layui-btn" href="javascript:;" zui-href="@Url.Action("add", "category")" zui-type="dialog" zui-width="800px" zui-height="400px" title="添加分类"><i class="layui-icon">&#xe654;</i> 添加</a>
+                <a class="layui-btn" href="javascript:;" zui-href="@Url.Action("create", "category")" zui-type="dialog" zui-width="800px" zui-height="400px" title="添加分类"><i class="layui-icon">&#xe654;</i> 添加</a>
                 <!--<a class="layui-btn" href="@Url.Action("", "")"  rel="ids" posttype="string" target="selectedTodo" title="确定要删除这些吗?"><i class="layui-icon">&#xe640;</i> 删除</a>-->
             </div>
             <table id="table_@(guid)" lay-filter="table_@(guid)"></table>
@@ -56,7 +56,7 @@
                 treeDefaultClose: false, // treetable新增参数
                 treeLinkage: true, // treetable新增参数
                 elem: '#table_@(guid)',
-                url: '@Url.Action("List", "Category")',
+                url: '@Url.Action("PagedList", "Category")',
                 limit:1000,
                 cols: [
                     [
