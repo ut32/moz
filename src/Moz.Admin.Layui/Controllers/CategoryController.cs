@@ -1,95 +1,101 @@
-﻿using System.Linq;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
-using Moz.Administration.Models.AdminMenus;
-using Moz.Biz.Dtos.Categories;
-using Moz.Biz.Services.Categories;
-using Moz.Exceptions;
+using Moz.Admin.Layui.Models.Categories;
+using Moz.Auth.Attributes;
+using Moz.Bus.Services.Categories;
 
-namespace Moz.Administration.Controllers
+namespace Moz.Admin.Layui.Controllers
 {
+    [AdminAuth(Permissions = "admin.category")]
     public class CategoryController : AdminAuthBaseController
     {
         private readonly ICategoryService _categoryService;
-        ///private readonly IRoleService _roleService;
         public CategoryController(ICategoryService categoryService)
         {
-            _categoryService = categoryService;
-            //this._roleService = roleService;
+            this._categoryService = categoryService;
         }
-        
 
+        [AdminAuth(Permissions = "admin.category.index")]
         public IActionResult Index()
         {
-            return View("~/Administration/Views/Category/Index.cshtml");
+            var model = new IndexModel();
+            return View("~/Administration/Views/Category/Index.cshtml",model);
         }
-
-        public IActionResult List(QueryRequest request)
+        
+        [AdminAuth(Permissions = "admin.category.index")]
+        public IActionResult PagedList(Moz.Bus.Dtos.Categories.PagedQueryCategoryDto dto)
         {
-            var list = _categoryService.Query(request);
+            var list = _categoryService.PagedQueryCategories(dto);
             var result = new
             {
                 Code = 0,
                 Message = "",
-                Data = list.List
+                Total = list.Data.TotalCount,
+                Data = list.Data.List
             };
             return Json(result);
         }
-
-        public IActionResult Add()
+        
+        [AdminAuth(Permissions = "admin.category.create")]
+        public IActionResult Create()
         {
-            return View("~/Administration/Views/Category/Add.cshtml");
+            var model = new  CreateModel();
+            return View("~/Administration/Views/Category/Create.cshtml",model);
         }
         
 
         [HttpPost]
-        public IActionResult SaveAdd(CreateRequest arg)
+        [AdminAuth(Permissions = "admin.category.create")]
+        public IActionResult Create(Moz.Bus.Dtos.Categories.CreateCategoryDto dto)
         {
-            var resp = _categoryService.Create(arg);
-            return RespJson(resp);
+            var result = _categoryService.CreateCategory(dto);
+            return Json(result);
         }
         
-        public IActionResult Update([FromQuery]long id)
+        [AdminAuth(Permissions = "admin.category.update")]
+        public IActionResult Update(Moz.Bus.Dtos.Categories.GetCategoryDetailDto dto)
         {
-            var menu = _categoryService.GetDetailById(new GetDetailByIdRequest(){ Id = id});
-            if (menu == null)
+            var result = _categoryService.GetCategoryDetail(dto);
+            if (result.Code > 0)
             {
-                throw new MozException("参数不正确");
+                return Json(result);
             }
-            return View("~/Administration/Views/Category/Update.cshtml",menu);
-        }
-        
-
-        [HttpPost]
-        public IActionResult SaveUpdate(UpdateRequest arg)
-        {
-            var resp = _categoryService.Update(arg);
-            return RespJson(resp); 
-        }
-
-        [HttpGet]
-        public IActionResult AllSubMenus(long? parentId) 
-        {
-            var resp = _categoryService.QueryChildrenByParentId(new QueryChildrenByParentIdRequest
+            var model = new UpdateModel()
             {
-                ParentId = parentId
-            });
-            return Json(resp.AllSubs);
+                Category = result.Data
+            };
+            return View("~/Administration/Views/Category/Update.cshtml",model);
         }
+        
 
         [HttpPost]
-        public IActionResult SetOrderIndex(SetOrderIndexRequest arg)
+        [AdminAuth(Permissions = "admin.category.update")]
+        public IActionResult Update(Moz.Bus.Dtos.Categories.UpdateCategoryDto dto)
         {
-            var resp = _categoryService.SetOrderIndex(arg);
-            return RespJson(resp);
+            var result = _categoryService.UpdateCategory(dto); 
+            return Json(result);
         }
         
         [HttpPost]
-        public IActionResult Delete(DeleteRequest arg)
+        [AdminAuth(Permissions = "admin.category.delete")]
+        public IActionResult Delete(Moz.Bus.Dtos.Categories.DeleteCategoryDto dto)
         {
-            var resp = _categoryService.Delete(arg);
-            return RespJson(resp);
+            var result = _categoryService.DeleteCategory(dto);
+            return Json(result);
+        }
+        
+        [HttpPost]
+        [AdminAuth(Permissions = "admin.category.setIsActive")]
+        public IActionResult SetIsActive()
+        {
+            return Json(null);
+        }
+        
+        [HttpPost]
+        [AdminAuth(Permissions = "admin.category.setOrderIndex")]
+        public IActionResult SetOrderIndex()
+        {
+            return Json(null);
         }
     }
-    
 }

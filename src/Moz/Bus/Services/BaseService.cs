@@ -9,9 +9,9 @@ namespace Moz.Bus.Services
             return new ServOkResult();
         }
 
-        protected ServErrorResult Error(string msg = "发生错误")
+        protected ServErrorResult Error(string msg = "发生错误", int code = 600)
         {
-            return new ServErrorResult(msg); 
+            return new ServErrorResult(msg, code);
         }
     }
 }

@@ -1,104 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Microsoft.Extensions.Caching.Distributed;
 using Moz.Biz.Dtos.Categories;
-using Moz.Biz.Services.Categories;
+using Moz.Bus.Dtos;
+using Moz.Bus.Dtos.Categories;
 using Moz.Bus.Models.Categories;
 using Moz.DataBase;
 using Moz.Events;
-using Moz.Exceptions;
 
-namespace Moz.CMS.Services.Categories
+namespace Moz.Bus.Services.Categories
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public class CategoryService : ICategoryService
+    public partial class CategoryService : BaseService,ICategoryService
     {
+        #region Constants
 
-        public static readonly string CACHE_CATEGORY_ALL_KEY = "CACHE_CATEGORY_ALL";
+        // ReSharper disable once InconsistentNaming
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static readonly string CACHE_CATEGORY_ALL_KEY = "CACHE_CATEGORY_ALL_KEY";
         
-        private readonly IDistributedCache _distributedCache;
+        #endregion
+
+        #region Fields
         private readonly IEventPublisher _eventPublisher;
+        private readonly IDistributedCache _distributedCache;
+        #endregion
 
-        public CategoryService(  
-            IDistributedCache distributedCache,
-            IEventPublisher eventPublisher)
+        #region Ctor
+        public CategoryService(
+            IEventPublisher eventPublisher,
+            IDistributedCache distributedCache)
         {
-            _distributedCache = distributedCache;
             _eventPublisher = eventPublisher;
+            _distributedCache = distributedCache;
         }
+        #endregion
 
-        public CreateResponse Create(CreateRequest request)
-        {
-            var category = new Category
-            {
-                Name = request.Name,
-                ParentId = request.ParentId,
-                Alias = request.Alias,
-                Desciption = request.Description,
-                OrderIndex = 0
-            };
-            using (var client = DbFactory.GetClient())
-            {
-                category.Id = client.Insertable(category).ExecuteReturnBigIdentity();
-            }
-            _distributedCache.Remove(CACHE_CATEGORY_ALL_KEY);
-            _eventPublisher.EntityCreated(category);
-            return new CreateResponse();
-        }
-
-
-        public UpdateResponse Update(UpdateRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var category = client.Queryable<Category>().InSingle(request.Id);
-                if (category == null)
-                {
-                    throw new MozException("找不到该条信息");
-                }
-
-                category.ParentId = request.ParentId;
-                category.Name = request.Name;
-                category.Desciption = request.Desciption;
-                category.Alias = request.Alias;
-                
-                client.Updateable(category).ExecuteCommand();   
-                _distributedCache.Remove(CACHE_CATEGORY_ALL_KEY);
-                return new UpdateResponse();
-            }
-        }
-
-        public SetOrderIndexResponse SetOrderIndex(SetOrderIndexRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var category = client.Queryable<Category>().InSingle(request.Id);
-                if (category == null)
-                {
-                    throw new MozException("找不到该条信息");
-                }
-
-                category.OrderIndex = int.Parse(request.OrderIndex);
-                client.Updateable(category).UpdateColumns(t => new { t.OrderIndex }).ExecuteCommand();
-                _distributedCache.Remove(CACHE_CATEGORY_ALL_KEY);
-                return new SetOrderIndexResponse();
-            }
-        }
-
-        public DeleteResponse Delete(DeleteRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                client.Deleteable<Category>(request.Id).ExecuteCommand();
-            }
-            //_eventPublisher.EntityDeleted();
-            _distributedCache.Remove(CACHE_CATEGORY_ALL_KEY);
-            return new DeleteResponse();
-        }
-
+        #region Utils
+        
         /// <summary>
-        /// 获取缓存
+        /// 获取缓存表
         /// </summary>
         /// <returns></returns>
         private List<Category> GetCategoriesListCached()
@@ -111,117 +53,263 @@ namespace Moz.CMS.Services.Categories
                 }
             });
         }
+        
 
-        public List<long> GetChildrenIdsByParentId(long? parentId,bool includeSelfId = true)
+        /// <summary>
+        /// 更新路径
+        /// </summary>
+        /// <param name="categoryId"></param>
+        private static void UpdatePathByCategoryId(long categoryId)
         {
-            // ReSharper disable once RedundantAssignment
-            var categoriesList = GetCategoriesListCached();
-            var ids = new List<long>();
-            void Func(long? pid)
+            List<Category> categories; 
+            using (var db = DbFactory.GetClient())
             {
-                var subCategories = categoriesList.Where(t => t.ParentId == pid).ToList();
+                categories = db.Queryable<Category>().ToList();
+            }
+
+            if (!categories.Any())
+            {
+                return;
+            }
+            
+            string GetPath(long currentId)
+            {
+                var curCategory = categories.FirstOrDefault(it => it.Id == currentId);
+                var parentCategoryId = curCategory?.ParentId;
+                if (parentCategoryId == null || 0 == parentCategoryId)
+                {
+                    return currentId.ToString();
+                }
+                return GetPath(parentCategoryId.Value)+"."+currentId;
+            }
+
+            var updateCategoriesList = new List<Category>(); 
+            void UpdatePath(long currentId)
+            {
+                var curCategory = categories.FirstOrDefault(it => it.Id == currentId);
+                if (curCategory == null)
+                {
+                    return;
+                }
+                
+                curCategory.Path = GetPath(currentId);
+                
+                updateCategoriesList.Add(curCategory);
+
+                var subCategories = categories.Where(it => it.ParentId == currentId).ToList();
+                if (!subCategories.Any())
+                {
+                    return;
+                }
+
                 foreach (var subCategory in subCategories)
                 {
-                    ids.Add(subCategory.Id);
-                    Func(subCategory.Id);
+                    UpdatePath(subCategory.Id);
                 }
             }
-            if(includeSelfId && parentId>0)
-                ids.Add(parentId.Value);
-            return ids;
-        }
-        
-        public string GetParentNameByChildId(long childId, long rootId)
-        {
-            try
+            
+            UpdatePath(categoryId);
+            if (!updateCategoriesList.Any())
             {
-                var categoriesList = GetCategoriesListCached(); 
-                var names = new List<string>();   
-                void Func(long cid)
-                {
-                    var category = categoriesList.FirstOrDefault(t => t.Id == cid);
-                    if (category != null)
-                    {
-                        names.Insert(0,category.Name);
-                        if (category.ParentId!=null && category.ParentId.Value!=0 && category.ParentId != rootId)
-                        {
-                            Func(category.ParentId.Value);
-                        }
-                    }
-                }
-
-                Func(childId);
-
-                return names.Join(" > ");
+                return;
             }
-            catch (Exception e)
+
+            using (var db = DbFactory.GetClient())
             {
-                Console.WriteLine(e);
-                throw;
+                db.Updateable(updateCategoriesList)
+                    .UpdateColumns(it => new { it.Path })
+                    .ExecuteCommand();
             }
             
         }
+        
+        #endregion
 
-        public QueryChildrenByParentIdResponse QueryChildrenByParentId(QueryChildrenByParentIdRequest request)
+        #region Methods
+
+        /// <summary>
+        /// 获取详细
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ServResult<CategoryDetail> GetCategoryDetail(ServRequest<GetCategoryDetailDto> request)
         {
-            var list = GetCategoriesListCached();
-            var categories = GetAllSubCategories(list,request.ParentId);
-            return new QueryChildrenByParentIdResponse()
+            Category category = null;
+            using (var client = DbFactory.GetClient())
             {
-                AllSubs = categories
-            };
+                 category = client.Queryable<Category>().InSingle(request.Data.Id);
+            }
+            if(category == null)
+            {
+                return null;
+            }
+            var res = new CategoryDetail();
+            res.Id = category.Id;
+            res.Name = category.Name;
+            res.Alias = category.Alias;
+            res.Desciption = category.Description;
+            res.OrderIndex = category.OrderIndex;
+            res.ParentId = category.ParentId;
+            res.Path = category.Path;
+            return res;
         }
 
-        private List<SimpleCategory> GetAllSubCategories(List<Category> list, long? parentId)
+        /// <summary>
+        /// 插入
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ServResult CreateCategory(ServRequest<CreateCategoryDto> request)
         {
+            var category = new Category
+            {
+                Name = request.Data.Name,
+                Alias = request.Data.Alias,
+                Description = request.Data.Description,
+                ParentId = request.Data.ParentId
+            };
+            using (var client = DbFactory.GetClient())
+            {
+                category.Id = client.Insertable(category).ExecuteReturnBigIdentity();
+            }
+            UpdatePathByCategoryId(category.Id);
+            _distributedCache.Remove(CACHE_CATEGORY_ALL_KEY);
+            _eventPublisher.EntityCreated(category);
+            return Ok();
+        }
+        
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ServResult UpdateCategory(ServRequest<UpdateCategoryDto> request)
+        {
+            Category category = null;
+            using (var client = DbFactory.GetClient())
+            {
+                category = client.Queryable<Category>().InSingle(request.Data.Id);
+                if (category == null)
+                {
+                    return Error("找不到该条信息");
+                }
+                category.Name = request.Data.Name;
+                category.Alias = request.Data.Alias;
+                category.Description = request.Data.Desciption;
+                category.ParentId = request.Data.ParentId;
+                client.Updateable(category).ExecuteCommand();
+            }
+            UpdatePathByCategoryId(category.Id);
+            _distributedCache.Remove(CACHE_CATEGORY_ALL_KEY);
+            _eventPublisher.EntityUpdated(category);
+            return Ok();
+        }
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ServResult DeleteCategory(ServRequest<DeleteCategoryDto> request)
+        {
+            Category category = null;
+            using (var client = DbFactory.GetClient())
+            {
+                category = client.Queryable<Category>().InSingle(request.Data.Id);
+                if (category == null)
+                {
+                    return Error("找不到该条信息");
+                }
+                client.Deleteable<Category>(request.Data.Id).ExecuteCommand();
+            }
+            _distributedCache.Remove(CACHE_CATEGORY_ALL_KEY);
+            _eventPublisher.EntityDeleted(category);
+            return Ok();
+        }
+        
+        
+        /*
+        /// <summary>
+        /// 批量删除
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ServResult BulkDeleteCategories(ServRequest<BulkDeleteCategoriesDto> request)
+        {
+            using (var client = DbFactory.GetClient())
+            {
+                client.Deleteable<Category>().In(request.Data.Ids).ExecuteCommand();
+            }
+            _eventPublisher.EntitiesDeleted<Category>(request.Data.Ids);
+            return Ok();
+        }
+        */
+
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ServResult<PagedList<QueryCategoryItem>> PagedQueryCategories(ServRequest<PagedQueryCategoryDto> request)
+        {
+            var page = request.Data.Page ?? 1;
+            var pageSize = request.Data.PageSize ?? 20;
+            using (var client = DbFactory.GetClient())
+            {
+                var total = 0;
+                var list = client.Queryable<Category>()
+                    //.WhereIF(!request.Keyword.IsNullOrEmpty(), t => t.Name.Contains(request.Keyword))
+                    .Select(t=>new QueryCategoryItem()
+                    {
+                        Id = t.Id, 
+                        Name = t.Name, 
+                        Alias = t.Alias, 
+                        Desciption = t.Description, 
+                        OrderIndex = t.OrderIndex, 
+                        ParentId = t.ParentId, 
+                        Path = t.Path, 
+                    })
+                    .OrderBy("id DESC")
+                    .ToPageList(page, pageSize,ref total);
+                return new PagedList<QueryCategoryItem>
+                {
+                    List = list,
+                    Page = page,
+                    PageSize = pageSize,
+                    TotalCount = total
+                };
+            }
+        }
+        
+        /// <summary>
+        /// 查询所有子类
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ServResult<List<SimpleCategory>> QuerySubCategoriesByParentId(ServRequest<long?> request)
+        {
+            return GetAllSubCategories(request.Data);
+        }
+
+        private List<SimpleCategory> GetAllSubCategories(long? parentId)
+        {
+            var list = GetCategoriesListCached(); 
             var subCategories = list.Where(t => t.ParentId == parentId).ToList();
             var result = new List<SimpleCategory>();
+            // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
             foreach (var subCategory in subCategories)
             {
                 result.Add(new SimpleCategory()
                 {
                     Id = subCategory.Id,
                     Name = subCategory.Name,
-                    Children = GetAllSubCategories(list,subCategory.Id)
+                    Alias = subCategory.Alias,
+                    Children = GetAllSubCategories(subCategory.Id)
                 });   
             }
             return result;
         }
 
-
-        public GetDetailByIdResponse GetDetailById(GetDetailByIdRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var category = client.Queryable<Category>().InSingle(request.Id);
-                if (category == null)
-                {
-                    return null;
-                }
-
-                return new GetDetailByIdResponse()
-                {
-                    Id = request.Id,
-                    Name = category.Name,
-                    ParentId = category.ParentId
-                };
-            }
-        }
-        
-        public QueryResponse Query(QueryRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var list = client.Queryable<Category>()
-                    .WhereIF(!request.Keyword.IsNullOrEmpty(), t => t.Name.Contains(request.Keyword))
-                    .OrderBy(t => t.OrderIndex)
-                    .ToList();
-                return new QueryResponse()
-                {
-                    Total = list.Count,
-                    List = list
-                };
-            }
-        }
+        #endregion
     }
 }

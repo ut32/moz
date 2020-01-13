@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FluentValidation;
 using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
@@ -26,6 +27,8 @@ namespace Moz.Bus.Dtos.Ads
         public long Id { get; set; }
         public string Title { get; set; }
         public string ImagePath { get; set; }
+
+        public string FullImagePath => ImagePath.GetFullPath();
         public string TargetUrl { get; set; } 
     }
     

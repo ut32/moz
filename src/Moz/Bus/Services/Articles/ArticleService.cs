@@ -6,10 +6,10 @@ using Microsoft.Extensions.Caching.Distributed;
 using Moz.Biz.Dtos.Articles;
 using Moz.Biz.Dtos.Articles.ArticleModels;
 using Moz.Biz.Services.Articles;
-using Moz.Biz.Services.Categories;
 using Moz.Bus.Dtos.Articles;
 using Moz.Bus.Dtos.Articles.ArticleModels;
 using Moz.Bus.Models.Articles;
+using Moz.Bus.Services.Categories;
 using Moz.DataBase;
 using Moz.Domain.Dtos.Articles.ArticleModels;
 using Moz.Events;
@@ -325,8 +325,8 @@ namespace Moz.Bus.Services.Articles
             
             //类别
             var categories = new long[] { };
-            if (request.CategoryId > 0)
-                categories = _categoryService.GetChildrenIdsByParentId(request.CategoryId).ToArray();
+            //if (request.CategoryId > 0)
+            //    categories = _categoryService.GetChildrenIdsByParentId(request.CategoryId).ToArray();
 
             using (var client = DbFactory.GetClient())
             {

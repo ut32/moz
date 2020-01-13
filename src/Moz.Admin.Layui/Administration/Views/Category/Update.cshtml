@@ -1,4 +1,4 @@
-@model Moz.Biz.Dtos.Categories.GetDetailByIdResponse
+@model Moz.Admin.Layui.Models.Categories.UpdateModel
 @{
   Layout = null;
   var guid = Guid.NewGuid().ToString("N");
@@ -10,12 +10,12 @@
   <div style="padding-top: 20px; padding-right: 20px;">
     <form class="layui-form"
           method="post"
-          action="@Url.Action("saveupdate", "category")"
+          action="@Url.Action("update", "category")"
           onBeforePost=""
           onSuccessCallBack=""
           lay-filter="form-@guid">
       
-      <input type="hidden" value="@Model.Id" name="id"/>
+      <input type="hidden" value="@Model.Category.Id" name="id"/>
       
       <div class="layui-form-item">
         <label class="layui-form-label">父菜单</label>
@@ -27,14 +27,14 @@
       <div class="layui-form-item">
         <label class="layui-form-label">名称</label>
         <div class="layui-input-block">
-          <input type="text" name="name" value="@Model.Name" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+          <input type="text" name="name" value="@Model.Category.Name" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
         </div>
       </div>
 
       <div class="layui-form-item">
         <label class="layui-form-label">别名</label>
         <div class="layui-input-block">
-          <input type="text" name="alias" value="@Model.Alias" placeholder="请输入" autocomplete="off" class="layui-input">
+          <input type="text" name="alias" value="@Model.Category.Alias" placeholder="请输入" autocomplete="off" class="layui-input">
         </div>
       </div>
 
@@ -70,7 +70,7 @@
         name: "ParentIdsStr",
         search: [false, true],
         //候选数据【必填】
-        selected:[@Model.ParentId]
+        selected:[@Model.Category.ParentId]
         ,
         data: "@Url.Action("allsubmenus", "Category")",
         field: { idName: 'Id', titleName: 'Name', childName: 'Children' }
