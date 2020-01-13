@@ -3,7 +3,7 @@ using FluentValidation;
 using FluentValidation.Attributes;
 using Moz.Validation;
 
-namespace Moz.Biz.Dtos.Categories
+namespace Moz.Bus.Dtos.Categories
 {
     [Validator(typeof(SetOrderIndexRequestValidator))]
     public class SetOrderIndexRequest

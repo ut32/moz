@@ -56,6 +56,6 @@ namespace Moz.Bus.Services.Categories
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ServResult<List<SimpleCategory>> QuerySubCategoriesByParentId(ServRequest<long?> request);
+        ServResult<List<SimpleCategory>> QuerySubCategoriesByParentId(ServRequest<long?> request);
     }
 }

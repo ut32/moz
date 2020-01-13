@@ -6,7 +6,7 @@ using Moz.Bus.Services.Categories;
 
 namespace Moz.Admin.Layui.Controllers
 {
-    [AdminAuth(Permissions = "admin.category")]
+    //[AdminAuth(Permissions = "admin.category")]
     public class CategoryController : AdminAuthBaseController
     {
         private readonly ICategoryService _categoryService;
@@ -96,6 +96,13 @@ namespace Moz.Admin.Layui.Controllers
         public IActionResult SetOrderIndex()
         {
             return Json(null);
+        }
+        
+        [HttpGet]
+        public IActionResult AllSubMenus(long? parentId)
+        {
+            var result = _categoryService.QuerySubCategoriesByParentId(parentId);
+            return Json(result.Data);
         }
     }
 }
