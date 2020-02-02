@@ -42,14 +42,17 @@
       <div class="layui-form-item">
         <label class="layui-form-label">描述</label>
         <div class="layui-input-block">
-          <textarea class="layui-input" name="description" rows="5"></textarea>
+          <textarea class="layui-textarea" name="description">@Model.Category.Description</textarea>
         </div>
       </div>
 
 
       <div class="layui-form-item">
         <div class="layui-input-block">
-          <button class="layui-btn" lay-submit="" lay-filter="">立即提交</button>
+          <button class="layui-btn" lay-submit="" lay-filter="">
+            <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i>
+            立即提交
+          </button>
           <button type="reset" class="layui-btn layui-btn-primary">重置</button>
         </div>
       </div>
@@ -70,7 +73,7 @@
         name: "ParentIdsStr",
         search: [false, true],
         //候选数据【必填】
-        selected:[@Model.Category.ParentId]
+        selected:[@(Model.Category.ParentIds)]
         ,
         data: "@Url.Action("allsubmenus", "Category")",
         field: { idName: 'Id', titleName: 'Name', childName: 'Children' }

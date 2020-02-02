@@ -9,7 +9,9 @@ namespace Moz.Core
     public interface IMozStartup
     {
         int Order { get; }  
-        void ConfigureServices(IServiceCollection services,IConfiguration configuration,MozOptions mozOptions);
-        void Configure(IApplicationBuilder application,IWebHostEnvironment env);
+        
+        void ConfigureServices(IServiceCollection services, IConfiguration configuration, IWebHostEnvironment webHostEnvironment, MozOptions mozOptions);   
+         
+        void Configure(IApplicationBuilder application, IConfiguration configuration, IWebHostEnvironment webHostEnvironment, MozOptions mozOptions);  
     } 
 }

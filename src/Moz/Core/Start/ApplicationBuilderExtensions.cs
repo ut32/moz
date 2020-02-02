@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
@@ -28,6 +29,7 @@ namespace Microsoft.AspNetCore.Builder
     {
         public static void UseMoz(this IApplicationBuilder application,IWebHostEnvironment env)
         {
+            var configuration = application.ApplicationServices.GetService(typeof(IConfiguration)) as IConfiguration;
             var options = (application.ApplicationServices.GetService(typeof(IOptions<MozOptions>)) as IOptions<MozOptions>)?.Value;
             if(options == null)
                 throw new ArgumentNullException(nameof (options));
@@ -78,7 +80,7 @@ namespace Microsoft.AspNetCore.Builder
                 .Select(startup => (IMozStartup)Activator.CreateInstance(startup.Type))
                 .OrderBy(startup => startup.Order);
             foreach (var instance in instances) 
-                instance.Configure(application, env);
+                instance.Configure(application,configuration, env, options);
             
             application.UseEndpoints(endpoints =>
             {

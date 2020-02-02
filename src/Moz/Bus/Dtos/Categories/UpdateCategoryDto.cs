@@ -1,4 +1,6 @@
-﻿using FluentValidation;
+﻿using System;
+using System.Linq;
+using FluentValidation;
 using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
 using Moz.Validation;
@@ -31,22 +33,31 @@ namespace Moz.Bus.Dtos.Categories
         /// <summary>
         /// 
         /// </summary>
-        public string Desciption { get;set; } 
+        public string Description { get;set; } 
         
         /// <summary>
         /// 
         /// </summary>
-        public int OrderIndex { get;set; } 
+        public long? ParentId
+        {
+            get
+            {
+
+                if (ParentIdsStr.IsNullOrEmpty()) return null;
+                var ids = ParentIdsStr.Split(',')
+                    .Where(t => !t.IsNullOrEmpty() && t.All(char.IsDigit))
+                    .Select(long.Parse).ToArray();
+                if (ids.Any()) return ids.Last();
+                return null;
+            }
+        }
         
         /// <summary>
         /// 
         /// </summary>
-        public long? ParentId { get;set; } 
+        //public string Path { get;set; } 
         
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Path { get;set; } 
+        public string ParentIdsStr { get; set; }
         
         #endregion     
     }

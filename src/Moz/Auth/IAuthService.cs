@@ -1,4 +1,6 @@
 ﻿using System;
+using Moz.Bus.Dtos;
+using Moz.Bus.Dtos.Auth;
 using Moz.Bus.Models.Members;
 using Moz.WebApi;
 
@@ -6,49 +8,46 @@ namespace Moz.Auth
 {
     public interface IAuthService
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        ServResult<string> GetAuthenticatedUId();
         
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        SimpleMember GetAuthenticatedMember();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        string GetAuthenticatedUId();
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="memberId"></param>
-        /// <param name="roleId"></param>
-        /// <param name="expDatetime"></param>
-        /// <returns>true 成功, false 失败</returns>
-        bool AddRoleToMemberId(long memberId, long roleId, DateTime? expDatetime = null);
-
+        ServResult<SimpleMember> GetAuthenticatedMember();
 
         /// <summary>
         /// 用户名密码登录
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        MemberLoginResult LoginWithUsernamePassword(MemberLoginRequest request);
+        ServResult<MemberLoginApo> LoginWithUsernamePassword(ServRequest<LoginWithUsernamePasswordDto> request);
 
         /// <summary>
         /// 三方授权登录
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        MemberLoginResult ExternalAuth(ExternalAuthRequest request);
+        ServResult<MemberLoginApo> ExternalAuth(ServRequest<ExternalAuthDto> request); 
+ 
+ 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        ServResult SetAuthCookie(ServRequest<SetAuthCookieDto> request);
 
 
-        void SetAuthCookie(string token);
-
-
-        void RemoveAuthCookie();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        ServResult RemoveAuthCookie();
 
     }
 }

@@ -9,14 +9,16 @@ namespace Moz.Admin.Layui.Common
 {
     public class StartUp: IMozStartup
     {
-        public int Order { get; } = 99;
+        public int Order { get; } = 90;
 
-        public void ConfigureServices(IServiceCollection services, IConfiguration configuration, MozOptions mozOptions)
+        public void ConfigureServices(IServiceCollection services, IConfiguration configuration,
+            IWebHostEnvironment webHostEnvironment, MozOptions mozOptions)
         {
             
         }
 
-        public void Configure(IApplicationBuilder application, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder application, IConfiguration configuration, IWebHostEnvironment webHostEnvironment,
+            MozOptions mozOptions)
         {
             
         }

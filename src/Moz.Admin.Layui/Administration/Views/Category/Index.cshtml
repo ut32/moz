@@ -4,6 +4,7 @@
 }
 <div class="zui-page">
     <div class="layui-card">
+        <!--
         <div class="layui-form layui-card-header">
             <div class="layui-form-item">
                 <div class="layui-inline">
@@ -19,9 +20,10 @@
                 </div>
             </div>
         </div>
+        -->
         <div class="layui-card-body">
             <div class="layui-btn-group">
-                <a class="layui-btn" href="javascript:;" zui-href="@Url.Action("create", "category")" zui-type="dialog" zui-width="800px" zui-height="400px" title="添加分类"><i class="layui-icon">&#xe654;</i> 添加</a>
+                <a class="layui-btn" href="javascript:;" zui-href="@Url.Action("create", "category")" zui-type="dialog" zui-width="800px" zui-height="420px" title="添加分类"><i class="layui-icon">&#xe654;</i> 添加</a>
                 <!--<a class="layui-btn" href="@Url.Action("", "")"  rel="ids" posttype="string" target="selectedTodo" title="确定要删除这些吗?"><i class="layui-icon">&#xe640;</i> 删除</a>-->
             </div>
             <table id="table_@(guid)" lay-filter="table_@(guid)"></table>
@@ -30,7 +32,7 @@
 </div>
 
 <script type="text/html" id="toolbar_@(guid)">
-    <a class="layui-btn layui-btn-normal layui-btn-xs" href="javascript:;" zui-href="@Url.Action("update", "category")?id={{d.Id}}" zui-type="dialog" zui-width="800px" zui-height="400px" title="编辑">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" href="javascript:;" zui-href="@Url.Action("update", "category")?id={{d.Id}}" zui-type="dialog" zui-width="800px" zui-height="420px" title="编辑">
         <i class="layui-icon layui-icon-edit"></i>编辑
     </a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" href="javascript:;" zui-href="@Url.Action("delete", "category")?id={{d.Id}}" zui-type="ajax" zui-confirm="你确认删除(id={{d.Id}})吗？">
@@ -38,13 +40,16 @@
     </a>
 </script>
 <script>
-    layui.use(['form', 'treetable'],
+    layui.use(['form', 'treetable','admin'],
         function() {
-            var form = layui.form;
+            let form = layui.form;
+            let admin = layui.admin;
+            let treetable = layui.treetable;
+            
             form.render();
 
 
-            var treetable = layui.treetable;
+            
 
             // 渲染表格
             treetable.render({
@@ -63,7 +68,7 @@
                         { field: 'id', width: 50, title: 'Id' },
                         { field: 'Name', title: '名称' },
                         {
-                            field:'Alias',title:'别名',width:200
+                            field:'Alias',title:'别名',width:250
                         },
                         {
                             field: 'OrderIndex',
@@ -78,21 +83,10 @@
             });
 
             //监听单元格编辑
-            treetable.on('edit(table_@(guid))',
-                function(obj) {
-                    var value = obj.value, data = obj.data;
-                    $.post("@Url.Action("SetOrderIndex", "Category")",
-                        { "Id": data.Id, "OrderIndex": value },
-                        function(data) {
-                            if (data.Code > 0) {
-                                layer.msg(data.Message);
-                            } else {
-                                layer.msg("设置成功");
-                                navTab.reloadCurrentTab();
-                            }
-                        },
-                        "json");
-                });
+            treetable.on('edit(table_@(guid))',function(obj) {
+                var value = obj.value, data = obj.data, field = obj.field;
+                admin.onCellEdit("@Url.Action("SetOrderIndex", "Category")",{ "Id": data.Id , "OrderIndex": value });
+            });
 
             var $ = layui.$,
                 active = {

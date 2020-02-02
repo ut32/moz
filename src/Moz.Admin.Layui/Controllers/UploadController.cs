@@ -36,6 +36,9 @@ namespace Moz.Admin.Layui.Controllers
             if (model.File.ContentType.Contains("jpeg") || model.File.ContentType.Contains("jpg"))
             {
                 extension = "jpg";
+            }else if (model.File.ContentType.Equals("video/mp4", StringComparison.OrdinalIgnoreCase))
+            {
+                extension = "mp4";
             }
 
             var file = $"/upload/{guid}.{extension}";

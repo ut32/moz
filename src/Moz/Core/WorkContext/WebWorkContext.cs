@@ -34,10 +34,15 @@ namespace Moz.Core.WorkContext
         {
             get
             {
-                var uId = _authService.GetAuthenticatedUId();
-                if (uId.IsNullOrEmpty()) return null;
-                var member = _distributedCache.GetOrSet($"cache_member_{uId}", () => _authService.GetAuthenticatedMember());
-                return member;
+                var result = _authService.GetAuthenticatedUId();
+                if (result.Code > 0)
+                    return null;
+                
+                var authenticatedMemberResult = _distributedCache.GetOrSet($"CACHE_MEMBER_{result.Data}", () => _authService.GetAuthenticatedMember());
+                if (authenticatedMemberResult.Code > 0)
+                    return null;
+                
+                return authenticatedMemberResult.Data;
             }
         }
        

@@ -85,17 +85,11 @@ namespace Moz.Admin.Layui.Controllers
         }
         
         [HttpPost]
-        [AdminAuth(Permissions = "admin.category.setIsActive")]
-        public IActionResult SetIsActive()
-        {
-            return Json(null);
-        }
-        
-        [HttpPost]
         [AdminAuth(Permissions = "admin.category.setOrderIndex")]
-        public IActionResult SetOrderIndex()
+        public IActionResult SetOrderIndex(Moz.Bus.Dtos.Categories.SetOrderIndexDto dto)
         {
-            return Json(null);
+            var result = _categoryService.SetOrderIndex(dto);
+            return Json(result);
         }
         
         [HttpGet]

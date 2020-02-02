@@ -1,16 +1,7 @@
 using System.Collections.Generic;
 
-namespace Moz.Biz.Dtos.Categories
+namespace Moz.Bus.Dtos.Categories
 {
-    public class QueryChildrenByParentIdRequest
-    {
-         public long? ParentId { get; set; }
-    }
-
-    public class QueryChildrenByParentIdResponse
-    {
-        public List<SimpleCategory> AllSubs { get; set; }
-    }
 
     public class SimpleCategory
     {

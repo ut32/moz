@@ -1,6 +1,6 @@
-namespace Moz.Auth
+namespace Moz.Bus.Dtos.Auth
 {
-    public class MemberLoginRequest
+    public class LoginWithUsernamePasswordDto
     {
         public string Username { get; set; }
         public string Password { get; set; } 

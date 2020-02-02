@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Moz.Admin.Layui.Common;
 using Moz.Administration.Models.Members;
 using Moz.Auth;
+using Moz.Bus.Dtos.Auth;
 using Moz.Core.Options;
 using Moz.Exceptions;
 
@@ -12,9 +13,7 @@ namespace Moz.Admin.Layui.Controllers
 {
     public class HomeController : AdminBaseController
     {
-        private readonly IAuthService _authenticationService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IAuthService _passportService;
+        private readonly IAuthService _authService;
         private readonly IOptions<MozOptions> _mozOptions;
 
         public HomeController(IAuthService passportService,
@@ -22,9 +21,7 @@ namespace Moz.Admin.Layui.Controllers
             IHttpContextAccessor httpContextAccessor,
             IOptions<MozOptions> mozOptions)
         {
-            _authenticationService = authenticationService;
-            _passportService = passportService;
-            _httpContextAccessor = httpContextAccessor;
+            _authService = passportService;
             _mozOptions = mozOptions;
         }
 
@@ -41,14 +38,17 @@ namespace Moz.Admin.Layui.Controllers
         [HttpPost]
         public IActionResult Index(LoginModel model)
         {
-            var resp = _passportService.LoginWithUsernamePassword(new MemberLoginRequest()
+            var result = _authService.LoginWithUsernamePassword(new LoginWithUsernamePasswordDto
             {
                 Username = model.Username,
                 Password = model.Password
+            }); 
+            if(result.Code>0)
+                throw new AlertException(result.Message);
+            _authService.SetAuthCookie(new SetAuthCookieDto()
+            {
+                Token = result.Data.AccessToken
             });
-            if(resp.IsError)
-                throw new MozException(resp.Errors.FirstOrDefault());
-            _passportService.SetAuthCookie(resp.AccessToken);
             return RespJson(new{});
         }
         
@@ -56,7 +56,7 @@ namespace Moz.Admin.Layui.Controllers
         [HttpGet]
         public IActionResult Logout()
         {
-            _passportService.RemoveAuthCookie();
+            _authService.RemoveAuthCookie();
             return RedirectToAction("Index");
         }
         

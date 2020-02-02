@@ -2,14 +2,15 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>UT</Authors>
+    <Authors>the7</Authors>
     <Copyright>https://ut32.com</Copyright>
     <Description>极速网站开发框架/a light fast web framework for .net core 3.1</Description>
     <Version>1.0.1</Version>
     <Title>极速网站开发框架/a light fast web framework for .net core 3.1</Title>
     <PackageLicenseUrl>https://github.com/ut32/moz/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/ut32/moz</RepositoryUrl>
-    <PackageProjectUrl>https://ut32.com/moz</PackageProjectUrl>
+    <PackageProjectUrl>https://ut32.com/category/opensource/moz</PackageProjectUrl>
+    <PackageTags>极速网站开发框架</PackageTags>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AspectCore.Extensions.DependencyInjection" Version="2.0.0" />

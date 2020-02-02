@@ -32,6 +32,7 @@ namespace Moz.Core.Options
           
         /// <summary>
         /// 加密KEY,关系到应用安全，很重要
+        /// 在线生成 https://ut32.com/tool/pwd
         /// </summary>
         public string EncryptKey { get; set; }
 

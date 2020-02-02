@@ -1,9 +1,10 @@
 using System;
+using Moz.Auth;
 using Moz.Bus.Models.Members;
 
-namespace Moz.Auth
+namespace Moz.Bus.Dtos.Auth
 {
-    public class ExternalAuthRequest
+    public class ExternalAuthDto
     {
         /// <summary>
         /// Access Token
@@ -35,7 +36,7 @@ namespace Moz.Auth
         /// </summary>
         public ExternalAuthUserInfo UserInfo { get; set; }
     }
-
+    
     public class ExternalAuthUserInfo
     {
         /// <summary>

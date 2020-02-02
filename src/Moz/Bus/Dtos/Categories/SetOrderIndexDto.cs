@@ -5,24 +5,18 @@ using Moz.Validation;
 
 namespace Moz.Bus.Dtos.Categories
 {
-    [Validator(typeof(SetOrderIndexRequestValidator))]
-    public class SetOrderIndexRequest
+    [Validator(typeof(SetOrderIndexDtoValidator))]
+    public class SetOrderIndexDto
     {
         public long Id { get; set; }
-        public string OrderIndex { get; set; }
-    }
-    
-    public class SetOrderIndexResponse
-    {
-        
+        public int OrderIndex { get; set; }
     }
 
-    public class SetOrderIndexRequestValidator : MozValidator<SetOrderIndexRequest>
+    public class SetOrderIndexDtoValidator : MozValidator<SetOrderIndexDto>
     {
-        public SetOrderIndexRequestValidator()
+        public SetOrderIndexDtoValidator()
         {
             RuleFor(t => t.Id).GreaterThan(0).WithMessage("参数错误");
-            RuleFor(t => t.OrderIndex).Must(t => t.IsNumbers()).WithMessage("排序数字不正确");
         }
     }
 }

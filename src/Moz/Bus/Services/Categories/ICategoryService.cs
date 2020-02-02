@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Moz.Biz.Dtos.Categories;
 using Moz.Bus.Dtos;
 using Moz.Bus.Dtos.Categories;
 
@@ -27,6 +26,13 @@ namespace Moz.Bus.Services.Categories
         /// <param name="request"></param>
         /// <returns></returns>
         ServResult DeleteCategory(ServRequest<DeleteCategoryDto> request);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        ServResult SetOrderIndex(ServRequest<SetOrderIndexDto> request);
         
         /*
         /// <summary>
@@ -57,5 +63,19 @@ namespace Moz.Bus.Services.Categories
         /// <param name="request"></param>
         /// <returns></returns>
         ServResult<List<SimpleCategory>> QuerySubCategoriesByParentId(ServRequest<long?> request);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        ServRequest<string> GetCategoryPathByAlias(ServRequest<string> request);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        ServResult<string> GetCategoryNameByAlias(ServResult<string> request);
     }
 }

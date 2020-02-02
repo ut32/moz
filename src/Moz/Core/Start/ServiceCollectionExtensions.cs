@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Moz.Auth;
 using Moz.Auth.Attributes;
 using Moz.Auth.Handlers;
 using Moz.CMS.Services.Settings;
@@ -37,44 +39,42 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class ServiceCollectionExtensions
     {
 
-        public static IServiceProvider AddMoz(this IServiceCollection services, Action<MozOptions> configure)
+        public static void AddMoz(this IServiceCollection services, Action<MozOptions> configure)
         {
             if (services == null)
-                throw new ArgumentNullException(nameof (services));
-            
+                throw new ArgumentNullException(nameof(services));
+
             if (configure == null)
-                throw new ArgumentNullException(nameof (configure));
-            
+                throw new ArgumentNullException(nameof(configure));
+
             services.Configure(configure);
-            
+
             //get system configuration
             var buildServiceProvider = services.BuildServiceProvider();
             var configuration = buildServiceProvider.GetService<IConfiguration>();
+            var webHostEnvironment = buildServiceProvider.GetService<IWebHostEnvironment>();
 
             //valid configuration
             var options = buildServiceProvider.GetService<IOptions<MozOptions>>();
-            if(options?.Value == null)
-                throw new ArgumentNullException(nameof (MozOptions));
-            
+            if (options?.Value == null)
+                throw new ArgumentNullException(nameof(MozOptions));
+
             //required key 
-            if(options.Value.EncryptKey.IsNullOrEmpty())
-                throw new ArgumentNullException(nameof (options.Value.EncryptKey));
-            
-            if(options.Value.EncryptKey.Length!=16)
+            if (options.Value.EncryptKey.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(options.Value.EncryptKey));
+
+            if (options.Value.EncryptKey.Length != 16)
                 throw new ArgumentException("Encrypt Key's length must equal 16");
-            
+
             //check database connection string
-            if (!options.Value.Db.Any(t=> "default".Equals(t.Name, StringComparison.OrdinalIgnoreCase)))
+            if (!options.Value.Db.Any(t => "default".Equals(t.Name, StringComparison.OrdinalIgnoreCase)))
                 throw new ArgumentNullException(nameof(options.Value.Db));
 
-            var serviceProvider = ConfigureServices(services,configuration,options.Value); 
+            var serviceProvider = ConfigureServices(services, configuration, webHostEnvironment, options.Value);
             EngineContext.Create(serviceProvider);
-            
-            return serviceProvider;
         }
 
-        private static IServiceProvider ConfigureServices(IServiceCollection services, IConfiguration configuration,
-            MozOptions mozOptions)
+        private static IServiceProvider ConfigureServices(IServiceCollection services,IConfiguration configuration, IWebHostEnvironment webHostEnvironment,MozOptions mozOptions)
         {
             ServicePointManager.SecurityProtocol =
                 SecurityProtocolType.Tls12 |
@@ -94,13 +94,10 @@ namespace Microsoft.Extensions.DependencyInjection
                 {
                     cfg.RequireHttpsMetadata = false;
                     cfg.SaveToken = true;
-
-                    cfg.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidIssuer = "https://ut32.com",
-                        ValidAudience = "moz_application",
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(mozOptions.EncryptKey))
-                    };
+                    
+                    var parameters = EngineContext.Current.Resolve<IJwtService>().GetTokenValidationParameters();
+                    cfg.TokenValidationParameters = parameters;
+                    
                     cfg.Events = new JwtBearerEvents
                     {
                         OnAuthenticationFailed = o => throw new AlertException("auth failure")
@@ -195,8 +192,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #endregion
 
-
-
             //获取所有的 IMozStartup
             var startupConfigurations = TypeFinder.FindClassesOfType<IMozStartup>();
 
@@ -212,8 +207,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 .Select(startup => (IMozStartup) Activator.CreateInstance(startup.Type))
                 .OrderBy(startup => startup.Order);
             foreach (var instance in instances)
-                instance.ConfigureServices(services, configuration, mozOptions);
+                instance.ConfigureServices(services,configuration,webHostEnvironment,mozOptions);
 
+            //services.
             return services.BuildServiceProvider();
         }
     }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Caching.Distributed;
-using Moz.Biz.Dtos.Categories;
 using Moz.Bus.Dtos;
 using Moz.Bus.Dtos.Categories;
 using Moz.Bus.Models.Categories;
@@ -147,7 +146,7 @@ namespace Moz.Bus.Services.Categories
             res.Id = category.Id;
             res.Name = category.Name;
             res.Alias = category.Alias;
-            res.Desciption = category.Description;
+            res.Description = category.Description;
             res.OrderIndex = category.OrderIndex;
             res.ParentId = category.ParentId;
             res.Path = category.Path;
@@ -193,9 +192,9 @@ namespace Moz.Bus.Services.Categories
                 {
                     return Error("找不到该条信息");
                 }
-                category.Name = request.Data.Name;
+                category.Name = request.Data.Name; 
                 category.Alias = request.Data.Alias;
-                category.Description = request.Data.Desciption;
+                category.Description = request.Data.Description;
                 category.ParentId = request.Data.ParentId;
                 client.Updateable(category).ExecuteCommand();
             }
@@ -226,8 +225,24 @@ namespace Moz.Bus.Services.Categories
             _eventPublisher.EntityDeleted(category);
             return Ok();
         }
-        
-        
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ServResult SetOrderIndex(ServRequest<SetOrderIndexDto> request)
+        {
+            using (var client = DbFactory.GetClient())
+            {
+                client.Updateable<Category>().SetColumns(it=>new Category
+                {
+                    OrderIndex = request.Data.OrderIndex
+                }).Where(it=>it.Id==request.Data.Id).ExecuteCommand();
+            }
+            return Ok();
+        }
         /*
         /// <summary>
         /// 批量删除
@@ -253,7 +268,7 @@ namespace Moz.Bus.Services.Categories
         public ServResult<PagedList<QueryCategoryItem>> PagedQueryCategories(ServRequest<PagedQueryCategoryDto> request)
         {
             var page = request.Data.Page ?? 1;
-            var pageSize = request.Data.PageSize ?? 20;
+            var pageSize = request.Data.PageSize ?? 1000;
             using (var client = DbFactory.GetClient())
             {
                 var total = 0;
@@ -269,7 +284,7 @@ namespace Moz.Bus.Services.Categories
                         ParentId = t.ParentId, 
                         Path = t.Path, 
                     })
-                    .OrderBy("id DESC")
+                    .OrderBy("order_index ASC, id DESC")
                     .ToPageList(page, pageSize,ref total);
                 return new PagedList<QueryCategoryItem>
                 {
@@ -280,7 +295,34 @@ namespace Moz.Bus.Services.Categories
                 };
             }
         }
+
+        /// <summary>
+        /// 根据别名获取路径
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ServRequest<string> GetCategoryPathByAlias(ServRequest<string> request)
+        {
+            if (request.Data.IsNullOrEmpty()) return null;
+            var list = GetCategoriesListCached();
+            return list.FirstOrDefault(it => it.Alias.Equals(request.Data, StringComparison.OrdinalIgnoreCase))
+                ?.Path;
+        }
+
+        /// <summary>
+        /// 根据别名获取
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ServResult<string> GetCategoryNameByAlias(ServResult<string> request)
+        {
+            if (request.Data.IsNullOrEmpty()) return null;
+            var list = GetCategoriesListCached();
+            return list.FirstOrDefault(it => it.Alias.Equals(request.Data, StringComparison.OrdinalIgnoreCase))
+                ?.Name;
+        }
         
+
         /// <summary>
         /// 查询所有子类
         /// </summary>
@@ -309,6 +351,8 @@ namespace Moz.Bus.Services.Categories
             }
             return result;
         }
+        
+        
 
         #endregion
     }
