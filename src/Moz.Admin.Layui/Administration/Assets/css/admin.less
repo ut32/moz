@@ -187,6 +187,7 @@
           flex: 1;
           display: flex;
           justify-content: flex-end;
+          
         }
         .layui-nav{
           background: none;
@@ -217,6 +218,12 @@
               transition: -webkit-transform .5s ease;
               transition: transform .5s ease;
               transition: transform .5s ease,-webkit-transform .5s ease;
+            }
+            .layui-nav-more{
+              border-top-color: #666;
+              &.layui-nav-mored{
+                border-color: transparent transparent #666;
+              }
             }
           }
           .layui-nav-bar{
