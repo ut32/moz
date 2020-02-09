@@ -1,4 +1,4 @@
-﻿@model Moz.Administration.Models.ScheduleTasks.IndexModel
+﻿@model Moz.Admin.Layui.Models.ScheduleTasks.IndexModel
 @{
     Layout = null;
     var guid = Guid.NewGuid().ToString("N");
@@ -52,7 +52,7 @@
 </div>
 
 <script type="text/html" id="toolbar_@(guid)">
-    <a class="layui-btn layui-btn-normal layui-btn-xs" href="javascript:;" zui-href="@Url.Action("update", "ScheduleTask")?id={{d.Id}}" zui-type="dialog"  zui-width="600px" zui-height="400px" title="编辑">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" href="javascript:;" zui-href="@Url.Action("update", "ScheduleTask")?id={{d.Id}}" zui-type="dialog"  zui-width="600px" zui-height="300px" title="编辑">
         <i class="layui-icon layui-icon-edit"></i>编辑
     </a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" href="javascript:;" zui-href="@Url.Action("delete", "ScheduleTask")?id={{d.Id}}" zui-type="ajax" zui-confirm="你确认删除[{{d.Name}}]这条任务吗？">

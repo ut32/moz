@@ -4,20 +4,15 @@ using Moz.Validation;
 
 namespace Moz.Bus.Dtos.AdminMenus
 {
-    [Validator(typeof(UpdateAdminMenuRequestValidator))]
-    public class UpdateAdminMenuRequest:CreateAdminMenuRequest
+    [Validator(typeof(UpdateAdminMenuDtoValidator))]
+    public class UpdateAdminMenuDto:CreateAdminMenuDto
     {
         public long Id { get; set; }
     }
-    
-    public class UpdateAdminMenuResponse
-    {
-        
-    }
 
-    public class UpdateAdminMenuRequestValidator : MozValidator<UpdateAdminMenuRequest>
+    public class UpdateAdminMenuDtoValidator : MozValidator<UpdateAdminMenuDto>
     {
-        public UpdateAdminMenuRequestValidator()
+        public UpdateAdminMenuDtoValidator()
         {
             RuleFor(t => t.Id).GreaterThan(0).WithMessage("参数不正确");
             RuleFor(t => t.Name).NotNull().NotEmpty().WithMessage("名称不能为空");

@@ -9,8 +9,8 @@ namespace Moz.Bus.Dtos.Members
     /// <summary>
     /// tab_member
     /// </summary>
-    [Validator(typeof(PagedQueryMemberRequestValidator))]
-    public class PagedQueryMemberRequest
+    [Validator(typeof(PagedQueryMemberDtoValidator))]
+    public class PagedQueryMemberDto
     {
         #region 属性
         public int? Page { get; set; }
@@ -18,13 +18,7 @@ namespace Moz.Bus.Dtos.Members
         public string Keyword{ get;set; }
         #endregion     
     }
-    
-    
-    public class PagedQueryMemberResponse: PagedList<QueryMemberItem>
-    {
-    
-    }
-    
+
     public class QueryMemberItem
     {
         /// <summary>
@@ -158,9 +152,9 @@ namespace Moz.Bus.Dtos.Members
         public string[] Roles { get; set; }
     }
     
-    public class PagedQueryMemberRequestValidator : MozValidator<PagedQueryMemberRequest>
+    public class PagedQueryMemberDtoValidator : MozValidator<PagedQueryMemberDto>
     {
-        public PagedQueryMemberRequestValidator(ILocalizationService localizationService)
+        public PagedQueryMemberDtoValidator(ILocalizationService localizationService)
         {
             
         }

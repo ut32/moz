@@ -1,5 +1,5 @@
 ﻿
-namespace Moz.Administration.Models.Permissions
+namespace Moz.Admin.Layui.Models.Permissions
 {
     public class IndexModel
     {

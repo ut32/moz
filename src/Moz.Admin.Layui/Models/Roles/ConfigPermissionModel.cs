@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Moz.Administration.Models.Roles
+namespace Moz.Admin.Layui.Models.Roles
 {
     public class ConfigPermissionModel
     {

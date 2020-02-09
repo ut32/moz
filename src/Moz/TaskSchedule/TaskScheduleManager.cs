@@ -9,18 +9,10 @@ using Quartz.Impl;
 
 namespace Moz.TaskSchedule
 {
-    // ReSharper disable once UnusedMember.Global
-    internal class TaskScheduleManager
+    internal class TaskScheduleManager:ITaskScheduleManager
     {
-        public static readonly TaskScheduleManager Instance;
         private readonly IScheduler _scheduler;
-
-        static TaskScheduleManager()
-        {
-            Instance = new TaskScheduleManager();
-        }
-
-        private TaskScheduleManager()
+        public TaskScheduleManager()
         {
             var props = new NameValueCollection
             {
@@ -28,8 +20,9 @@ namespace Moz.TaskSchedule
             };
             var factory = new StdSchedulerFactory(props);
             _scheduler = factory.GetScheduler().GetAwaiter().GetResult();
+            _scheduler.ListenerManager.AddJobListener(new DefaultJobListener());
         }
-
+        
         public async Task Init()
         {
             using (var client = DbFactory.GetClient())
@@ -94,25 +87,20 @@ namespace Moz.TaskSchedule
                 }
 
                 await _scheduler.Start();
-                _scheduler.ListenerManager.AddJobListener(new DefaultJobListener());
             }
         }
-
         public async Task ResumeJob(ScheduleTask scheduleTask)
         {
             await _scheduler.ResumeJob(new JobKey(scheduleTask.JobKey, scheduleTask.JobGroup));
         }
-
         public async Task PauseJob(ScheduleTask scheduleTask) 
         {
             await _scheduler.PauseJob(new JobKey(scheduleTask.JobKey, scheduleTask.JobGroup));
         }
-
         public async Task TriggerJob(ScheduleTask scheduleTask)
         {
             await _scheduler.TriggerJob(new JobKey(scheduleTask.JobKey, scheduleTask.JobGroup));
         }
-
         public async Task DisableJob(ScheduleTask scheduleTask)
         {
             if (!scheduleTask.TriggerKey.IsNullOrEmpty() && !scheduleTask.JobGroup.IsNullOrEmpty())
@@ -146,7 +134,6 @@ namespace Moz.TaskSchedule
                 client.Updateable(scheduleTask).ExecuteCommand();
             }
         }
-
         public async Task EnableJob(ScheduleTask scheduleTask)
         {
             if (!scheduleTask.TriggerKey.IsNullOrEmpty() && !scheduleTask.JobGroup.IsNullOrEmpty())

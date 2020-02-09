@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Moz.Bus.Dtos;
 using Moz.Bus.Dtos.Categories;
+using Moz.Bus.Models.Categories;
 
 namespace Moz.Bus.Services.Categories
 {
@@ -62,7 +63,7 @@ namespace Moz.Bus.Services.Categories
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        ServResult<List<SimpleCategory>> QuerySubCategoriesByParentId(ServRequest<long?> request);
+        ServResult<List<CategoryTree>> QuerySubCategoriesByParentId(ServRequest<long?> request);
         
         /// <summary>
         /// 

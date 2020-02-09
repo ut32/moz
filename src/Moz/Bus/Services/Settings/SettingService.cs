@@ -5,17 +5,19 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Caching.Distributed;
 using Moz.Bus.Models.Configuration;
+using Moz.CMS.Services.Settings;
 using Moz.Configuration;
 using Moz.DataBase;
 using Moz.Events;
 using Moz.Utils;
 
-namespace Moz.CMS.Services.Settings
+namespace Moz.Bus.Services.Settings
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class SettingService : ISettingService
     {
 
+        // ReSharper disable once InconsistentNaming
         private const string SETTING_CACHE_KEY_ALL = "SETTING_CACHE_KEY_ALL";
         
         private readonly IEventPublisher _eventPublisher;

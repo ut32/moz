@@ -8,14 +8,14 @@ namespace Moz.Bus.Dtos.AdminMenus
     /// <summary>
     /// tab_admin_menu
     /// </summary>
-    [Validator(typeof(GetAdminMenuDetailRequestValidator))]
-    public class GetAdminMenuDetailRequest
+    [Validator(typeof(GetAdminMenuDetailDtoValidator))]
+    public class GetAdminMenuDetailDto
     {
-        public long Id {get;set;}      
+        public long Id {get;set;}
     }
     
     
-    public class GetAdminMenuDetailResponse
+    public class GetAdminMenuDetailApo
     {
         /// <summary>
         /// 
@@ -51,9 +51,9 @@ namespace Moz.Bus.Dtos.AdminMenus
     }
     
     
-    public class GetAdminMenuDetailRequestValidator : MozValidator<GetAdminMenuDetailRequest>
+    public class GetAdminMenuDetailDtoValidator : MozValidator<GetAdminMenuDetailDto>
     {
-        public GetAdminMenuDetailRequestValidator(ILocalizationService localizationService)
+        public GetAdminMenuDetailDtoValidator(ILocalizationService localizationService)
         {
             RuleFor(x => x.Id).GreaterThan(0).WithMessage("参数错误");
         }

@@ -16,6 +16,8 @@ namespace Moz.DataBase
 {
     public static class DbFactory
     {
+        private static bool? _isInstalled = false;
+
         public static DbClient GetClient(string name = "default")
         {
 
@@ -37,12 +39,34 @@ namespace Moz.DataBase
             
             return client;
         }
-
-        public static bool IsInstalled(string name = "default")
+        
+        public static bool CheckInstalled(MozOptions mozOptions) 
         {
-            using (var db = GetClient(name))
+            if(_isInstalled != null && _isInstalled.Value) return true;
+            try 
             {
-                return db.DbMaintenance.IsAnyTable("tab_member", false);
+                var dbOption = mozOptions.Db.FirstOrDefault(it => it.Name.Equals("default", StringComparison.OrdinalIgnoreCase));
+                
+                if (dbOption == null)
+                    return false;
+                
+                if(dbOption.MasterConnectionString.IsNullOrEmpty())
+                    return false;
+
+                using (var db = new SqlSugarClient(new ConnectionConfig
+                {
+                    DbType = dbOption.Type,
+                    ConnectionString = dbOption.MasterConnectionString
+                }))
+                {
+                    _isInstalled = db.DbMaintenance.IsAnyTable("tab_member", false);
+                    return _isInstalled.Value;
+                }
+            }
+            catch (Exception ex) 
+            {
+                Console.WriteLine(ex);
+                return false;
             }
         }
     }

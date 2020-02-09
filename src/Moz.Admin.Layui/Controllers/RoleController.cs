@@ -1,24 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using Moz.Administration.Models.AdminMenus;
-using Moz.Administration.Models.Roles;
-using Moz.Domain.Dtos.Members.Permissions;
-using Moz.Domain.Dtos.Members.Roles;
-using Moz.Domain.Services.AdminMenus;
-using Moz.Domain.Services.Members;
-using Moz.Exceptions;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
-using Moz.Auth;
+using Moz.Admin.Layui.Models.Roles;
 using Moz.Auth.Attributes;
 using Moz.Bus.Dtos.AdminMenus;
-using Moz.Bus.Dtos.Members.Permissions;
-using Moz.Bus.Dtos.Members.Roles;
+using Moz.Bus.Dtos.Permissions;
+using Moz.Bus.Dtos.Roles;
+using Moz.Bus.Services.AdminMenus;
 using Moz.Bus.Services.Members;
+using Moz.Bus.Services.Permissions;
+using Moz.Bus.Services.Roles;
 using Moz.Core;
+using Moz.Exceptions;
+using GetMenusByRoleDto = Moz.Bus.Dtos.Roles.GetMenusByRoleDto;
 
-namespace Moz.Administration.Controllers
+namespace Moz.Admin.Layui.Controllers
 {
     [AdminAuth(Permissions = "admin.role")]
     public class RoleController : AdminAuthBaseController
@@ -26,30 +22,34 @@ namespace Moz.Administration.Controllers
         private readonly IMemberService _memberService;
         private readonly IAdminMenuService _adminMenuService;
         private readonly IWorkContext _workContext;
-        public RoleController(IMemberService memberService,IAdminMenuService adminMenuService,IWorkContext workContext)
+        private readonly IRoleService _roleService;
+        private readonly IPermissionService _permissionService;
+        public RoleController(IMemberService memberService,IAdminMenuService adminMenuService,IWorkContext workContext, IRoleService roleService, IPermissionService permissionService)
         {
             this._memberService = memberService;
             this._adminMenuService = adminMenuService;
             this._workContext = workContext;
+            _roleService = roleService;
+            _permissionService = permissionService;
         }
 
         [AdminAuth(Permissions = "admin.role.index")]
         public IActionResult Index()
         {
-            var model = new Moz.Administration.Models.Roles.IndexModel();
+            var model = new IndexModel();
             return View("~/Administration/Views/Role/Index.cshtml",model);
         }
         
         [AdminAuth(Permissions = "admin.role.index")]
-        public IActionResult PagedList(PagedQueryRoleRequest request)
+        public IActionResult PagedList(PagedQueryRoleDto dto)
         {
-            var list = _memberService.PagedQueryRoles(request);
+            var list = _roleService.PagedQueryRoles(dto);
             var result = new
             {
                 Code = 0,
                 Message = "",
-                Total = list.TotalCount,
-                Data = list.List
+                Total = list.Data.TotalCount,
+                Data = list.Data.List
             };
             return Json(result);
         }
@@ -57,30 +57,30 @@ namespace Moz.Administration.Controllers
         [AdminAuth(Permissions = "admin.role.crate")]
         public IActionResult Create()
         {
-            var model = new Moz.Administration.Models.Roles.CreateModel();
+            var model = new CreateModel();
             return View("~/Administration/Views/Role/Create.cshtml",model);
         }
-        
+
 
         [AdminAuth(Permissions = "admin.role.crate")]
         [HttpPost]
-        public IActionResult Create(Moz.Domain.Dtos.Members.Roles.CreateRoleRequest request)
+        public IActionResult Create(CreateRoleDto dto)
         {
-            var resp = _memberService.CreateRole(request);
-            return RespJson(resp);
+            var result = _roleService.CreateRole(dto);
+            return Json(result);
         }
-        
+
         [AdminAuth(Permissions = "admin.role.update")]
-        public IActionResult Update(Moz.Domain.Dtos.Members.Roles.GetRoleDetailRequest request)
+        public IActionResult Update(GetRoleDetailDto dto)
         {
-            var role = _memberService.GetRoleDetail(request);
-            if (role == null)
+            var result = _roleService.GetRoleDetail(dto);
+            if (result.Code>0)
             {
-                throw new MozException("信息不存在，可能被删除");
+                return Json(result);
             }
-            var model = new Moz.Administration.Models.Roles.UpdateModel()
+            var model = new UpdateModel()
             {
-                Role = role
+                Role = result.Data
             };
             return View("~/Administration/Views/Role/Update.cshtml",model);
         }
@@ -88,32 +88,61 @@ namespace Moz.Administration.Controllers
 
         [HttpPost]
         [AdminAuth(Permissions = "admin.role.update")]
-        public IActionResult Update(Moz.Domain.Dtos.Members.Roles.UpdateRoleRequest request)
+        public IActionResult Update(UpdateRoleDto dto)
         {
-            var resp = _memberService.UpdateRole(request); 
-            return RespJson(resp);
+            var result = _roleService.UpdateRole(dto); 
+            return Json(result);
         }
         
         [HttpPost]
         [AdminAuth(Permissions = "admin.role.delete")]
-        public IActionResult Delete(Moz.Domain.Dtos.Members.Roles.DeleteRoleRequest request)
+        public IActionResult Delete(DeleteRoleDto dto)
         {
-            var resp = _memberService.DeleteRole(request);
-            return RespJson(resp);
+            var result = _roleService.DeleteRole(dto);
+            return Json(result);
+        }
+        
+        
+        [HttpPost]
+        [AdminAuth(Permissions = "admin.role.setIsActive")]
+        public IActionResult SetIsActive(SetIsActiveRoleDto dto)
+        {
+            var result = _roleService.SetIsActive(dto);
+            return Json(result);
+        }
+        
+        [HttpPost]
+        [AdminAuth(Permissions = "admin.role.setIsAdmin")]
+        public IActionResult SetIsAdmin(SetIsAdminRoleDto dto)
+        {
+            var result = _roleService.SetIsAdmin(dto);
+            return Json(result);
         }
 
         [AdminAuth(Permissions = "admin.role.configPermission")]
-        public IActionResult ConfigPermission(GetPermissionsByRoleRequest request)
+        public IActionResult ConfigPermission(GetPermissionsByRoleDto dto)
         {
 
-            var allPermissions = _memberService.PagedQueryPermissions(new PagedQueryPermissionRequest()
+            var pagedQueryPermissionsResult 
+                = _permissionService.PagedQueryPermissions(new PagedQueryPermissionDto()
             {
                 Page = 1,
                 PageSize = 10000
             });
-            var permissionsByRole = _memberService.GetPermissionsByRole(request);
+            if (pagedQueryPermissionsResult.Code > 0)
+            {
+                return Json(pagedQueryPermissionsResult);
+            }
 
-            var configPermissions = allPermissions.List
+            var getPermissionsResult = _roleService.GetPermissionsByRole(dto);
+            if (getPermissionsResult.Code > 0)
+            {
+                return Json(getPermissionsResult);
+            }
+
+            var permissionsByRole = getPermissionsResult.Data;
+            
+            var configPermissions = pagedQueryPermissionsResult.Data.List
                 .OrderBy(t => t.OrderIndex)
                 .ThenBy(t => t.Id)
                 .Select(t => new ConfigPermissionItem()
@@ -126,7 +155,7 @@ namespace Moz.Administration.Controllers
                 }).ToList();
             var model = new ConfigPermissionModel()
             {
-                RoleId = request.RoleId,
+                RoleId = dto.RoleId,
                 Permissions = configPermissions
             };
 
@@ -135,25 +164,31 @@ namespace Moz.Administration.Controllers
 
         [HttpPost]
         [AdminAuth(Permissions = "admin.role.configPermission")]
-        public IActionResult ConfigPermission(Moz.Domain.Dtos.Members.Roles.ConfigPermissionRequest request)
+        public IActionResult ConfigPermission(ConfigPermissionDto dto)
         {
-            var resp = _memberService.ConfigPermission(request); 
-            //_workContext.CurrentMember
-            return RespJson(resp);
+            var result = _roleService.ConfigPermission(dto);
+            return Json(result);
         }
         
         [AdminAuth(Permissions = "admin.role.configMenu")]
-        public IActionResult ConfigMenu(GetMenusByRoleRequest request)
+        public IActionResult ConfigMenu(GetMenusByRoleDto dto)
         {
 
-            var allMenus = _adminMenuService.PagedQueryAdminMenus(new PagedQueryAdminMenuRequest()
+            var allMenus = _adminMenuService.PagedQueryAdminMenus(new PagedQueryAdminMenusDto()
             {
                 Page = 1,
                 PageSize = 10000
             });
-            var menusByRole = _adminMenuService.GetMenusByRole(request);
+            
+            var getMenusByRoleResult = _roleService.GetMenusByRole(dto);
+            if (getMenusByRoleResult.Code > 0)
+            {
+                return Json(getMenusByRoleResult);
+            }
 
-            var configMenus = allMenus.List
+            var menusByRole = getMenusByRoleResult.Data;
+
+            var configMenus = allMenus.Data.List
                 .OrderBy(t => t.OrderIndex)
                 .ThenBy(t => t.Id)
                 .Select(t => new ConfigMenuItem()
@@ -166,7 +201,7 @@ namespace Moz.Administration.Controllers
                 }).ToList();
             var model = new ConfigMenuModel()
             {
-                RoleId = request.RoleId,
+                RoleId = dto.RoleId,
                 Menus = configMenus
             };
 
@@ -175,26 +210,12 @@ namespace Moz.Administration.Controllers
 
         [HttpPost]
         [AdminAuth(Permissions = "admin.role.configMenu")]
-        public IActionResult ConfigMenu(ConfigMenuRequest request)
+        public IActionResult ConfigMenu(ConfigMenuDto dto)
         {
-            var resp = _memberService.ConfigMenu(request); 
-            return RespJson(resp);
+            var result = _roleService.ConfigMenu(dto); 
+            return Json(result);
         }
 
-        [HttpPost]
-        [AdminAuth(Permissions = "admin.role.setisactive")]
-        public IActionResult SetIsActive(SetRoleIsActiveRequest request)
-        {
-            var resp = _memberService.SetRoleIsActive(request);
-            return RespJson(resp);
-        }
         
-        [HttpPost]
-        [AdminAuth(Permissions = "admin.role.setisadmin")]
-        public IActionResult SetIsAdmin(SetRoleIsAdminRequest request)
-        {
-            var resp = _memberService.SetRoleIsAdmin(request);
-            return RespJson(resp);
-        }
     }
 }

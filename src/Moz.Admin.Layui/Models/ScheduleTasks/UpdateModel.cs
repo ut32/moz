@@ -1,8 +1,8 @@
-﻿namespace Moz.Administration.Models.ScheduleTasks
+﻿namespace Moz.Admin.Layui.Models.ScheduleTasks
 {
     public class UpdateModel
     {
-         public Moz.Biz.Dtos.ScheduleTasks.GetScheduleTaskDetailResponse ScheduleTask { get; set; }
+         public Moz.Bus.Dtos.ScheduleTasks.ScheduleTaskDetailApo ScheduleTask { get; set; }
     }
     
 }

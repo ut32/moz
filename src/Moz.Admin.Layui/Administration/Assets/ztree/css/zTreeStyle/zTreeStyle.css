@@ -120,12 +120,77 @@ website:	http://code.google.com/p/jquerytree/
 .ztree li span.button.switch {width:18px; height:23px}
 .ztree li span.button.root_open{background-position:-92px -54px}
 .ztree li span.button.root_close{background-position:-74px -54px}
-.ztree li span.button.roots_open{background-position:-92px 0}
-.ztree li span.button.roots_close{background-position:-74px 0}
+.ztree li span.button.roots_open,.ztree li span.button.root_open{
+    background: url(./img/line_conn.gif) 0 0 repeat-y;
+    position: relative;
+    font-family: "zuifont", serif !important;
+    font-size:16px;
+    font-style:normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #555;
+}
+.ztree li span.button.roots_open:after,.ztree li span.button.root_open:after{
+    content: "\e656";
+    width: 13px;
+    height: 12px;
+    background: #fff;
+    position: absolute;
+    left: 0;
+    top: 6px;
+    line-height: 12px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.ztree li span.button.roots_open:before,.ztree li span.button.root_open:before{
+    width: 9px;
+    height: 12px;
+    border-bottom: #d2d2d2 1px solid;
+    content: ' ';
+    position: absolute;
+    left: 8px;
+    top: 0;
+}
+
+.ztree li span.button.roots_close,.ztree li span.button.root_close{
+
+    background: url(./img/line_conn.gif) 0 0 repeat-y;
+    position: relative;
+    font-family: "zuifont", serif !important;
+    font-size:16px;
+    font-style:normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #555;
+}
+.ztree li span.button.roots_close:after,.ztree li span.button.root_close:after{
+    content: "\e657";
+    width: 13px;
+    height: 12px;
+    background: #fff;
+    position: absolute;
+    left: 0;
+    top: 6px;
+    line-height: 12px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.ztree li span.button.roots_close:before,.ztree li span.button.root_close:before{
+    width: 9px;
+    height: 12px;
+    border-bottom: #d2d2d2 1px solid;
+    content: ' ';
+    position: absolute;
+    left: 8px;
+    top: 0;
+}
+
 .ztree li span.button.center_open{
     background: url(./img/line_conn.gif) 0 0 repeat-y;
     position: relative;
-    font-family:"zuifont" !important;
+    font-family: "zuifont", serif !important; 
     font-size:16px;
     font-style:normal;
     -webkit-font-smoothing: antialiased;
@@ -157,7 +222,7 @@ website:	http://code.google.com/p/jquerytree/
 .ztree li span.button.center_close{
     background: url(./img/line_conn.gif) 0 0 repeat-y;
     position: relative;
-    font-family:"zuifont" !important;
+    font-family: "zuifont", serif !important;
     font-size:16px;
     font-style:normal;
     -webkit-font-smoothing: antialiased;

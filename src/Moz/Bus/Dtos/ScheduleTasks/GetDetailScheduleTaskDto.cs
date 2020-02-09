@@ -4,26 +4,19 @@ using Moz.Bus.Models.ScheduleTasks;
 using Moz.Bus.Services.Localization;
 using Moz.Validation;
 
-namespace Moz.Biz.Dtos.ScheduleTasks
+namespace Moz.Bus.Dtos.ScheduleTasks
 {
     /// <summary>
     /// tab_schedule_task
     /// </summary>
-    [Validator(typeof(GetScheduleTaskDetailRequestValidator))]
-    public class GetScheduleTaskDetailRequest
+    [Validator(typeof(GetScheduleTaskDetailDtoValidator))]
+    public class GetScheduleTaskDetailDto
     {
-        #region 属性
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get;set; } 
-        
-        #endregion     
+        public long Id {get;set;}      
     }
     
     
-    public class GetScheduleTaskDetailResponse
+    public class ScheduleTaskDetailApo
     {
         /// <summary>
         /// 
@@ -98,16 +91,16 @@ namespace Moz.Biz.Dtos.ScheduleTasks
         /// <summary>
         /// 
         /// </summary>
-        public System.DateTime? LastSuccessTime { get;set; } 
+        public System.DateTime? LastSuccessTime { get;set; }  
         
     }
     
     
-    public class GetScheduleTaskDetailRequestValidator : MozValidator<GetScheduleTaskDetailRequest>
+    public class GetScheduleTaskDetailDtoValidator : MozValidator<GetScheduleTaskDetailDto>
     {
-        public GetScheduleTaskDetailRequestValidator(ILocalizationService localizationService)
+        public GetScheduleTaskDetailDtoValidator(ILocalizationService localizationService)
         {
-            RuleFor(x => x.Id).GreaterThan(0).WithMessage("发生错误");
+            RuleFor(x => x.Id).GreaterThan(0).WithMessage("参数错误");
         }
     }
     

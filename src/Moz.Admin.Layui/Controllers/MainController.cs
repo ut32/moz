@@ -33,5 +33,10 @@ namespace Moz.Admin.Layui.Controllers
             };
             return View("~/Administration/Views/Main/Index.cshtml", model);
         }
+
+        public IActionResult Welcome()
+        {
+            return View("~/Administration/Views/Main/Index.cshtml");
+        }
     }
 }

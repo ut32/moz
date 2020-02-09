@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Security.Cryptography.X509Certificates;
 
-namespace Moz.Administration.Models.ScheduleTasks
+namespace Moz.Admin.Layui.Models.ScheduleTasks
 {
     public class CreateModel
     {

@@ -1,4 +1,4 @@
-@model Moz.Administration.Models.Roles.IndexModel
+@model Moz.Admin.Layui.Models.Roles.IndexModel
 @{
     Layout = null;
     var guid = Guid.NewGuid().ToString("N");
@@ -42,6 +42,21 @@
     <a class="layui-btn layui-btn-disabled layui-btn-xs " href="javascript:;">
         <i class="layui-icon layui-icon-delete"></i>删除
     </a>
+        {{# if(d.Code=='Administrator'){ }}
+        <a class="layui-btn layui-btn-disabled layui-btn-xs " href="javascript:;">
+            <i class="layui-icon layui-icon-delete"></i>权限配置
+        </a>
+        <a class="layui-btn layui-btn-disabled layui-btn-xs " href="javascript:;">
+            <i class="layui-icon layui-icon-delete"></i>菜单配置
+        </a>
+        {{# }else{ }}
+        <a class="layui-btn  layui-btn-warm layui-btn-xs" href="javascript:;" zui-href="@Url.Action("ConfigPermission", "Role")?roleid={{d.Id}}" zui-type="dialog" zui-width="500px" zui-height="600px" title="{{d.Name}}-权限配置">
+            <i class="layui-icon layui-icon-auz"></i>权限配置
+        </a>
+        <a class="layui-btn layui-btn-xs" href="javascript:;" zui-href="@Url.Action("ConfigMenu", "Role")?roleid={{d.Id}}" zui-type="dialog" zui-width="500px" zui-height="600px" title="{{d.Name}}-管理菜单配置">
+            <i class="layui-icon layui-icon-spread-left"></i>菜单配置
+        </a>
+        {{# } }}
     {{# }else{ }}
     <a class="layui-btn layui-btn-normal layui-btn-xs" href="javascript:;" zui-href="@Url.Action("update", "Role")?id={{d.Id}}" zui-type="dialog" zui-width="500px" zui-height="400px" title="编辑角色">
         <i class="layui-icon layui-icon-edit"></i>编辑
@@ -49,13 +64,13 @@
     <a class="layui-btn layui-btn-danger layui-btn-xs" href="javascript:;" zui-href="@Url.Action("delete", "Role")?id={{d.Id}}" zui-type="ajax" zui-confirm="你确认删除此条信息(ID={{d.Id}})吗？">
         <i class="layui-icon layui-icon-delete"></i>删除
     </a>
-    {{# } }}
     <a class="layui-btn  layui-btn-warm layui-btn-xs" href="javascript:;" zui-href="@Url.Action("ConfigPermission", "Role")?roleid={{d.Id}}" zui-type="dialog" zui-width="500px" zui-height="600px" title="{{d.Name}}-权限配置">
         <i class="layui-icon layui-icon-auz"></i>权限配置
     </a>
     <a class="layui-btn layui-btn-xs" href="javascript:;" zui-href="@Url.Action("ConfigMenu", "Role")?roleid={{d.Id}}" zui-type="dialog" zui-width="500px" zui-height="600px" title="{{d.Name}}-管理菜单配置">
         <i class="layui-icon layui-icon-spread-left"></i>菜单配置
     </a>
+    {{# } }}
 </script>
 <script type="text/html" id="activeTpl_@(guid)">
     {{#
@@ -120,7 +135,7 @@
                             unresize: true
                         },
                         {
-                             title: '操作', width: 330, toolbar: '#toolbar_@(guid)'
+                             title: '操作', width: 350, toolbar: '#toolbar_@(guid)'
                         }
                     ]
                 ],

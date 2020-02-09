@@ -1,9 +1,9 @@
 using Moz.Bus.Dtos.AdminMenus;
 
-namespace Moz.Administration.Models.AdminMenus
+namespace Moz.Admin.Layui.Models.AdminMenus
 {
     public class UpdateModel
     {
-        public GetAdminMenuDetailResponse Detail { get; set; }
+        public GetAdminMenuDetailApo Detail { get; set; }
     }
 }

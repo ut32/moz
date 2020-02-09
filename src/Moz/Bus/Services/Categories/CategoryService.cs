@@ -328,20 +328,20 @@ namespace Moz.Bus.Services.Categories
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ServResult<List<SimpleCategory>> QuerySubCategoriesByParentId(ServRequest<long?> request)
+        public ServResult<List<CategoryTree>> QuerySubCategoriesByParentId(ServRequest<long?> request)
         {
             return GetAllSubCategories(request.Data);
         }
 
-        private List<SimpleCategory> GetAllSubCategories(long? parentId)
+        private List<CategoryTree> GetAllSubCategories(long? parentId)
         {
             var list = GetCategoriesListCached(); 
             var subCategories = list.Where(t => t.ParentId == parentId).ToList();
-            var result = new List<SimpleCategory>();
+            var result = new List<CategoryTree>();
             // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
             foreach (var subCategory in subCategories)
             {
-                result.Add(new SimpleCategory()
+                result.Add(new CategoryTree()
                 {
                     Id = subCategory.Id,
                     Name = subCategory.Name,

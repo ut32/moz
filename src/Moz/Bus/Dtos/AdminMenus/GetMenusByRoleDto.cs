@@ -6,19 +6,19 @@ using Moz.Validation;
 
 namespace Moz.Bus.Dtos.AdminMenus
 {
-    public class GetMenusByRoleRequest
+    public class GetMenusByRoleDto
     {
         public long RoleId { get; set; }
     }
 
-    public class GetMenusByRoleResponse
+    public class GetMenusByRoleApo
     {
         public List<AdminMenu> Menus { get; set; }
     }
     
-    public class GetMenusByRoleValidator: MozValidator<GetMenusByRoleRequest>
+    public class GetMenusByRoleDtoValidator: MozValidator<GetMenusByRoleDto>
     {
-        public GetMenusByRoleValidator(ILocalizationService localizationService)
+        public GetMenusByRoleDtoValidator(ILocalizationService localizationService)
         {
             RuleFor(x => x.RoleId).GreaterThan(0).WithMessage("参数错误");
         }

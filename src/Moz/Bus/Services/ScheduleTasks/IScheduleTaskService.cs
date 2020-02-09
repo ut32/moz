@@ -1,18 +1,58 @@
-﻿using Moz.Biz.Dtos.ScheduleTasks;
+﻿using Moz.Bus.Dtos;
 using Moz.Bus.Dtos.ScheduleTasks;
 
-namespace Moz.CMS.Services.ScheduleTasks
+namespace Moz.Bus.Services.ScheduleTasks
 {
     public interface IScheduleTaskService
     {
-        CreateScheduleTaskResponse CreateScheduleTask(CreateScheduleTaskRequest request);
-        UpdateScheduleTaskResponse UpdateScheduleTask(UpdateScheduleTaskRequest request);
-        DeleteScheduleTaskResponse DeleteScheduleTask(DeleteScheduleTaskRequest request);
-        GetScheduleTaskDetailResponse GetScheduleTaskDetail(GetScheduleTaskDetailRequest request);
-        PagedQueryScheduleTaskResponse PagedQueryScheduleTasks(PagedQueryScheduleTaskRequest request);
+        /// <summary>
+        /// 创建
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        ServResult CreateScheduleTask(ServRequest<CreateScheduleTaskDto> request);
+        
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        ServResult UpdateScheduleTask(ServRequest<UpdateScheduleTaskDto> request);
+        
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        ServResult DeleteScheduleTask(ServRequest<DeleteScheduleTaskDto> request);
 
-        ExecuteScheduleTaskResponse ExecuteScheduleTask(ExecuteScheduleTaskRequest request);
+        /// <summary>
+        /// 获取单条数据
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        ServResult<ScheduleTaskDetailApo> GetScheduleTaskDetail(ServRequest<GetScheduleTaskDetailDto> request);
+        
+        /// <summary> 
+        /// 分页查询
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        ServResult<PagedList<QueryScheduleTaskItem>> PagedQueryScheduleTasks(ServRequest<PagedQueryScheduleTaskDto> request);
+ 
 
-        SetIsEnableScheduleTaskResponse SetIsEnableScheduleTask(SetIsEnableScheduleTaskRequest request);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        ServResult ExecuteScheduleTask(ServRequest<ExecuteScheduleTaskDto> request);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        ServResult SetIsEnableScheduleTask(ServRequest<SetIsEnableScheduleTaskDto> request);
     }
 }

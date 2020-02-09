@@ -1,18 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using Moz.Bus.Dtos;
 using Moz.Bus.Dtos.AdminMenus;
-using Moz.Common;
 
-namespace Moz.Domain.Services.AdminMenus
+namespace Moz.Bus.Services.AdminMenus
 {
     public interface IAdminMenuService
     {
-        CreateAdminMenuResponse CreateAdminMenu(CreateAdminMenuRequest request);
-        UpdateAdminMenuResponse UpdateAdminMenu(UpdateAdminMenuRequest request);
-        DeleteAdminMenuResponse DeleteAdminMenu(DeleteAdminMenuRequest request);
-        SetAdminMenuOrderIndexResponse SetAdminMenuOrderIndex(SetAdminMenuOrderIndexRequest request);
-        GetAdminMenuDetailResponse GetAdminMenuDetail(GetAdminMenuDetailRequest request);
-        PagedQueryAdminMenuResponse PagedQueryAdminMenus(PagedQueryAdminMenuRequest request);
-        GetMenusByRoleResponse GetMenusByRole(GetMenusByRoleRequest request);
-        QueryChildrenByParentIdResponse QueryChildrenByParentId(QueryChildrenByParentIdRequest request);
+        ServResult CreateAdminMenu(ServRequest<CreateAdminMenuDto> request);
+        ServResult UpdateAdminMenu(ServRequest<UpdateAdminMenuDto> request);
+        ServResult DeleteAdminMenu(ServRequest<DeleteAdminMenuDto> request);
+        ServResult SetAdminMenuOrderIndex(ServRequest<SetAdminMenuOrderIndexDto> request);
+        ServResult<GetAdminMenuDetailApo> GetAdminMenuDetail(ServRequest<GetAdminMenuDetailDto> request);
+        ServResult<PagedList<QueryAdminMenuItem>> PagedQueryAdminMenus(ServRequest<PagedQueryAdminMenusDto> request);
+        //ServResult<GetMenusByRoleApo> GetMenusByRole(ServRequest<GetMenusByRoleDto> request);
+        ServResult<QueryChildrenByParentIdApo> QueryChildrenByParentId(ServRequest<QueryChildrenByParentIdDto> request);
     }
 }

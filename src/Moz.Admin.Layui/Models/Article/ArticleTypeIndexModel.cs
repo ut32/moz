@@ -2,6 +2,7 @@
 using Moz.Common;
 using Moz.Utils;
 
+/*
 namespace Moz.Presentation.Administration.Models.Articles
 {
     public class ArticleTypeIndexModel
@@ -10,3 +11,4 @@ namespace Moz.Presentation.Administration.Models.Articles
         //public ArticleTypeSearchModel Search { get; set; }
     }
 }
+*/

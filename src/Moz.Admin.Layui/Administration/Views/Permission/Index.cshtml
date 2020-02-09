@@ -1,11 +1,28 @@
-﻿@model Moz.Administration.Models.Permissions.IndexModel
+﻿@model Moz.Admin.Layui.Models.Permissions.IndexModel
 @{
     Layout = null;
     var guid = Guid.NewGuid().ToString("N");
 }
 <div class="zui-page layui-form" lay-filter="form-@guid">
     <div class="layui-card">
-        <div style="height: 5px"></div>
+        <div class="layui-card-header" style="padding: 20px 0;">
+            <div class="layui-form-item">
+        
+                <div class="layui-inline">
+                    <label class="layui-form-label">关键字</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="keyword" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+        
+                <div class="layui-inline">
+                    <button class="layui-btn" lay-submit="" zui-event="search">
+                        <i class="layui-icon layui-icon-search"></i>
+                    </button>
+                </div>
+        
+            </div>
+        </div>
         <div class="layui-card-body">
             <div class="layui-btn-group">
                 <a class="layui-btn" href="javascript:;" zui-href="@Url.Action("create", "Permission")" zui-type="dialog" zui-width="800px" zui-height="400px" title="添加"><i class="layui-icon">&#xe654;</i> 添加</a>
@@ -66,7 +83,7 @@
                 treeSpid: null, // treetable新增参数
                 treeIdName: 'Id', // treetable新增参数
                 treePidName: 'ParentId', // treetable新增参数
-                treeDefaultClose: true, // treetable新增参数
+                treeDefaultClose: false, // treetable新增参数
                 treeLinkage: true, // treetable新增参数
                 url: '@Url.Action("PagedList", "Permission",new{ PageSize = 10000})',
                 cols: [

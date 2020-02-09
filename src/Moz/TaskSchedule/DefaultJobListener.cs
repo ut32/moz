@@ -17,23 +17,18 @@ namespace Moz.TaskSchedule
                 var jobKey = context.JobDetail.Key.Name;
                 using (var client = DbFactory.GetClient())
                 {
-                    var scheduleTask = client.Queryable<ScheduleTask>().Single(t => t.JobKey == jobKey);
-                    if (scheduleTask != null)
-                    {
-                        scheduleTask.LastStartTime = DateTime.Now;
-                        client.Updateable(scheduleTask).UpdateColumns(t => new
+                    await client.Updateable<ScheduleTask>()
+                        .SetColumns(it => new ScheduleTask()
                         {
-                            t.LastStartTime
-                        }).ExecuteCommand();
-                    }
+                            LastStartTime = DateTime.Now
+                        }).Where(it => it.JobKey == jobKey)
+                        .ExecuteCommandAsync();
                 }
             }
             catch (Exception e)
             {
                 // ignored
             }
-
-            await Task.Delay(0, cancellationToken);
         }
 
         public async Task JobExecutionVetoed(IJobExecutionContext context,
@@ -49,7 +44,6 @@ namespace Moz.TaskSchedule
             {
                 if (jobException != null)
                 {
-                    Console.WriteLine(jobException);
                     jobException.UnscheduleAllTriggers = true;
                 }
 

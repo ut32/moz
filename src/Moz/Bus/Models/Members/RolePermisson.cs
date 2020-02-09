@@ -3,10 +3,10 @@
 namespace Moz.Bus.Models.Members
 {
     /// <summary>
-    ///     role_permisson
+    ///     
     /// </summary>
-    [SugarTable("tab_role_permisson")]
-    public class RolePermisson : BaseModel
+    [SugarTable("tab_role_permission")]
+    public class RolePermission : BaseModel
     {
         #region 属性
 
@@ -17,8 +17,8 @@ namespace Moz.Bus.Models.Members
 
         /// <summary>
         /// </summary>
-        [SugarColumn(ColumnName = "permisson_id")]
-        public long PermissonId { get; set; }
+        [SugarColumn(ColumnName = "permission_id")]
+        public long PermissionId { get; set; }
 
         #endregion
     }

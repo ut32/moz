@@ -5,13 +5,9 @@ using Moz.Validation;
 
 namespace Moz.Bus.Dtos.Members
 {
-    public class ChangePasswordResponse
-    {
-        
-    }
 
-    [Validator(typeof(ChangePasswordRequestValidator))]
-    public class ChangePasswordRequest
+    [Validator(typeof(ChangePasswordDtoValidator))]
+    public class ChangePasswordDto
     { 
         public long MemberId { get; set; }
         public string OldPassword { get; set; }
@@ -19,9 +15,9 @@ namespace Moz.Bus.Dtos.Members
         public string ConfirmPassword { get; set; } 
     }
 
-    public class ChangePasswordRequestValidator : MozValidator<ChangePasswordRequest>
+    public class ChangePasswordDtoValidator : MozValidator<ChangePasswordDto>
     {
-        public ChangePasswordRequestValidator(ILocalizationService localizationService)
+        public ChangePasswordDtoValidator(ILocalizationService localizationService)
         {
             RuleFor(it => it.MemberId).GreaterThan(0).WithMessage("参数不正确");
             RuleFor(it => it.OldPassword).NotEmpty().WithMessage("旧密码不能为空");

@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
+using Moz.Admin.Layui.Models.Members;
 using Moz.Administration.Models.Members;
+using Moz.Auth.Attributes;
 using Moz.Bus.Dtos.Members;
-using Moz.Bus.Dtos.Members.Roles;
+using Moz.Bus.Dtos.Roles;
 using Moz.Bus.Services.Members;
+using Moz.Bus.Services.Roles;
 using Moz.Configuration;
 using Moz.Core;
 using Moz.Exceptions;
@@ -13,42 +17,48 @@ using Moz.Presentation.Administration.Models.Articles;
 
 namespace Moz.Admin.Layui.Controllers
 {
-    //[Permission(Name = "MEMBER_MANAGE")]
+    [AdminAuth(Permissions = "admin.member")]
     public class MemberController : AdminAuthBaseController
     {
         private readonly IMemberService _memberService;
         private readonly AdminSettings _adminSettings;
         private readonly IWorkContext _workContext;
+        private readonly IRoleService _roleService;
         
-        public MemberController(IMemberService memberService,AdminSettings adminSettings,IWorkContext workContext)
+        public MemberController(IMemberService memberService,AdminSettings adminSettings,IWorkContext workContext, IRoleService roleService)
         {
             _adminSettings = adminSettings;
             _memberService = memberService;
             _workContext = workContext;
+            _roleService = roleService;
         }
 
-        //[AdminAuthorize(Permissions = "admin.member.index")]
+        [AdminAuth(Permissions = "admin.member.index")]
         public IActionResult Index()
         {
             var model = new Moz.Administration.Models.Members.IndexModel();
             return View("~/Administration/Views/Member/Index.cshtml",model);
         }
         
-        //[AdminAuthorize(Permissions = "admin.member.index")]
-        public IActionResult PagedList(PagedQueryMemberRequest request)
+        [AdminAuth(Permissions = "admin.member.index")]
+        public IActionResult PagedList(PagedQueryMemberDto dto)
         {
-            var list = _memberService.PagedQueryMembers(request);
+            var pagedQueryMembersResult = _memberService.PagedQueryMembers(dto);
+            if (pagedQueryMembersResult.Code > 0)
+            {
+                return Json(pagedQueryMembersResult);
+            }
             var result = new
             {
                 Code = 0,
                 Message = "",
-                Total = list.TotalCount,
-                Data = list.List
+                Total = pagedQueryMembersResult.Data.TotalCount,
+                Data = pagedQueryMembersResult.Data.List
             };
             return Json(result);
         }
         
-        //[AdminAuthorize(Permissions = "admin.member.create")]
+        [AdminAuth(Permissions = "admin.member.create")]
         public IActionResult Create()
         {
             var model = new  Moz.Administration.Models.Members.CreateModel();
@@ -57,68 +67,52 @@ namespace Moz.Admin.Layui.Controllers
         
 
         [HttpPost]
-        //[AdminAuthorize(Permissions = "admin.member.create")]
-        public IActionResult Create(Moz.Biz.Dtos.Members.CreateMemberRequest request)
+        [AdminAuth(Permissions = "admin.member.create")]
+        public IActionResult Create(CreateMemberDto dto)
         {
-            //var resp = _memberService.CreateMember(request);
-            return RespJson(new{});
+            var result = _memberService.CreateMember(dto);
+            return Json(result);
         }
         
-        //[AdminAuthorize(Permissions = "admin.member.update")]
-        public IActionResult Update(long id)
+        
+        [AdminAuth(Permissions = "admin.member.update")]
+        public IActionResult Update(GetMemberDetailDto dto)
         {
-            var request = new GetMemberDetailRequest
+            var getMemberDetailResult = _memberService.GetMemberDetail(dto);
+            if(getMemberDetailResult.Code>0)
             {
-                Id = id
-            };
-            var member = _memberService.GetMemberDetail(request);
-            if (member == null)
-                throw new MozException("信息不存在，可能被删除");
+                return Json(getMemberDetailResult);
+            }
 
-            var roles = _memberService.PagedQueryRoles(new PagedQueryRoleRequest
+            var pagedQueryRolesResult = _roleService.PagedQueryRoles(new PagedQueryRoleDto
             {
                 PageSize = 100
             });
-            var model = new Moz.Administration.Models.Members.UpdateModel
+            if (pagedQueryRolesResult.Code > 0)
             {
-                Member = member,
-                Roles = roles.List
+                return Json(pagedQueryRolesResult);
+            }
+
+            var model = new UpdateModel
+            {
+                Member = getMemberDetailResult.Data,
+                Roles = pagedQueryRolesResult.Data.List
             };
             return View("~/Administration/Views/Member/Update.cshtml", model);
         }
 
 
         [HttpPost]
-        //[AdminAuthorize(Permissions = "admin.member.update")]
-        public IActionResult Update(SaveUpdateModel model)
+        [AdminAuth(Permissions = "admin.member.update")]
+        public IActionResult Update(UpdateMemberDto dto)
         {
-            var request = new UpdateMemberRequest
-            {
-                Id = model.Id,
-                Username = model.Username,
-                Password = model.Password,
-                Email = model.Email,
-                Mobile = model.Mobile,
-                Nickname = model.Nickname,
-                Avatar = model.Avatar,
-                Gender = model.Gender,
-                BirthDay = model.BirthDay,
-                Roles = model.Roles
-            };
-            var resp = _memberService.UpdateMember(request); 
-            return RespJson(new{});
-        }
+            var result = _memberService.UpdateMember(dto); 
+            return Json(result);
+        } 
 
         [HttpPost]
         //[AdminAuthorize(Permissions = "admin.member.setisactive")]
         public IActionResult SetIsActive()
-        {
-            return RespJson(null);
-        }
-        
-        [HttpPost]
-        //[AdminAuthorize(Permissions = "admin.member.setorderindex")]
-        public IActionResult SetOrderIndex()
         {
             return RespJson(null);
         }
@@ -136,23 +130,22 @@ namespace Moz.Admin.Layui.Controllers
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult ChangePwd(ChangePwdModel model)
+        public IActionResult ChangePwd(ChangePasswordDto dto)
         {
-            var request = new ChangePasswordRequest
-            {
-                ConfirmPassword = model.ConfirmPassword,
-                MemberId = _workContext.CurrentMember.Id,
-                NewPassword = model.NewPassword,
-                OldPassword = model.OldPassword
-            };
-            var resp = _memberService.ChangePassword(request);
-            return RespJson(resp);
+            dto.MemberId = _workContext.CurrentMember.Id;
+            var result = _memberService.ChangePassword(dto);
+            return Json(result);
         }
         
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult ResetPwd(long[] ids)
         {
@@ -160,58 +153,12 @@ namespace Moz.Admin.Layui.Controllers
             if (!_adminSettings.ResetPassword.IsNullOrEmpty())
                 newPwd = _adminSettings.ResetPassword;
             
-            var response = _memberService.ResetPassword(new ResetPasswordRequest()
+            var dto = _memberService.ResetPassword(new ResetPasswordDto()
             {
                 NewPassword =newPwd,
                 MemberIds = ids
             });
-            return RespJson(response); 
+            return Json(dto); 
         }
-
-        #region 权限管理
-
-        public IActionResult PermissionList()
-        {
-            /*
-            var list = _memberService.GetPermissionsPagedList(
-                t=>new Permission(){ Id=t.Id,Name = t.Name,Code = t.Code,IsActive = t.IsActive}, 
-                null,
-                null,
-                (searchModel.Page ?? 1) - 1,
-                searchModel.NumPerPage ?? 50); 
-            var model = new PermissionListModel
-            {
-                PagedList = list
-            };
-            */
-
-            //return View("~/Administration/Views/Member/PermissionList.cshtml", null);
-            return null;
-        }
-
-
-        public IActionResult SetPermissionActive(long id)
-        {
-            Thread.Sleep(1000);
-            return Json(new
-            {
-                Code = 0,
-                Message = "保存成功",
-                navTabId = "permissionlist"
-            });
-        }
-
-        [HttpPost]
-        public IActionResult ArticleTypeAdd(ArticleTypeAddSaveModel model)
-        {
-            return Json(new
-            {
-                Code = 0,
-                Message = "保存成功",
-                navTabId = "articletypelist"
-            });
-        }
-
-        #endregion
     }
 }

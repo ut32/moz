@@ -1,8 +1,8 @@
 ﻿@using Microsoft.Extensions.Options
 @using Moz.Bus.Dtos.AdminMenus
+@using Moz.Bus.Services.AdminMenus
 @using Moz.Core
 @using Moz.Core.Options
-@using Moz.Domain.Services.AdminMenus
 @model Moz.Administration.Models.Main.IndexRspModel
 @inject IWorkContext WorkContext
 @inject IAdminMenuService AdminMenuService
@@ -34,11 +34,13 @@
             </h1>
             <ul class="layui-nav layui-nav-tree">
                 <li class="layui-nav-item">
-                    <a href="javascript:" zui-href="/home/welcome" zui-type="tab">
+                    <a href="javascript:" zui-href="home/welcome" zui-type="tab">
                         <i class="layui-icon layui-icon-console"></i>
                         <cite>控制台</cite>
                     </a>
                 </li>
+                @if(WorkContext.CurrentMember.IsAdministrator)
+                {
                 <li class="layui-nav-item layui-nav-itemed">
                     <a href="javascript:;">
                         <i class="layui-icon layui-icon-set"></i>
@@ -102,13 +104,14 @@
                         </dd>
                     </dl>
                 </li>
+                }
                 @{
-                    var list = AdminMenuService.PagedQueryAdminMenus(new PagedQueryAdminMenuRequest()
+                    var list = AdminMenuService.PagedQueryAdminMenus(new PagedQueryAdminMenusDto()
                     {
                         Page = 1,
                         PageSize = 10000
                     });
-                    var parents = list.List.Where(t => t.ParentId == null);
+                    var parents = list.Data.List.Where(t => t.ParentId == null);
                 }
                 @foreach (var menu in parents)
                 {
@@ -119,7 +122,7 @@
                             <cite>@menu.Name</cite>
                         </a>
                         <dl class="layui-nav-child">
-                            @foreach (var item in list.List.Where(t=>t.ParentId==menu.Id))
+                            @foreach (var item in list.Data.List.Where(t=>t.ParentId==menu.Id))
                             {
                                 <dd>
                                     <a href="javascript:;" zui-href="@item.Link" zui-type="tab" title="@item.Name">

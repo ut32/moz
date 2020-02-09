@@ -5,12 +5,14 @@
     <Authors>the7</Authors>
     <Copyright>https://ut32.com</Copyright>
     <Description>极速网站开发框架/a light fast web framework for .net core 3.1</Description>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Title>极速网站开发框架/a light fast web framework for .net core 3.1</Title>
     <PackageLicenseUrl>https://github.com/ut32/moz/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/ut32/moz</RepositoryUrl>
     <PackageProjectUrl>https://ut32.com/category/opensource/moz</PackageProjectUrl>
     <PackageTags>极速网站开发框架</PackageTags>
+    <PackageIconUrl>http://t0.qlogo.cn/mbloghead/7623b068c0d72423b8b0/180</PackageIconUrl>
+    <AssemblyVersion>1.0.3</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AspectCore.Extensions.DependencyInjection" Version="2.0.0" />

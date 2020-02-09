@@ -3,13 +3,13 @@ using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
 using Moz.Validation;
 
-namespace Moz.Biz.Dtos.ScheduleTasks
+namespace Moz.Bus.Dtos.ScheduleTasks
 {
     /// <summary>
     /// tab_schedule_task
     /// </summary>
-    [Validator(typeof(ExecuteScheduleTaskRequestValidator))]
-    public class ExecuteScheduleTaskRequest
+    [Validator(typeof(ExecuteScheduleTaskDtoValidator))]
+    public class ExecuteScheduleTaskDto
     {
         #region 属性
         
@@ -20,17 +20,11 @@ namespace Moz.Biz.Dtos.ScheduleTasks
         
         #endregion     
     }
-    
-    
-    public class ExecuteScheduleTaskResponse
+
+
+    public class ExecuteScheduleTaskDtoValidator : MozValidator<ExecuteScheduleTaskDto>
     {
-    
-    }
-    
-    
-    public class ExecuteScheduleTaskRequestValidator : MozValidator<ExecuteScheduleTaskRequest>
-    {
-        public ExecuteScheduleTaskRequestValidator(ILocalizationService localizationService)
+        public ExecuteScheduleTaskDtoValidator(ILocalizationService localizationService)
         {
             RuleFor(x => x.Id).GreaterThan(0).WithMessage("发生错误，参与不能为0");
         }

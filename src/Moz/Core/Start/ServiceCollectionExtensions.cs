@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,9 +25,11 @@ using Moz.Core;
 using Moz.Core.Attributes;
 using Moz.Core.Options;
 using Moz.Core.WorkContext;
+using Moz.DataBase;
 using Moz.Events;
 using Moz.Events.Publishers;
 using Moz.Exceptions;
+using Moz.TaskSchedule;
 using Moz.Utils;
 using Moz.Utils.FileManager;
 using Moz.Utils.Types;
@@ -49,32 +52,33 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.Configure(configure);
 
-            //get system configuration
+            //获取配置
             var buildServiceProvider = services.BuildServiceProvider();
             var configuration = buildServiceProvider.GetService<IConfiguration>();
             var webHostEnvironment = buildServiceProvider.GetService<IWebHostEnvironment>();
 
-            //valid configuration
+            //验证mozOptions
             var options = buildServiceProvider.GetService<IOptions<MozOptions>>();
             if (options?.Value == null)
-                throw new ArgumentNullException(nameof(MozOptions));
+                throw new Exception(nameof(MozOptions));
 
-            //required key 
+            //必须配置EncryptKey
             if (options.Value.EncryptKey.IsNullOrEmpty())
-                throw new ArgumentNullException(nameof(options.Value.EncryptKey));
+                throw new Exception(nameof(options.Value.EncryptKey));
 
+            //必须为16位
             if (options.Value.EncryptKey.Length != 16)
-                throw new ArgumentException("Encrypt Key's length must equal 16");
+                throw new Exception("加密KEY位数不正确，必须为16位");
 
-            //check database connection string
-            if (!options.Value.Db.Any(t => "default".Equals(t.Name, StringComparison.OrdinalIgnoreCase)))
-                throw new ArgumentNullException(nameof(options.Value.Db));
-
+            //检查是否已安装数据库
+            DbFactory.CheckInstalled(options.Value);
+            
             var serviceProvider = ConfigureServices(services, configuration, webHostEnvironment, options.Value);
             EngineContext.Create(serviceProvider);
         }
 
-        private static IServiceProvider ConfigureServices(IServiceCollection services,IConfiguration configuration, IWebHostEnvironment webHostEnvironment,MozOptions mozOptions)
+        private static IServiceProvider ConfigureServices(IServiceCollection services, IConfiguration configuration,
+            IWebHostEnvironment webHostEnvironment, MozOptions mozOptions)
         {
             ServicePointManager.SecurityProtocol =
                 SecurityProtocolType.Tls12 |
@@ -84,9 +88,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("admin_authorize",
-                    policy => { policy.Requirements.Add(new AdminAuthorizationHandler()); });
+                    policy => { policy.Requirements.Add(new DefaultAuthorizationRequirement("admin")); });
                 options.AddPolicy("member_authorize",
-                    policy => { policy.Requirements.Add(new MemberAuthorizationHandler()); });
+                    policy => { policy.Requirements.Add(new DefaultAuthorizationRequirement("member")); });
             });
 
             services.AddAuthentication()
@@ -94,10 +98,10 @@ namespace Microsoft.Extensions.DependencyInjection
                 {
                     cfg.RequireHttpsMetadata = false;
                     cfg.SaveToken = true;
-                    
+
                     var parameters = EngineContext.Current.Resolve<IJwtService>().GetTokenValidationParameters();
                     cfg.TokenValidationParameters = parameters;
-                    
+
                     cfg.Events = new JwtBearerEvents
                     {
                         OnAuthenticationFailed = o => throw new AlertException("auth failure")
@@ -113,15 +117,9 @@ namespace Microsoft.Extensions.DependencyInjection
             });
 
             //添加MVC
-            services.AddMvc(options =>
-                {
-                   
-                })
+            services.AddMvc(options => { })
                 .AddRazorRuntimeCompilation()
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.PropertyNamingPolicy = null;
-                })
+                .AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = null; })
                 .AddFluentValidation(options =>
                 {
                     options.ImplicitlyValidateChildProperties = true;
@@ -140,12 +138,14 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region 依赖注入
 
-            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            services.TryAddTransient<IWorkContext, WebWorkContext>();
-            services.TryAddSingleton<IFileManager, FileManager>();
-            services.TryAddTransient<HttpContextHelper>();
-            services.TryAddSingleton<IEventPublisher, DefaultEventPublisher>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddTransient<IWorkContext, WebWorkContext>();
+            services.AddSingleton<IFileManager, FileManager>();
+            services.AddTransient<HttpContextHelper>();
+            services.AddSingleton<IEventPublisher, DefaultEventPublisher>();
+            services.AddSingleton<ITaskScheduleManager, TaskScheduleManager>();
+            services.AddSingleton<IAuthorizationHandler, DefaultAuthorizationHandler>();
 
             //注入服务类 查找所有Service结尾的类进行注册
             var allServiceInterfaces = TypeFinder.GetAllTypes()
@@ -154,28 +154,38 @@ namespace Microsoft.Extensions.DependencyInjection
             foreach (var serviceInterface in allServiceInterfaces)
             {
                 var service = TypeFinder.FindClassesOfType(serviceInterface.Type)?.FirstOrDefault();
-                if (service != null) services.TryAddTransient(serviceInterface.Type, service.Type);
+                if (service != null) services.AddTransient(serviceInterface.Type, service.Type);
             }
 
 
             //注册settings
-            var settingService = services.BuildServiceProvider().GetService<ISettingService>();
             var settingTypes = TypeFinder.FindClassesOfType(typeof(ISettings)).ToList();
             foreach (var settingType in settingTypes)
-                services.TryAddTransient(settingType.Type, o => settingService.LoadSetting(settingType.Type));
+                services.TryAddTransient(settingType.Type, serviceProvider =>
+                {
+                    if (DbFactory.CheckInstalled(mozOptions))
+                    {
+                        var settingService = serviceProvider.GetService<ISettingService>();
+                        return settingService.LoadSetting(settingType.Type);
+                    }
+
+                    var instance = Activator.CreateInstance(settingType.Type);
+                    return instance;
+                });
+
 
             //注入 ExceptionHandler
             var exceptionHandlers = TypeFinder.FindClassesOfType(typeof(IExceptionHandler))
-                .Where(it=>it.Type!=typeof(ErrorHandlingMiddleware))
+                .Where(it => it.Type != typeof(ErrorHandlingMiddleware))
                 .ToList();
             foreach (var exceptionHandler in exceptionHandlers)
-                services.TryAddSingleton(exceptionHandler.Type);
-            
+                services.AddSingleton(exceptionHandler.Type);
+
             //注入 StatusCodePageHandler
             var statusCodePageHandlers = TypeFinder.FindClassesOfType(typeof(IStatusCodePageHandler)).ToList();
             foreach (var statusCodePageHandler in statusCodePageHandlers)
-                services.TryAddSingleton(statusCodePageHandler.Type);
-            
+                services.AddSingleton(statusCodePageHandler.Type);
+
             //事件发布
             var consumerTypes = TypeFinder.FindClassesOfType(typeof(ISubscriber<>)).ToList();
             foreach (var consumerType in consumerTypes)
@@ -187,7 +197,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     return isMatch;
                 }, typeof(ISubscriber<>));
                 var interfaceType = interfaceTypes.FirstOrDefault();
-                if (interfaceType != null) services.TryAddTransient(interfaceType, consumerType.Type);
+                if (interfaceType != null) services.AddTransient(interfaceType, consumerType.Type);
             }
 
             #endregion
@@ -207,7 +217,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .Select(startup => (IMozStartup) Activator.CreateInstance(startup.Type))
                 .OrderBy(startup => startup.Order);
             foreach (var instance in instances)
-                instance.ConfigureServices(services,configuration,webHostEnvironment,mozOptions);
+                instance.ConfigureServices(services, configuration, webHostEnvironment, mozOptions);
 
             //services.
             return services.BuildServiceProvider();

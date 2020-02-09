@@ -14,7 +14,8 @@ namespace Moz.Bus.Dtos
         {
             return new ServRequest<T>
             {
-                Data = value
+                Data = value,
+                IsValidated = true
             };
         }
     }

@@ -1,76 +1,79 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Moz.Domain.Dtos.Members.Permissions;
-using Moz.Domain.Services.Members;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
-using Moz.Auth;
+using Moz.Admin.Layui.Models.Permissions;
 using Moz.Auth.Attributes;
-using Moz.Bus.Dtos.Members.Permissions;
+using Moz.Bus.Dtos.Permissions;
 using Moz.Bus.Services.Members;
+using Moz.Bus.Services.Permissions;
 using Moz.Exceptions;
 
-namespace Moz.Administration.Controllers
+namespace Moz.Admin.Layui.Controllers
 {
     [AdminAuth(Permissions = "admin.permission")]
     public class PermissionController : AdminAuthBaseController
     {
         private readonly IMemberService _memberService;
-        public PermissionController(IMemberService memberService)
+        private readonly IPermissionService _permissionService;
+        public PermissionController(IMemberService memberService, IPermissionService permissionService)
         {
             this._memberService = memberService;
+            _permissionService = permissionService;
         }
 
        
         [AdminAuth(Permissions = "admin.permission.index")]
         public IActionResult Index()
         {
-            var model = new Moz.Administration.Models.Permissions.IndexModel();
+            var model = new IndexModel();
             return View("~/Administration/Views/Permission/Index.cshtml",model);
         }
         
         [AdminAuth(Permissions = "admin.permission.index")]
-        public IActionResult PagedList(PagedQueryPermissionRequest request)
+        public IActionResult PagedList(PagedQueryPermissionDto dto)
         {
-            var list = _memberService.PagedQueryPermissions(request);
-            var result = new
+            var result = _permissionService.PagedQueryPermissions(dto);
+            if (result.Code > 0)
+            {
+                return Json(result);
+            }
+
+            var data = new
             {
                 Code = 0,
                 Message = "",
-                Total = list.TotalCount,
-                Data = list.List
+                Total = result.Data.TotalCount,
+                Data = result.Data.List
             };
-            return Json(result);
+            return Json(data);
         }
         
         [AdminAuth(Permissions = "admin.permission.create")]
         public IActionResult Create()
         {
-            var model = new  Moz.Administration.Models.Permissions.CreateModel();
+            var model = new  CreateModel();
             return View("~/Administration/Views/Permission/Create.cshtml",model);
         }
         
 
         [HttpPost]
         [AdminAuth(Permissions = "admin.permission.create")]
-        public IActionResult Create(Moz.Domain.Dtos.Members.Permissions.CreatePermissionRequest request)
+        public IActionResult Create(CreatePermissionDto dto)
         {
-            var resp = _memberService.CreatePermission(request);
-            return RespJson(resp);
+            var result = _permissionService.CreatePermission(dto);
+            return Json(result);
         }
         
         [AdminAuth(Permissions = "admin.permission.update")]
-        public IActionResult Update(Moz.Domain.Dtos.Members.Permissions.GetPermissionDetailRequest request)
+        public IActionResult Update(GetPermissionDetailDto dto)
         {
-            var permission = _memberService.GetPermissionDetail(request);
-            if (permission == null)
+            var result = _permissionService.GetPermissionDetail(dto);
+            if (result.Code > 0)
             {
-                throw new MozException("信息不存在，可能被删除");
+                return Json(result);
             }
-            var model = new  Moz.Administration.Models.Permissions.UpdateModel()
+            var model = new  UpdateModel()
             {
-                Permission = permission
+                Permission = result.Data
             };
             return View("~/Administration/Views/Permission/Update.cshtml",model);
         }
@@ -78,33 +81,41 @@ namespace Moz.Administration.Controllers
 
         [HttpPost]
         [AdminAuth(Permissions = "admin.permission.update")]
-        public IActionResult Update(Moz.Domain.Dtos.Members.Permissions.UpdatePermissionRequest request)
+        public IActionResult Update(UpdatePermissionDto dto)
         {
-            var resp = _memberService.UpdatePermission(request); 
-            return RespJson(resp);
+            var result = _permissionService.UpdatePermission(dto); 
+            return Json(result);
         }
         
         [HttpPost]
         [AdminAuth(Permissions = "admin.permission.delete")]
-        public IActionResult Delete(Moz.Domain.Dtos.Members.Permissions.DeletePermissionRequest request)
+        public IActionResult Delete(DeletePermissionDto dto)
         {
-            var resp = _memberService.DeletePermission(request);
-            return RespJson(resp);
+            var result = _permissionService.DeletePermission(dto);
+            return Json(result);
         }
 
         [HttpPost]
-        [AdminAuth(Permissions = "admin.permission.isactive")]
-        public IActionResult SetIsActive(SetPermissionIsActiveRequest request)
+        [AdminAuth(Permissions = "admin.permission.isActive")]
+        public IActionResult SetIsActive(SetIsActivePermissionDto dto)
         {
-            var resp = _memberService.SetPermissionIsActive(request);
-            return RespJson(resp);
+            var result = _permissionService.SetIsActive(dto);
+            return Json(result);
         }
         
         [HttpPost]
-        public IActionResult SetOrderIndex(SetPermissionOrderIndexRequest request)
+        [AdminAuth(Permissions = "admin.permission.setOrderIndex")]
+        public IActionResult SetOrderIndex(SetOrderIndexPermissionDto dto)
         {
-            var resp = _memberService.SetPermissionOrderIndex(request);
-            return RespJson(resp);
+            var result = _permissionService.SetOrderIndex(dto);
+            return Json(result);
+        }
+        
+        [HttpGet]
+        public IActionResult AllSubPermissions(long? parentId)
+        {
+            var result = _permissionService.QuerySubPermissionsByParentId(parentId);
+            return Json(result.Data);
         }
     }
 }

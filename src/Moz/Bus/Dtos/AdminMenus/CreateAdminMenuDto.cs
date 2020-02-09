@@ -6,8 +6,8 @@ using Moz.Validation;
 
 namespace Moz.Bus.Dtos.AdminMenus
 {
-    [Validator(typeof(CreateAdminMenuRequestValidator))]
-    public class CreateAdminMenuRequest
+    [Validator(typeof(CreateAdminMenuDtoValidator))]
+    public class CreateAdminMenuDto
     {
         public string ParentIdsStr { get; set; }
         public string Name { get; set; }
@@ -27,16 +27,11 @@ namespace Moz.Bus.Dtos.AdminMenus
                 return null;
             }
         }
-    } 
-    
-    public class CreateAdminMenuResponse
-    {
-        
     }
-
-    public class CreateAdminMenuRequestValidator : MozValidator<CreateAdminMenuRequest>
+    
+    public class CreateAdminMenuDtoValidator : MozValidator<CreateAdminMenuDto>
     {
-        public CreateAdminMenuRequestValidator()
+        public CreateAdminMenuDtoValidator()
         {
             RuleFor(t => t.Name).NotNull().NotEmpty().WithMessage("名称不能为空");
             RuleFor(t => t.Link).NotNull().NotEmpty().WithMessage("链接不能为空");

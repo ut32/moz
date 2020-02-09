@@ -4,16 +4,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
-using Moz.Biz.Dtos.Members;
+using Moz.Bus.Dtos;
 using Moz.Bus.Dtos.Members;
-using Moz.Bus.Dtos.Members.Permissions;
-using Moz.Bus.Dtos.Members.Roles;
 using Moz.Bus.Models.AdminMenus;
 using Moz.Bus.Models.Members;
-using Moz.Core.Service.Members;
 using Moz.DataBase;
-using Moz.Domain.Dtos.Members.Permissions;
-using Moz.Domain.Dtos.Members.Roles;
 using Moz.Events;
 using Moz.Exceptions;
 using Moz.Service.Security;
@@ -23,13 +18,14 @@ using SqlSugar;
 
 namespace Moz.Bus.Services.Members
 {
-    public class MemberService : IMemberService
+    public class MemberService :BaseService, IMemberService
     {
 
         private readonly IDistributedCache _distributedCache;
         private readonly IEncryptionService _encryptionService;
         private readonly IEventPublisher _eventPublisher;
         private readonly MemberSettings _memberSettings;
+        private IMemberService _memberServiceImplementation;
 
         public MemberService(
             IDistributedCache distributedCache,
@@ -43,62 +39,458 @@ namespace Moz.Bus.Services.Members
             _memberSettings = memberSettings;
         }
 
-        #region 用户管理
+        #region Utils
         
+        /// <summary>
+        /// </summary>
+        /// <param name="memberId"></param>
+        /// <returns></returns>
+        private IEnumerable<Role> GetRolesByMemberId(long memberId)
+        {
+            var dt = DateTime.Now;
+            using (var client = DbFactory.GetClient())
+            {
+                return client.Queryable<MemberRole, Role>((mr, r) => new object[]
+                    {
+                        JoinType.Left, mr.RoleId == r.Id
+                    })
+                    .Where((mr, r) => mr.MemberId == memberId 
+                                      && (mr.ExpireDate == null || mr.ExpireDate != null && mr.ExpireDate > dt)
+                                      && r.IsActive)
+                    .Select((mr, r) => new 
+                    {
+                        r.Id,
+                        r.Code,
+                        r.IsActive,
+                        r.Name,
+                        r.IsAdmin,
+                        mr.ExpireDate
+                    })
+                    .ToList()
+                    .Select(it=> new Role()
+                    {
+                        Code = it.Code,
+                        Id = it.Id,
+                        Name = it.Name,
+                        IsActive = it.IsActive,
+                        IsAdmin = it.IsAdmin
+                    });
+            }
+        }
+        
+        #endregion
+
+        #region Methods
+
         /// <summary>
         /// 获取详细
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public GetMemberDetailResponse GetMemberDetail(GetMemberDetailRequest request)
+        public ServResult<GetMemberDetailApo> GetMemberDetail(ServRequest<GetMemberDetailDto> request)
         {
             using (var client = DbFactory.GetClient())
             {
-                 var member = client.Queryable<Member>().InSingle(request.Id);
-                 if(member == null)
-                 {
-                    return null;
-                 }
+                var member = client.Queryable<Member>().InSingle(request.Data.Id);
+                if (member == null)
+                {
+                    return Error("找不着信息");
+                }
 
-                 var roles = client.Queryable<MemberRole>()
-                     .Where(it=>it.MemberId == request.Id)
-                     .Select(it=>new { it.RoleId })
-                     .ToList()
-                     .Select(it=>it.RoleId).
-                     ToArray();
+                var roles = client.Queryable<MemberRole>()
+                    .Where(it => it.MemberId == request.Data.Id)
+                    .Select(it => new {it.RoleId})
+                    .ToList()
+                    .Select(it => it.RoleId).ToArray();
 
-                 var resp = new GetMemberDetailResponse
-                 {
-                     Id = member.Id,
-                     Username = member.Username,
-                     Email = member.Email,
-                     Mobile = member.Mobile,
-                     Avatar = member.Avatar,
-                     Gender = member.Gender,
-                     Birthday = member.Birthday,
-                     RegisterIp = member.RegisterIp,
-                     RegisterDatetime = member.RegisterDatetime,
-                     LoginCount = member.LoginCount,
-                     LastLoginIp = member.LastLoginIp,
-                     LastLoginDatetime = member.LastLoginDatetime,
-                     CannotLoginUntilDate = member.CannotLoginUntilDate,
-                     LastActiveDatetime = member.LastActiveDatetime,
-                     FailedLoginAttempts = member.FailedLoginAttempts,
-                     OnlineTimeCount = member.OnlineTimeCount,
-                     Address = member.Address,
-                     RegionCode = member.RegionCode,
-                     Lng = member.Lng,
-                     Lat = member.Lat,
-                     Geohash = member.Geohash,
-                     IsActive = member.IsActive,
-                     IsDelete = member.IsDelete,
-                     IsEmailValid = member.IsEmailValid,
-                     IsMobileValid = member.IsMobileValid,
-                     Nickname = member.Nickname,
-                     Roles = roles
-                 };
-                 return resp;
+                var resp = new GetMemberDetailApo
+                {
+                    Id = member.Id,
+                    Username = member.Username,
+                    Email = member.Email,
+                    Mobile = member.Mobile,
+                    Avatar = member.Avatar,
+                    Gender = member.Gender,
+                    Birthday = member.Birthday,
+                    RegisterIp = member.RegisterIp,
+                    RegisterDatetime = member.RegisterDatetime,
+                    LoginCount = member.LoginCount,
+                    LastLoginIp = member.LastLoginIp,
+                    LastLoginDatetime = member.LastLoginDatetime,
+                    CannotLoginUntilDate = member.CannotLoginUntilDate,
+                    LastActiveDatetime = member.LastActiveDatetime,
+                    FailedLoginAttempts = member.FailedLoginAttempts,
+                    OnlineTimeCount = member.OnlineTimeCount,
+                    Address = member.Address,
+                    RegionCode = member.RegionCode,
+                    Lng = member.Lng,
+                    Lat = member.Lat,
+                    Geohash = member.Geohash,
+                    IsActive = member.IsActive,
+                    IsDelete = member.IsDelete,
+                    IsEmailValid = member.IsEmailValid,
+                    IsMobileValid = member.IsMobileValid,
+                    Nickname = member.Nickname,
+                    Roles = roles
+                };
+                return resp;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public SimpleMember GetSimpleMemberByUId(string uid)
+        {
+            SimpleMember GetSimpleMember(string newUid) 
+            {
+                using (var client = DbFactory.GetClient())
+                {
+                    var member = client.Queryable<Member>().Select(t => new
+                    {
+                        t.Id,
+                        t.UId,
+                        t.Email,
+                        t.Username,
+                        t.Nickname,
+                        t.Mobile,
+                        t.IsActive,
+                        t.IsDelete,
+                        t.Avatar,
+                        t.CannotLoginUntilDate
+                    }).Single(t => t.UId == newUid);
+
+                    if (member == null)
+                        return null;
+
+                    return new SimpleMember
+                    {
+                        Id = member.Id,
+                        UId = member.UId,
+                        Email = member.Email,
+                        Username = member.Username,
+                        Nickname = member.Nickname,
+                        Mobile = member.Mobile,
+                        Avatar = member.Avatar,
+                        IsActive = member.IsActive,
+                        IsDelete = member.IsDelete,
+                        CannotLoginUntilDate = member.CannotLoginUntilDate
+                    };
+                }
+            }
+            
+            var currentMember =  GetSimpleMember(uid);
+            if (currentMember == null) return null;
+
+            currentMember.Roles = GetRolesByMemberId(currentMember.Id) ?? new List<Role>();
+            currentMember.Permissions = new List<Permission>();
+            return currentMember;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ServResult ResetPassword(ServRequest<ResetPasswordDto> request)
+        {
+            using (var db = DbFactory.GetClient())
+            {
+                var members = db.Queryable<Member>()
+                    .Select(it => new Member {Id = it.Id, Password = it.Password, PasswordSalt = it.PasswordSalt})
+                    .Where(it => request.Data.MemberIds.Contains(it.Id))
+                    .ToList();
+
+                var saltKey = _encryptionService.CreateSaltKey(6);
+                var newPassword = _encryptionService
+                    .CreatePasswordHash(request.Data.NewPassword, saltKey, _memberSettings.HashedPasswordFormat);
+
+                members.ForEach(it =>
+                {
+                    it.Password = newPassword;
+                    it.PasswordSalt = saltKey;
+                });
+                db.Updateable(members)
+                    .UpdateColumns(it => new
+                    {
+                        it.Password,
+                        it.PasswordSalt
+                    })
+                    .ExecuteCommand();
+
+                return Ok();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ServResult<CreateMemberApo> CreateMember(ServRequest<CreateMemberDto> request)
+        {
+            var member = new Member
+            {
+                UId = Guid.NewGuid().ToString("N"),
+                Address = null,
+                Avatar = request.Data.Avatar,
+                Nickname = request.Data.Nickname,
+                Birthday = null,
+                CannotLoginUntilDate = null,
+                Email = null,
+                FailedLoginAttempts = 0,
+                Gender = request.Data.Gender,
+                Geohash = null,
+                IsActive = true,
+                IsDelete = false,
+                IsEmailValid = false,
+                IsMobileValid = false,
+                LastActiveDatetime = DateTime.Now,
+                LastLoginDatetime = DateTime.Now,
+                LastLoginIp = null,
+                Lat = null,
+                Lng = null,
+                LoginCount = 0,
+                Mobile = null,
+                OnlineTimeCount = 0,
+                Password = null,
+                PasswordSalt = null,
+                RegionCode = null,
+                RegisterDatetime = DateTime.Now,
+                RegisterIp = null,
+                Username = request.Data.Username
+            };
+            using (var db = DbFactory.GetClient())
+            {
+                
+                
+                {
+                    var isExist = db.Queryable<Member>()
+                        .Where(it => it.Username.Equals(request.Data.Username))
+                        .Select(it => new {it.Id})
+                        .ToList()
+                        .Any();
+                    if (isExist)
+                    {
+                        return Error($"此用户名 {request.Data.Username} 已存在");
+                    }
+
+                    member.Username = request.Data.Username;
+                }
+                
+                {
+                    var saltKey = _encryptionService.CreateSaltKey(6);
+                    var newPassword = _encryptionService
+                        .CreatePasswordHash(request.Data.Password, saltKey, _memberSettings.HashedPasswordFormat);
+
+                    member.Password = newPassword;
+                    member.PasswordSalt = saltKey;
+                }
+
+                if (!request.Data.Email.IsNullOrEmpty())
+                {
+                    var isExist = db.Queryable<Member>()
+                        .Where(it => it.Email.Equals(request.Data.Email))
+                        .Select(it => new {it.Id})
+                        .ToList()
+                        .Any();
+                    if (isExist)
+                    {
+                        return Error($"此邮箱 {request.Data.Email} 已存在");
+                    }
+
+                    member.Email = request.Data.Email;
+                }
+
+                if (!request.Data.Mobile.IsNullOrEmpty())
+                {
+                    var isExist = db.Queryable<Member>()
+                        .Where(it => it.Mobile.Equals(request.Data.Mobile))
+                        .Select(it => new {it.Id})
+                        .ToList()
+                        .Any();
+                    if (isExist)
+                    {
+                        return Error($"此手机 {request.Data.Mobile} 已存在");
+                    }
+
+                    member.Mobile = request.Data.Mobile;
+                }
+
+                db.UseTran(tran =>
+                {
+                    member.Id = tran.Insertable(member).ExecuteReturnBigIdentity();
+                    tran.Insertable(new MemberRole
+                    {
+                        ExpireDate = null,
+                        MemberId = member.Id,
+                        RoleId = 3
+                    }).ExecuteCommand();
+                    return 0;
+                });
+
+            }
+
+            return new CreateMemberApo
+            {
+                Id = member.Id,
+                UId = member.UId,
+                Username = member.Username
+            };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="MozException"></exception>
+        public ServResult UpdateMember(ServRequest<UpdateMemberDto> request)
+        {
+            using (var db = DbFactory.GetClient())
+            {
+                var member = db.Queryable<Member>().InSingle(request.Data.Id);
+                if (member == null)
+                {
+                    return Error("找不到该用户");
+                }
+
+                if (!member.Username.Equals(request.Data.Username, StringComparison.OrdinalIgnoreCase))
+                {
+                    var isExist = db.Queryable<Member>()
+                        .Where(it => it.Username.Equals(request.Data.Username))
+                        .Select(it => new {it.Id})
+                        .ToList()
+                        .Any();
+                    if (isExist)
+                    {
+                        return Error($"此用户名 {request.Data.Username} 已存在");
+                    }
+
+                    member.Username = request.Data.Username;
+                }
+
+                if (!request.Data.Password.Equals("******"))
+                {
+                    var saltKey = _encryptionService.CreateSaltKey(6);
+                    var newPassword = _encryptionService
+                        .CreatePasswordHash(request.Data.Password, saltKey, _memberSettings.HashedPasswordFormat);
+
+                    member.Password = newPassword;
+                    member.PasswordSalt = saltKey;
+                }
+
+                if (!request.Data.Email.IsNullOrEmpty() &&
+                    !request.Data.Email.Equals(member.Email, StringComparison.OrdinalIgnoreCase))
+                {
+                    var isExist = db.Queryable<Member>()
+                        .Where(it => it.Email.Equals(request.Data.Email))
+                        .Select(it => new {it.Id})
+                        .ToList()
+                        .Any();
+                    if (isExist)
+                    {
+                        return Error($"此邮箱 {request.Data.Email} 已存在");
+                    }
+                    member.Email = request.Data.Email;
+                }
+
+                if (!request.Data.Mobile.IsNullOrEmpty() &&
+                    !request.Data.Mobile.Equals(member.Mobile, StringComparison.OrdinalIgnoreCase))
+                {
+                    var isExist = db.Queryable<Member>()
+                        .Where(it => it.Mobile.Equals(request.Data.Mobile))
+                        .Select(it => new {it.Id})
+                        .ToList()
+                        .Any();
+                    if (isExist)
+                    {
+                        return Error($"此手机 {request.Data.Mobile} 已存在");
+                    }
+
+                    member.Mobile = request.Data.Mobile;
+                }
+
+                member.Nickname = request.Data.Nickname;
+                member.Avatar = request.Data.Avatar;
+                member.Gender = request.Data.Gender;
+                member.Birthday = request.Data.BirthDay;
+                
+                db.UseTran(tran =>
+                {
+                    tran.Updateable(member).UpdateColumns(it => new
+                    {
+                        it.Username,
+                        it.Password,
+                        it.PasswordSalt,
+                        it.Email,
+                        it.Mobile,
+                        it.Nickname,
+                        it.Avatar,
+                        it.Gender,
+                        it.Birthday
+                    }).ExecuteCommand();
+
+                    tran.Deleteable<MemberRole>().Where(it => it.MemberId == member.Id).ExecuteCommand();
+
+                    if (request.Data.Roles != null && request.Data.Roles.Length > 0)
+                    {
+                        var newRoles = request.Data.Roles.Select(it => new MemberRole
+                        {
+                            ExpireDate = null,
+                            MemberId = member.Id,
+                            RoleId = it
+                        }).ToList();
+                        tran.Insertable(newRoles).ExecuteCommand();
+                    }
+
+                    return 0;
+                });
+                
+                _distributedCache.Remove($"CACHE_MEMBER_{member.UId}");
+
+                return Ok();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="MozException"></exception>
+        public ServResult ChangePassword(ServRequest<ChangePasswordDto> request)
+        {
+            using (var db = DbFactory.GetClient())
+            {
+                var member = db.Queryable<Member>().InSingle(request.Data.MemberId);
+                if (member == null)
+                {
+                    return Error("找不到该用户");
+                }
+                
+                var inputEncryptOldPassword = _encryptionService.CreatePasswordHash(request.Data.OldPassword, member.PasswordSalt, _memberSettings.HashedPasswordFormat);
+                if (!inputEncryptOldPassword.Equals(member.Password, StringComparison.OrdinalIgnoreCase))
+                {
+                    return Error("原密码不正确");
+                }
+
+                var saltKey = _encryptionService.CreateSaltKey(6);
+                var newPassword = _encryptionService.CreatePasswordHash(request.Data.NewPassword, saltKey, _memberSettings.HashedPasswordFormat);
+
+                member.Password = newPassword;
+                member.PasswordSalt = saltKey;
+
+                db.Updateable(member).UpdateColumns(it => new
+                {
+                    it.Password,
+                    it.PasswordSalt
+                }).ExecuteCommand();
+            }
+
+            return Ok();
         }
 
         /// <summary>
@@ -106,15 +498,15 @@ namespace Moz.Bus.Services.Members
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public PagedQueryMemberResponse PagedQueryMembers(PagedQueryMemberRequest request)
+        public ServResult<PagedList<QueryMemberItem>> PagedQueryMembers(ServRequest<PagedQueryMemberDto> request)
         {
-            var page = request.Page ?? 1;
-            var pageSize = request.PageSize ?? 20;
+            var page = request.Data.Page ?? 1;
+            var pageSize = request.Data.PageSize ?? 20;
             using (var client = DbFactory.GetClient())
             {
                 var total = 0;
                 var list = client.Queryable<Member>()
-                    .WhereIF(!request.Keyword.IsNullOrEmpty(), t => t.Username.Contains(request.Keyword))
+                    .WhereIF(!request.Data.Keyword.IsNullOrEmpty(), t => t.Username.Contains(request.Data.Keyword))
                     .Select(t => new QueryMemberItem()
                     {
                         Id = t.Id,
@@ -163,7 +555,7 @@ namespace Moz.Bus.Services.Members
                     .ToList();
                 list.ForEach(it => { it.Roles = roles.Where(x => x.MemberId == it.Id).Select(x => x.Name).ToArray(); });
 
-                return new PagedQueryMemberResponse()
+                return new PagedList<QueryMemberItem>
                 {
                     List = list,
                     Page = page,
@@ -173,946 +565,6 @@ namespace Moz.Bus.Services.Members
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="uid"></param>
-        /// <returns></returns>
-        public SimpleMember GetSimpleMemberByUId(string uid)
-        {
-            SimpleMember GetSimpleMember(string newuid) 
-            {
-                using (var client = DbFactory.GetClient())
-                {
-                    var member = client.Queryable<Member>().Select(t => new
-                    {
-                        t.Id,
-                        t.UId,
-                        t.Email,
-                        t.Username,
-                        t.Nickname,
-                        t.Mobile,
-                        t.IsActive,
-                        t.IsDelete,
-                        t.Avatar,
-                        t.CannotLoginUntilDate
-                    }).Single(t => t.UId == newuid);
-
-                    if (member == null)
-                        return null;
-
-                    return new SimpleMember
-                    {
-                        Id = member.Id,
-                        UId = member.UId,
-                        Email = member.Email,
-                        Username = member.Username,
-                        Nickname = member.Nickname,
-                        Mobile = member.Mobile,
-                        Avatar = member.Avatar,
-                        IsActive = member.IsActive,
-                        IsDelete = member.IsDelete,
-                        CannotLoginUntilDate = member.CannotLoginUntilDate
-                    };
-                }
-            }
-            
-            var simpleMember =  GetSimpleMember(uid);
-            if (simpleMember == null) return null;
-
-            var t2 = Task.Run(() => GetAvailablePermissionsByMemberId(simpleMember.Id));
-            var t3 = Task.Run(() => GetAvailableRolesByMemberId(simpleMember.Id));
-            Task.WaitAll(t2, t3);
-
-            simpleMember.Roles = t3.Result ?? new List<Role>();
-            simpleMember.Permissions = t2.Result ?? new List<Permission>();
-
-            return simpleMember;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public ResetPasswordResponse ResetPassword(ResetPasswordRequest request)
-        {
-            using (var db = DbFactory.GetClient())
-            {
-                var members = db.Queryable<Member>()
-                    .Select(it => new Member {Id = it.Id, Password = it.Password, PasswordSalt = it.PasswordSalt})
-                    .Where(it => request.MemberIds.Contains(it.Id))
-                    .ToList();
-
-                var saltKey = _encryptionService.CreateSaltKey(6);
-                var newPassword = _encryptionService
-                    .CreatePasswordHash(request.NewPassword, saltKey, _memberSettings.HashedPasswordFormat);
-
-                members.ForEach(it =>
-                {
-                    it.Password = newPassword;
-                    it.PasswordSalt = saltKey;
-                });
-                db.Updateable(members)
-                    .UpdateColumns(it => new
-                    {
-                        it.Password,
-                        it.PasswordSalt
-                    })
-                    .ExecuteCommand();
-
-                return new ResetPasswordResponse();
-            }
-        }
-
-
-        public UpdateMemberResponse UpdateMember(UpdateMemberRequest request)
-        {
-            using (var db = DbFactory.GetClient())
-            {
-                var member = db.Queryable<Member>().InSingle(request.Id);
-                if (member == null)
-                    throw new MozException("找不到该用户");
-
-                if (!member.Username.Equals(request.Username, StringComparison.OrdinalIgnoreCase))
-                {
-                    var isExist = db.Queryable<Member>()
-                        .Where(it => it.Username.Equals(request.Username))
-                        .Select(it => new {it.Id})
-                        .ToList()
-                        .Any();
-                    if (isExist)
-                        throw new MozException($"此用户名 {request.Username} 已存在");
-
-                    member.Username = request.Username;
-                }
-
-                if (!request.Password.Equals("******"))
-                {
-                    var saltKey = _encryptionService.CreateSaltKey(6);
-                    var newPassword = _encryptionService
-                        .CreatePasswordHash(request.Password, saltKey, _memberSettings.HashedPasswordFormat);
-
-                    member.Password = newPassword;
-                    member.PasswordSalt = saltKey;
-                }
-
-                if (!request.Email.IsNullOrEmpty() &&
-                    !request.Email.Equals(member.Email, StringComparison.OrdinalIgnoreCase))
-                {
-                    var isExist = db.Queryable<Member>()
-                        .Where(it => it.Email.Equals(request.Email))
-                        .Select(it => new {it.Id})
-                        .ToList()
-                        .Any();
-                    if (isExist)
-                        throw new MozException($"此邮箱 {request.Email} 已存在");
-
-                    member.Email = request.Email;
-                }
-
-                if (!request.Mobile.IsNullOrEmpty() &&
-                    !request.Mobile.Equals(member.Mobile, StringComparison.OrdinalIgnoreCase))
-                {
-                    var isExist = db.Queryable<Member>()
-                        .Where(it => it.Mobile.Equals(request.Mobile))
-                        .Select(it => new {it.Id})
-                        .ToList()
-                        .Any();
-                    if (isExist)
-                        throw new MozException($"此手机 {request.Mobile} 已存在");
-
-                    member.Mobile = request.Mobile;
-                }
-
-                member.Nickname = request.Nickname;
-                member.Avatar = request.Avatar;
-                member.Gender = request.Gender;
-                member.Birthday = request.BirthDay;
-
-
-
-                db.UseTran(tran =>
-                {
-                    tran.Updateable(member).UpdateColumns(it => new
-                    {
-                        it.Username,
-                        it.Password,
-                        it.PasswordSalt,
-                        it.Email,
-                        it.Mobile,
-                        it.Nickname,
-                        it.Avatar,
-                        it.Gender,
-                        it.Birthday
-                    }).ExecuteCommand();
-
-                    tran.Deleteable<MemberRole>().Where(it => it.MemberId == member.Id).ExecuteCommand();
-
-                    if (request.Roles != null && request.Roles.Length > 0)
-                    {
-                        var newRoles = request.Roles.Select(it => new MemberRole
-                        {
-                            ExpireDate = null,
-                            MemberId = member.Id,
-                            RoleId = it
-                        }).ToList();
-                        tran.Insertable(newRoles).ExecuteCommand();
-                    }
-
-                    return 0;
-                });
-                
-                _distributedCache.Remove($"cache_member_{member.Id}");
-
-                return new UpdateMemberResponse();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        /// <exception cref="MozException"></exception>
-        public ChangePasswordResponse ChangePassword(ChangePasswordRequest request)
-        {
-            using (var db = DbFactory.GetClient())
-            {
-                var member = db.Queryable<Member>().InSingle(request.MemberId);
-                if (member == null)
-                    throw new MozException("找不到该用户");
-                
-                var inputEncryptOldPassword = _encryptionService.CreatePasswordHash(request.OldPassword, member.PasswordSalt, _memberSettings.HashedPasswordFormat);
-                if(!inputEncryptOldPassword.Equals(member.Password, StringComparison.OrdinalIgnoreCase)) 
-                    throw new MozException("原密码不正确");
-                
-                var saltKey = _encryptionService.CreateSaltKey(6);
-                var newPassword = _encryptionService
-                    .CreatePasswordHash(request.NewPassword, saltKey, _memberSettings.HashedPasswordFormat);
-
-                member.Password = newPassword;
-                member.PasswordSalt = saltKey;
-
-                db.Updateable(member).UpdateColumns(it => new
-                {
-                    it.Password,
-                    it.PasswordSalt
-                }).ExecuteCommand();
-            }
-
-            return new ChangePasswordResponse();
-        }
-        
         #endregion
-
-        #region 角色权限
-
-        /// <summary>
-        /// </summary>
-        /// <param name="memberId"></param>
-        /// <returns></returns>
-        public IEnumerable<Role> GetAvailableRolesByMemberId(long memberId)
-        {
-            var dt = DateTime.UtcNow;
-            using (var client = DbFactory.GetClient())
-            {
-                return client.Queryable<MemberRole, Role>((mr, r) => new object[]
-                    {
-                        JoinType.Left, mr.RoleId == r.Id
-                    })
-                    .Where((mr, r) =>
-                        mr.MemberId == memberId
-                        && (mr.ExpireDate == null || mr.ExpireDate != null && mr.ExpireDate > dt)
-                        && r.IsActive)
-                    .Select((mr, r) => new 
-                    {
-                        r.Id,
-                        r.Code,
-                        r.IsActive,
-                        r.Name,
-                        r.IsAdmin
-                    })
-                    .ToList()
-                    .Select(it=> new Role()
-                    {
-                        Code = it.Code,
-                        Id = it.Id,
-                        Name = it.Name,
-                        IsActive = it.IsActive,
-                        IsAdmin = it.IsAdmin
-                    });
-            }
-        }
-        
-
-        /// <summary>
-        /// </summary>
-        /// <param name="memberId"></param>
-        /// <returns></returns>
-        public IEnumerable<Permission> GetAvailablePermissionsByMemberId(long memberId)
-        {
-            var dt = DateTime.UtcNow;
-            using (var client = DbFactory.GetClient())
-            {
-                var permissionsFromRoles = client.Queryable<MemberRole, RolePermisson, Permission>((mr, rp, p) =>
-                        new object[]
-                        {
-                            JoinType.Left, mr.RoleId == rp.RoleId,
-                            JoinType.Left, rp.PermissonId == p.Id
-                        })
-                    .Where((mr, rp, p) =>
-                        mr.MemberId == memberId
-                        && (mr.ExpireDate == null || mr.ExpireDate != null && mr.ExpireDate > dt)
-                        && p.IsActive)
-                    .Select((mr, rp, p) =>
-                        new
-                        {
-                            Id = p.Id, Code = p.Code, IsActive = p.IsActive, Name = p.Name
-                        })
-                    .ToList();
-
-                var permissionsFromMember = client.Queryable<MemberPermission, Permission>((mp, p) =>
-                        new object[]
-                        {
-                            JoinType.Left, mp.PermissionId == p.Id
-                        })
-                    .Where((mp, p) => mp.MemberId == memberId && p.IsActive)
-                    .Select((mp, p) =>
-                        new
-                        {
-                            p.Id, p.Code, p.IsActive, p.Name
-                        })
-                    .ToList();
-
-                permissionsFromRoles.AddRange(permissionsFromMember);
-                return permissionsFromRoles.Select(it => new Permission
-                {
-                    Code = it.Code,
-                    Id = it.Id,
-                    Name = it.Name,
-                    IsActive = it.IsActive
-                }).Distinct(new PermissionComparer()).ToList();
-            }
-        }
-
-        //GetAvailablePermissionsByMemberId
-
-        /// <summary>
-        /// </summary>
-        /// <param name="memberId"></param>
-        /// <param name="roleId"></param>
-        public bool TryAddRoleToMemeberId(long memberId, long roleId)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var mRole = client.Queryable<MemberRole>().Single(t => t.MemberId == memberId && t.RoleId == roleId);
-                if (mRole != null) return false;
-
-                var id = client.Insertable(new MemberRole
-                {
-                    ExpireDate = new DateTime(2099, 1, 1),
-                    MemberId = memberId,
-                    RoleId = roleId
-                }).ExecuteReturnBigIdentity();
-                return id > 0;
-            }
-        }
-
-        public PagedList<Permission> GetPermissionsPagedList(Expression<Func<Permission, Permission>> selectFun = null,
-            Expression<Func<Permission, bool>> whereFun = null,
-            KeyValuePair<Expression<Func<Permission, object>>, OrderByType>? orders = null,
-            int pageIndex = 0,
-            int pageSize = 2147483647)
-        {
-            throw new Exception("xx");
-            /*
-            return _repository.GetPagedList<Permission>(selectFun:selectFun,
-                whereFun:whereFun,
-                orders:orders,
-                pageIndex:pageIndex, 
-                pageSize:pageSize);
-                */
-        }
-
-        #endregion
-
-        #region 角色管理
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public GetRoleDetailResponse GetRoleDetail(GetRoleDetailRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var role = client.Queryable<Role>().InSingle(request.Id);
-                if (role == null)
-                {
-                    return null;
-                }
-
-                var resp = new GetRoleDetailResponse
-                {
-                    Id = role.Id,
-                    Name = role.Name,
-                    Code = role.Code,
-                    IsAdmin = role.IsAdmin,
-                    IsActive = role.IsActive
-                };
-
-                return resp;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public CreateRoleResponse CreateRole(CreateRoleRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var role = new Role
-                {
-                    Name = request.Name,
-                    IsActive = request.IsActive,
-                    Code = request.Code,
-                    IsAdmin = request.IsAdmin,
-                    IsSystem = false
-                };
-                role.Id = client.Insertable(role).ExecuteReturnBigIdentity();
-
-                //_cacheManager.RemoveOnEntityCreated<Role>();
-                _eventPublisher.EntityCreated(role);
-
-                return new CreateRoleResponse();
-            }
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        /// <exception cref="MozException"></exception>
-        public UpdateRoleResponse UpdateRole(UpdateRoleRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var role = client.Queryable<Role>().InSingle(request.Id);
-                if (role == null)
-                {
-                    throw new MozException("找不到该条信息");
-                }
-
-                if (role.IsSystem)
-                {
-                    throw new MozException("不能编辑内置角色");
-                }
-
-                role.Name = request.Name;
-                role.IsActive = request.IsActive;
-                role.Code = request.Code;
-                role.IsAdmin = request.IsAdmin;
-                client.Updateable(role).ExecuteCommand();
-
-                //_cacheManager.RemoveOnEntityUpdated<Role>(request.Id);
-                _eventPublisher.EntityUpdated(role);
-
-                return new UpdateRoleResponse();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public DeleteRoleResponse DeleteRole(DeleteRoleRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var role = client.Queryable<Role>().InSingle(request.Id);
-                if (role == null)
-                {
-                    throw new MozException("找不到该条信息");
-                }
-
-                if (role.IsSystem)
-                {
-                    throw new MozException("不能删除内置角色");
-                }
-
-                client.Deleteable<Role>(request.Id).ExecuteCommand();
-
-                //_cacheManager.RemoveOnEntityDeleted<Role>(request.Id);
-                _eventPublisher.EntityDeleted(role);
-
-                return new DeleteRoleResponse();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public PagedQueryRoleResponse PagedQueryRoles(PagedQueryRoleRequest request)
-        {
-            var page = request.Page ?? 1;
-            var pageSize = request.PageSize ?? 20;
-            using (var client = DbFactory.GetClient())
-            {
-                var total = 0;
-                var list = client.Queryable<Role>()
-                    .WhereIF(!request.Keyword.IsNullOrEmpty(), t => t.Name.Contains(request.Keyword))
-                    .Select(t => new QueryRoleItem()
-                    {
-                        Id = t.Id,
-                        Code = t.Code,
-                        IsActive = t.IsActive,
-                        IsAdmin = t.IsAdmin,
-                        IsSystem = t.IsSystem,
-                        Name = t.Name
-                    })
-                    .OrderBy("id ASC")
-                    .ToPageList(page, pageSize, ref total);
-                return new PagedQueryRoleResponse()
-                {
-                    List = list,
-                    Page = page,
-                    PageSize = pageSize,
-                    TotalCount = total
-                };
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public SetRoleIsActiveResponse SetRoleIsActive(SetRoleIsActiveRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var role = client.Queryable<Role>().InSingle(request.Id);
-                if (role == null)
-                {
-                    throw new MozException("找不到该条信息");
-                }
-
-                if (role.IsSystem)
-                {
-                    throw new MozException("不能设置内置角色");
-                }
-
-                role.IsActive = request.IsActive;
-
-                client.Updateable<Role>(role).UpdateColumns(t => new {t.IsActive}).ExecuteCommand();
-
-                return new SetRoleIsActiveResponse();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public SetRoleIsAdminResponse SetRoleIsAdmin(SetRoleIsAdminRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var role = client.Queryable<Role>().InSingle(request.Id);
-                if (role == null)
-                {
-                    throw new MozException("找不到该条信息");
-                }
-
-                if (role.IsSystem)
-                {
-                    throw new MozException("不能设置内置角色");
-                }
-
-                role.IsAdmin = request.IsAdmin;
-
-                client.Updateable<Role>(role).UpdateColumns(t => new {t.IsAdmin}).ExecuteCommand();
-
-                return new SetRoleIsAdminResponse();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public GetPermissionsByRoleResponse GetPermissionsByRole(GetPermissionsByRoleRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var list = client.Queryable<RolePermisson, Permission>((rp, p) => new object[]
-                    {
-                        JoinType.Left, rp.PermissonId == p.Id
-                    })
-                    .Where((rp, p) => rp.RoleId == request.RoleId)
-                    .Select((rp, p) => new Permission()
-                    {
-                        Code = p.Code,
-                        Id = p.Id,
-                        IsActive = p.IsActive,
-                        Name = p.Name,
-                        ParentId = p.ParentId
-                    })
-                    .OrderBy("order_index ASC, id ASC")
-                    .ToList();
-
-                return new GetPermissionsByRoleResponse()
-                {
-                    Permissions = list
-                };
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public ConfigPermissionResponse ConfigPermission(ConfigPermissionRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var list = client.Queryable<RolePermisson, Permission>((rp, p) => new object[]
-                    {
-                        JoinType.Left, rp.PermissonId == p.Id
-                    })
-                    .Where((rp, p) => rp.RoleId == request.RoleId)
-                    .Select((rp, p) => new
-                    {
-                        PermissionId = p.Id,
-                        RolePermissonId = rp.Id
-                    })
-                    .ToList();
-
-                client.UseTran(tran =>
-                {
-                    var willAddPermissions = request.ConfigedPermissions
-                        .Where(t => list.All(x => x.PermissionId != t.Id))
-                        .Select(t => new RolePermisson()
-                        {
-                            PermissonId = t.Id,
-                            RoleId = request.RoleId
-                        })
-                        .ToList();
-
-                    var willRemovePermissions = list
-                        .Where(t => request.ConfigedPermissions.All(x => x.Id != t.PermissionId))
-                        .Select(t => t.RolePermissonId)
-                        .ToList();
-
-                    if (willAddPermissions.Any())
-                        tran.Insertable<RolePermisson>(willAddPermissions).ExecuteCommand();
-
-                    if (willRemovePermissions.Any())
-                        tran.Deleteable<RolePermisson>().In(willRemovePermissions).ExecuteCommand();
-
-                    return 0;
-                });
-
-                return new ConfigPermissionResponse();
-            }
-        }
-
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public ConfigMenuResponse ConfigMenu(ConfigMenuRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var list = client.Queryable<RoleMenu, AdminMenu>((rm, m) => new object[]
-                    {
-                        JoinType.Left, rm.MenuId == m.Id
-                    })
-                    .Where((rm, m) => rm.RoleId == request.RoleId)
-                    .Select((rm, m) => new
-                    {
-                        MenuId = m.Id,
-                        RoleMenuId = rm.Id
-                    })
-                    .ToList();
-
-                client.UseTran(tran =>
-                {
-                    var willAddMenus = request.ConfigedMenus
-                        .Where(t => list.All(x => x.MenuId != t.Id))
-                        .Select(t => new RoleMenu()
-                        {
-                            MenuId = t.Id,
-                            RoleId = request.RoleId
-                        })
-                        .ToList();
-
-                    var willRemoveMenus = list
-                        .Where(t => request.ConfigedMenus.All(x => x.Id != t.MenuId))
-                        .Select(t => t.RoleMenuId)
-                        .ToList();
-
-                    if (willAddMenus.Any())
-                        tran.Insertable<RoleMenu>(willAddMenus).ExecuteCommand();
-
-                    if (willRemoveMenus.Any())
-                        tran.Deleteable<RoleMenu>().In(willRemoveMenus).ExecuteCommand();
-
-                    return 0;
-                });
-
-                return new ConfigMenuResponse();
-            }
-        }
-
-
-        #endregion
-
-        #region 权限管理
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public GetPermissionDetailResponse GetPermissionDetail(GetPermissionDetailRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var permission = client.Queryable<Permission>().InSingle(request.Id);
-                if (permission == null)
-                {
-                    return null;
-                }
-
-                var resp = new GetPermissionDetailResponse();
-                resp.Id = permission.Id;
-                resp.Code = permission.Code;
-                resp.IsActive = permission.IsActive;
-                resp.Name = permission.Name;
-                resp.ParentId = permission.ParentId;
-
-                return resp;
-
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public CreatePermissionResponse CreatePermission(CreatePermissionRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var entity = new Permission();
-                entity.Name = request.Name;
-                entity.Code = request.Code;
-                entity.IsActive = request.IsActive;
-                entity.ParentId = request.ParentId;
-                entity.Id = client.Insertable(entity).ExecuteReturnBigIdentity();
-
-                //_cacheManager.RemoveOnEntityCreated<Permission>();
-                _eventPublisher.EntityCreated(entity);
-
-                return new CreatePermissionResponse();
-            }
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        /// <exception cref="MozException"></exception>
-        public UpdatePermissionResponse UpdatePermission(UpdatePermissionRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var permission = client.Queryable<Permission>().InSingle(request.Id);
-                if (permission == null)
-                {
-                    throw new MozException("找不到该条信息");
-                }
-
-                if (permission.IsSystem)
-                {
-                    throw new MozException("不能编辑内置权限");
-                }
-
-                permission.Name = request.Name;
-                permission.Code = request.Code;
-                permission.IsActive = request.IsActive;
-                permission.ParentId = request.ParentId;
-                permission.OrderIndex = request.OrderIndex;
-                client.Updateable(permission).ExecuteCommand();
-
-                //_cacheManager.RemoveOnEntityUpdated<Permission>(request.Id);
-                _eventPublisher.EntityUpdated(permission);
-
-                return new UpdatePermissionResponse();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public DeletePermissionResponse DeletePermission(DeletePermissionRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var permission = client.Queryable<Permission>().InSingle(request.Id);
-                if (permission == null)
-                {
-                    throw new MozException("找不到该条信息");
-                }
-
-                if (permission.IsSystem)
-                {
-                    throw new MozException("不能删除内置权限");
-                }
-
-                client.Deleteable<Permission>(request.Id).ExecuteCommand();
-
-                //_cacheManager.RemoveOnEntityDeleted<Permission>(request.Id);
-                _eventPublisher.EntityDeleted(permission);
-
-                return new DeletePermissionResponse();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public BulkDeletePermissionsResponse BulkDeletePermissions(BulkDeletePermissionsRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                client.Deleteable<Permission>().In(request.Ids).ExecuteCommand();
-
-                request.Ids.ToList().ForEach(t =>
-                {
-                    //_cacheManager.RemoveOnEntityDeleted<Permission>(t);
-                });
-                _eventPublisher.EntitiesDeleted<Permission>(request.Ids);
-
-                return new BulkDeletePermissionsResponse();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public PagedQueryPermissionResponse PagedQueryPermissions(PagedQueryPermissionRequest request)
-        {
-            var page = request.Page ?? 1;
-            var pageSize = request.PageSize ?? 20;
-            using (var client = DbFactory.GetClient())
-            {
-                var total = 0;
-                var list = client.Queryable<Permission>()
-                    .WhereIF(!request.Keyword.IsNullOrEmpty(), t => t.Name.Contains(request.Keyword))
-                    .Select(t => new QueryPermissionItem()
-                    {
-                        Code = t.Code,
-                        Id = t.Id,
-                        IsActive = t.IsActive,
-                        Name = t.Name,
-                        ParentId = t.ParentId,
-                        OrderIndex = t.OrderIndex,
-                        IsSystem = t.IsSystem
-                    })
-                    .OrderBy("order_index ASC,id ASC")
-                    .ToPageList(page, pageSize, ref total);
-                return new PagedQueryPermissionResponse()
-                {
-                    List = list,
-                    Page = page,
-                    PageSize = pageSize,
-                    TotalCount = total
-                };
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        /// <exception cref="MozException"></exception>
-        public SetPermissionIsActiveResponse SetPermissionIsActive(SetPermissionIsActiveRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var permission = client.Queryable<Permission>().InSingle(request.Id);
-                if (permission == null)
-                {
-                    throw new MozException("找不到该条信息");
-                }
-
-                if (permission.IsSystem)
-                {
-                    throw new MozException("不能设置内置权限");
-                }
-
-                permission.IsActive = request.IsActive;
-
-                client.Updateable<Permission>(permission).UpdateColumns(t => new {t.IsActive}).ExecuteCommand();
-
-                return new SetPermissionIsActiveResponse();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        /// <exception cref="MozException"></exception>
-        public SetPermissionOrderIndexResponse SetPermissionOrderIndex(SetPermissionOrderIndexRequest request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var permission = client.Queryable<Permission>().InSingle(request.Id);
-                if (permission == null)
-                {
-                    throw new MozException("找不到该条信息");
-                }
-
-                permission.OrderIndex = request.OrderIndex;
-
-                client.Updateable<Permission>(permission).UpdateColumns(t => new {t.OrderIndex}).ExecuteCommand();
-
-                return new SetPermissionOrderIndexResponse();
-            }
-        }
-
-        #endregion
-
     }
 }

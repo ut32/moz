@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Moz.Biz.Dtos.Members;
+using Moz.Bus.Dtos;
 using Moz.Bus.Dtos.Members;
-using Moz.Bus.Dtos.Members.Permissions;
-using Moz.Bus.Dtos.Members.Roles;
 using Moz.Bus.Models.Members;
-using Moz.Domain.Dtos.Members.Permissions;
-using Moz.Domain.Dtos.Members.Roles;
 using Moz.Utils.Impl;
 using SqlSugar;
 
@@ -15,35 +11,40 @@ namespace Moz.Bus.Services.Members
 {
     public interface IMemberService
     {
-        #region 会员管理
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="uid"></param>
         /// <returns></returns>
-        SimpleMember GetSimpleMemberByUId(string uid); 
+        SimpleMember GetSimpleMemberByUId(string uid);
 
         /// <summary> 
         /// 重置密码
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        ResetPasswordResponse ResetPassword(ResetPasswordRequest request);
+        ServResult ResetPassword(ServRequest<ResetPasswordDto> request);
 
         /// <summary>
         /// 获取用户详细
         /// </summary>
         /// <param name="request"></param>
-        /// <returns></returns>
-        GetMemberDetailResponse GetMemberDetail(GetMemberDetailRequest request);
+        /// <returns></returns> 
+        ServResult<GetMemberDetailApo> GetMemberDetail(ServRequest<GetMemberDetailDto> request);
 
         /// <summary>
+        /// 创建
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        ServResult<CreateMemberApo> CreateMember(ServRequest<CreateMemberDto> request);
+        
+        /// <summary> 
         /// 更新用户
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        UpdateMemberResponse UpdateMember(UpdateMemberRequest request);
+        ServResult UpdateMember(ServRequest<UpdateMemberDto> request);
 
 
         /// <summary>
@@ -51,42 +52,14 @@ namespace Moz.Bus.Services.Members
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        ChangePasswordResponse ChangePassword(ChangePasswordRequest request);
+        ServResult ChangePassword(ServRequest<ChangePasswordDto> request);
+
         
-        #endregion
-        
-        #region 角色管理
-        
-        CreateRoleResponse CreateRole(CreateRoleRequest request);
-        UpdateRoleResponse UpdateRole(UpdateRoleRequest request);
-        DeleteRoleResponse DeleteRole(DeleteRoleRequest request);
-        GetRoleDetailResponse GetRoleDetail(GetRoleDetailRequest request);
-        PagedQueryRoleResponse PagedQueryRoles(PagedQueryRoleRequest request);
-        GetPermissionsByRoleResponse GetPermissionsByRole(GetPermissionsByRoleRequest request);
-        ConfigPermissionResponse ConfigPermission(ConfigPermissionRequest request);
-        SetRoleIsActiveResponse SetRoleIsActive(SetRoleIsActiveRequest request);
-        SetRoleIsAdminResponse SetRoleIsAdmin(SetRoleIsAdminRequest request);
-        ConfigMenuResponse ConfigMenu(ConfigMenuRequest request);
-        
-        #endregion 
-
-        #region 权限管理
-
-        CreatePermissionResponse CreatePermission(CreatePermissionRequest request);
-        UpdatePermissionResponse UpdatePermission(UpdatePermissionRequest request);
-        DeletePermissionResponse DeletePermission(DeletePermissionRequest request);
-        BulkDeletePermissionsResponse BulkDeletePermissions(BulkDeletePermissionsRequest request);
-        GetPermissionDetailResponse GetPermissionDetail(GetPermissionDetailRequest request);
-        PagedQueryPermissionResponse PagedQueryPermissions(PagedQueryPermissionRequest request);
-        SetPermissionIsActiveResponse SetPermissionIsActive(SetPermissionIsActiveRequest request);
-        SetPermissionOrderIndexResponse SetPermissionOrderIndex(SetPermissionOrderIndexRequest request);
-
-        #endregion
-
-        #region MyRegion
-
-        PagedQueryMemberResponse PagedQueryMembers(PagedQueryMemberRequest request);
-
-        #endregion
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        ServResult<PagedList<QueryMemberItem>> PagedQueryMembers(ServRequest<PagedQueryMemberDto> request);
     }
 }

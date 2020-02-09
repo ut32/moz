@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using FluentValidation;
 using FluentValidation.Attributes;
-using Moz.Bus.Dtos.Members.Roles;
 using Moz.Bus.Models.Members;
 using Moz.Bus.Services.Localization;
 using Moz.Validation;
@@ -11,14 +10,14 @@ namespace Moz.Bus.Dtos.Members
     /// <summary>
     /// tab_member
     /// </summary>
-    [Validator(typeof(GetMemberDetailRequestValidator))]
-    public class GetMemberDetailRequest
+    [Validator(typeof(GetMemberDetailDtoValidator))]
+    public class GetMemberDetailDto
     {
         public long Id {get;set;}      
     }
     
     
-    public class GetMemberDetailResponse
+    public class GetMemberDetailApo
     {
         /// <summary>
         /// 
@@ -161,9 +160,9 @@ namespace Moz.Bus.Dtos.Members
     }
     
     
-    public class GetMemberDetailRequestValidator : MozValidator<GetMemberDetailRequest>
+    public class GetMemberDetailDtoValidator : MozValidator<GetMemberDetailDto>
     {
-        public GetMemberDetailRequestValidator(ILocalizationService localizationService)
+        public GetMemberDetailDtoValidator(ILocalizationService localizationService)
         {
             RuleFor(x => x.Id).GreaterThan(0).WithMessage("参数错误");
         }

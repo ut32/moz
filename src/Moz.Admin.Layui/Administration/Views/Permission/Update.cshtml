@@ -1,6 +1,4 @@
-﻿
-
-@model Moz.Administration.Models.Permissions.UpdateModel
+﻿@model Moz.Admin.Layui.Models.Permissions.UpdateModel
 @{
   Layout = null;
   var guid = Guid.NewGuid().ToString("N");
@@ -16,59 +14,73 @@
             
             <input type="hidden" value="@Model.Permission.Id" name="id"/>
             
+            <div class="layui-form-item">
+              <label class="layui-form-label">父菜单</label>
+              <div class="layui-input-block">
+                <div id="infinite_select_@guid"></div>
+              </div>
+            </div>
+            
 
-                <div class="layui-form-item">
-                  <label class="layui-form-label">name</label>
-                  <div class="layui-input-inline">
-                    <input type="text" name="name" value="@Model.Permission.Name" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
-                  </div>
-                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
-                </div>
+            <div class="layui-form-item">
+              <label class="layui-form-label">名称</label>
+              <div class="layui-input-block">
+                <input type="text" name="name" value="@Model.Permission.Name" lay-verify="required" placeholder="请输入名称" autocomplete="off" class="layui-input">
+              </div>
+              <div class="layui-form-mid layui-word-aux"></div>
+            </div>
+            
              
-                <div class="layui-form-item">
-                  <label class="layui-form-label">code</label>
-                  <div class="layui-input-inline">
-                    <input type="text" name="code" value="@Model.Permission.Code" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
-                  </div>
-                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
-                </div>
-             
-                <div class="layui-form-item">
-                  <label class="layui-form-label">isactive</label>
-                  <div class="layui-input-inline">
-                    <input type="text" name="isactive" value="@Model.Permission.IsActive" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
-                  </div>
-                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
-                </div>
-             
-                <div class="layui-form-item">
-                  <label class="layui-form-label">parentid</label>
-                  <div class="layui-input-inline">
-                    <input type="text" name="parentid" value="@Model.Permission.ParentId" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
-                  </div>
-                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
-                </div>
-             
+            <div class="layui-form-item">
+              <label class="layui-form-label">标识码</label>
+              <div class="layui-input-block">
+                <input type="text" name="code" value="@Model.Permission.Code" lay-verify="required" placeholder="请输入标识码" autocomplete="off" class="layui-input">
+              </div>
+              <div class="layui-form-mid layui-word-aux"></div>
+            </div>
+            
+            <div class="layui-form-item">
+              <label class="layui-form-label">是否可用</label>
+              <div class="layui-input-inline">
+                <input type="checkbox" name="IsActive" value="true" lay-skin="switch" lay-text="是|否" @(Model.Permission.IsActive ? "checked" : "")>
+              </div>
+            </div>
 
-        <div class="layui-form-item">
-          <div class="layui-input-block">
-            <button class="layui-btn" lay-submit="">
-              <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i> 立即提交
-            </button>
-            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-          </div>
-        </div>
+
+
+            <div class="layui-form-item">
+              <div class="layui-input-block">
+                <button class="layui-btn" lay-submit="">
+                  <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i> 立即提交
+                </button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+              </div>
+            </div>
+            
 
       </form>
     </div>
   </div>
 </div>
 <script>
-  layui.use(['form'],
+  layui.use(['form', 'selectN'],
     function() {
-      var form = layui.form;
+      var form = layui.form, selectN = layui.selectN;
 
-      form.render(null, "form-@guid");
+      form.render();
+
+      //无限级分类-基本配置
+      var catIns1 = selectN({
+        //元素容器【必填】
+        elem: '#infinite_select_@guid',
+        name: "ParentIdsStr",
+        search: [false, true],
+        //候选数据【必填】
+        selected:[]
+        ,
+        data: "@Url.Action("AllSubPermissions", "Permission")",
+        field: { idName: 'Id', titleName: 'Name', childName: 'Children' }
+      });
 
     });
 </script>

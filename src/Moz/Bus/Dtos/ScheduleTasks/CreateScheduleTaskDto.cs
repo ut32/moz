@@ -3,16 +3,14 @@ using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
 using Moz.Validation;
 
-namespace Moz.Biz.Dtos.ScheduleTasks
+namespace Moz.Bus.Dtos.ScheduleTasks
 {
     /// <summary>
     /// tab_schedule_task
     /// </summary>
-    [Validator(typeof(CreateScheduleTaskRequestValidator))]
-    public class CreateScheduleTaskRequest
+    [Validator(typeof(CreateScheduleTaskDtoValidator))]
+    public class CreateScheduleTaskDto
     {
-        #region 属性
-        
         /// <summary>
         /// 
         /// </summary>
@@ -26,23 +24,13 @@ namespace Moz.Biz.Dtos.ScheduleTasks
         /// <summary>
         /// 
         /// </summary>
-        public string Cron { get;set; } 
-        
-        #endregion     
+        public string Cron { get;set; }      
     }
     
-    
-    public class CreateScheduleTaskResponse
+    public class CreateScheduleTaskDtoValidator : MozValidator<CreateScheduleTaskDto>
     {
-    
-    }
-    
-    
-    public class CreateScheduleTaskRequestValidator : MozValidator<CreateScheduleTaskRequest>
-    {
-        public CreateScheduleTaskRequestValidator(ILocalizationService localizationService)
+        public CreateScheduleTaskDtoValidator(ILocalizationService localizationService)
         {
-
             RuleFor(x => x.Name).NotEmpty().WithMessage("名称不能为空");
             RuleFor(x => x.Type).NotEmpty().WithMessage("任务不能为空");
             RuleFor(x => x.Cron).NotEmpty().WithMessage("CRON表达式不能为空");

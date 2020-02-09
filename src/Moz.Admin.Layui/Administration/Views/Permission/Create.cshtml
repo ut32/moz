@@ -1,5 +1,5 @@
 ﻿
-@model Moz.Administration.Models.Permissions.CreateModel
+@model Moz.Admin.Layui.Models.Permissions.CreateModel
 @{
   Layout = null;
   var guid = Guid.NewGuid().ToString("N");
@@ -12,39 +12,37 @@
             action="@Url.Action("Create", "Permission")"
             onSuccessCallBack=""
             lay-filter="form-@guid">
+        
+        <div class="layui-form-item">
+          <label class="layui-form-label">父菜单</label>
+          <div class="layui-input-block">
+            <div id="infinite_select_@guid"></div>
+          </div>
+        </div>
+        
 
-                <div class="layui-form-item">
-                  <label class="layui-form-label">name</label>
-                  <div class="layui-input-inline">
-                    <input type="text" name="name" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
-                  </div>
-                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
-                </div>
-             
-                <div class="layui-form-item">
-                  <label class="layui-form-label">code</label>
-                  <div class="layui-input-inline">
-                    <input type="text" name="code" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
-                  </div>
-                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
-                </div>
-             
-                <div class="layui-form-item">
-                  <label class="layui-form-label">isactive</label>
-                  <div class="layui-input-inline">
-                    <input type="text" name="isactive" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
-                  </div>
-                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
-                </div>
-             
-                <div class="layui-form-item">
-                  <label class="layui-form-label">parentid</label>
-                  <div class="layui-input-inline">
-                    <input type="text" name="parentid" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
-                  </div>
-                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
-                </div>
-             
+        <div class="layui-form-item">
+          <label class="layui-form-label">名称</label>
+          <div class="layui-input-block">
+            <input type="text" name="name" lay-verify="required" placeholder="请输入名称" autocomplete="off" class="layui-input">
+          </div>
+          <div class="layui-form-mid layui-word-aux"></div>
+        </div>
+
+        <div class="layui-form-item">
+          <label class="layui-form-label">标识码</label>
+          <div class="layui-input-block">
+            <input type="text" name="code" lay-verify="required" placeholder="请输入标识码" autocomplete="off" class="layui-input">
+          </div>
+          <div class="layui-form-mid layui-word-aux"></div>
+        </div>
+
+        <div class="layui-form-item">
+          <label class="layui-form-label">是否可用</label>
+          <div class="layui-input-inline">
+            <input type="checkbox" name="IsActive" value="true" lay-skin="switch" lay-text="是|否">
+          </div>
+        </div>
 
         <div class="layui-form-item">
           <div class="layui-input-block">
@@ -60,11 +58,23 @@
   </div>
 </div>
 <script>
-  layui.use(['form'],
+  layui.use(['form', 'selectN', 'selectM'],
     function() {
-      var form = layui.form;
+      var form = layui.form, selectN = layui.selectN, selectM = layui.selectM;
 
-      form.render(null, "form-@guid");
+      form.render(null,"form-@guid");
+
+
+      //无限级分类-基本配置
+      var catIns1 = selectN({
+        //元素容器【必填】
+        elem: '#infinite_select_@guid',
+        name:"ParentIdsStr",
+        search: [false, true]
+        //候选数据【必填】
+        ,data:  "@Url.Action("AllSubPermissions", "Permission")"
+        ,field:{idName:'Id',titleName:'Name',childName:'Children'}
+      });
 
     });
 </script>

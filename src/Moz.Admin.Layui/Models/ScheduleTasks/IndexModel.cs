@@ -1,5 +1,5 @@
 ﻿
-namespace Moz.Administration.Models.ScheduleTasks
+namespace Moz.Admin.Layui.Models.ScheduleTasks
 {
     public class IndexModel
     {

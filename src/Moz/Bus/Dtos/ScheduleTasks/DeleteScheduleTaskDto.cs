@@ -3,36 +3,22 @@ using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
 using Moz.Validation;
 
-namespace Moz.Biz.Dtos.ScheduleTasks
+namespace Moz.Bus.Dtos.ScheduleTasks
 {
     /// <summary>
     /// tab_schedule_task
     /// </summary>
-    [Validator(typeof(DeleteScheduleTaskRequestValidator))]
-    public class DeleteScheduleTaskRequest
+    [Validator(typeof(DeleteScheduleTaskDtoValidator))]
+    public class DeleteScheduleTaskDto
     {
-        #region 属性
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get;set; } 
-        
-        #endregion     
+        public long Id {get;set;}     
     }
     
-    
-    public class DeleteScheduleTaskResponse
+    public class DeleteScheduleTaskDtoValidator : MozValidator<DeleteScheduleTaskDto>
     {
-    
-    }
-    
-    
-    public class DeleteScheduleTaskRequestValidator : MozValidator<DeleteScheduleTaskRequest>
-    {
-        public DeleteScheduleTaskRequestValidator(ILocalizationService localizationService)
+        public DeleteScheduleTaskDtoValidator(ILocalizationService localizationService)
         {
-            RuleFor(x => x.Id).GreaterThan(0).WithMessage("发生错误");
+            RuleFor(x => x.Id).GreaterThan(0).WithMessage("参数错误");
         }
     }
     

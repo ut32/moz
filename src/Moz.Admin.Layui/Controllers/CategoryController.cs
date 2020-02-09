@@ -6,7 +6,7 @@ using Moz.Bus.Services.Categories;
 
 namespace Moz.Admin.Layui.Controllers
 {
-    //[AdminAuth(Permissions = "admin.category")]
+    [AdminAuth(Permissions = "admin.category")]
     public class CategoryController : AdminAuthBaseController
     {
         private readonly ICategoryService _categoryService;

@@ -10,8 +10,8 @@ namespace Moz.Bus.Dtos.Members
     /// <summary>
     /// tab_member
     /// </summary>
-    [Validator(typeof(UpdateMemberRequestValidator))]
-    public class UpdateMemberRequest
+    [Validator(typeof(UpdateMemberDtoValidator))]
+    public class UpdateMemberDto
     {
         #region 属性
         
@@ -109,17 +109,10 @@ namespace Moz.Bus.Dtos.Members
         
         #endregion     
     }
-    
-    
-    public class UpdateMemberResponse
+
+    public class UpdateMemberDtoValidator : MozValidator<UpdateMemberDto>
     {
-    
-    }
-    
-    
-    public class UpdateMemberRequestValidator : MozValidator<UpdateMemberRequest>
-    {
-        public UpdateMemberRequestValidator(ILocalizationService localizationService)
+        public UpdateMemberDtoValidator(ILocalizationService localizationService)
         {
 
             RuleFor(x => x.Id).Must(t => true).WithMessage("发生错误");

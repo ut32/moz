@@ -1,5 +1,117 @@
 ﻿@{
     Layout = null;
+    var guid = Guid.NewGuid().ToString("N");
 }
-
-welcome
+<style>
+    .welcome-box {
+        color: #fff;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+    }
+    .welcome-box h2 {
+        font-size: 30px;
+        margin-top: 5px;
+    }
+    .welcome-box .icon span.layui-icon {
+        font-size: 40px;
+    }
+</style>
+<div class="zui-page layui-form" lay-filter="form-@guid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md3">
+            <div class="welcome-box"  style="background: #64b0f2">
+                <div class="info">
+                    <h5>用户数</h5>
+                    <h2>120</h2>
+                </div>
+                <div class="icon">
+                    <span class="layui-icon layui-icon-user"></span>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md3">
+            <div class="welcome-box"  style="background: #f1b53d">
+                <div class="info">
+                    <h5>访问量</h5>
+                    <h2>1232</h2>
+                </div>
+                <div class="icon">
+                    <span class="layui-icon layui-icon-chart"></span>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md3">
+            <div class="welcome-box"  style="background: #3db9dc">
+                <div class="info">
+                    <h5>文章数</h5>
+                    <h2>12</h2>
+                </div>
+                <div class="icon">
+                    <span class="layui-icon layui-icon-file"></span>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md3">
+            <div class="welcome-box" style="background: #ff5d48">
+                <div class="info">
+                    <h5>警告数</h5>
+                    <h2>5</h2>
+                </div>
+                <div class="icon">
+                    <span class="layui-icon layui-icon-about"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="height: 15px"></div>
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md9">
+            <div class="layui-card">
+                <div class="layui-card-header" style="padding-top: 0; padding-bottom: 0">
+                    数据概览
+                </div>
+                <div class="layui-card-body">
+                    <img src="~/Administration/Assets/images/dataset.jpg" style="height: auto;width: 100%;" alt=""/>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md3">
+            <div class="layui-card">
+                <div class="layui-card-header" style="padding-top: 0; padding-bottom: 0">
+                    关于Moz
+                </div>
+                <div class="layui-card-body">
+                         <table class="layui-table">
+                             <tbody>
+                             <tr>
+                               <td>版本</td>
+                               <td>@(Moz.Constant.Version)</td>
+                             </tr>
+                             <tr>
+                                 <td>源码</td>
+                                 <td><a href="https://www.github.com/ut32/moz" target="_blank" style="color: #00c4ff">Github</a></td>
+                             </tr>
+                             <tr>
+                                 <td>Nuget</td>
+                                 <td>
+                                     <span style="background: #0b2e13; display: inline-block; padding: 15px; color: #00aaaa ">
+                                     Install-Package Moz
+                                     </span>
+                                 </td>
+                             </tr>
+                             <tr>
+                                 <td>文档</td>
+                                 <td>
+                                     <a href="https://ut32.com/category/opensource/moz" target="_blank" style="color: #00c4ff">项目官网</a>
+                                 </td>
+                             </tr>
+                             
+                           </tbody>
+                         </table>   
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

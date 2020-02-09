@@ -8,6 +8,11 @@ namespace Microsoft.Extensions.Caching.Distributed
         public static T GetOrSet<T>(this IDistributedCache cache, string key, Func<T> func, DistributedCacheEntryOptions options=null)
         {
             var value = cache.GetString(key);
+            if ("CACHE_ROLE_ALL_KEY".Equals(key))
+            {
+                
+            }
+
             if (value.IsNullOrEmpty()) 
             {
                 if (func == null) return default(T);

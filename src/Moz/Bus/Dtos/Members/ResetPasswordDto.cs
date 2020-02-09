@@ -6,22 +6,17 @@ using Moz.Validation;
 
 namespace Moz.Bus.Dtos.Members
 {
-    
-    public class ResetPasswordResponse
-    {
-        
-    }
 
-    [Validator(typeof(ResetPasswordRequestValidator))]
-    public class ResetPasswordRequest
+    [Validator(typeof(ResetPasswordDtoValidator))]
+    public class ResetPasswordDto
     { 
         public long[] MemberIds { get; set; }
         public string NewPassword { get; set; } 
     }
 
-    public class ResetPasswordRequestValidator : MozValidator<ResetPasswordRequest>
+    public class ResetPasswordDtoValidator : MozValidator<ResetPasswordDto>
     {
-        public ResetPasswordRequestValidator(ILocalizationService localizationService)
+        public ResetPasswordDtoValidator(ILocalizationService localizationService)
         {
             RuleFor(it => it.MemberIds).Must(it=>it.Any()).WithMessage("至少选择一项");
             RuleFor(it => it.NewPassword).NotEmpty().WithMessage("默认密码不能为空");

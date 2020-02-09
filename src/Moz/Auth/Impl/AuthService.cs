@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Moz.Auth.Attributes;
 using Moz.Bus.Dtos;
 using Moz.Bus.Dtos.Auth;
+using Moz.Bus.Dtos.Members;
 using Moz.Bus.Models.Common;
 using Moz.Bus.Models.Members;
 using Moz.Bus.Services;
@@ -212,47 +213,21 @@ namespace Moz.Auth.Impl
                     db.UseTran(tran =>
                     {
                         var identify = tran.Insertable(new Identify()).ExecuteReturnBigIdentity();
-                        memberUId = Guid.NewGuid().ToString("N");
-                        var memberId = tran.Insertable(new Member
+                        var registerMemberResult = _memberService.CreateMember(new CreateMemberDto
                         {
-                            UId = memberUId,
-                            Address = null,
-                            Avatar = request?.Data.UserInfo?.Avatar,
-                            Nickname = request?.Data.UserInfo?.Nickname,
-                            Birthday = null,
-                            CannotLoginUntilDate = null,
-                            Email = null,
-                            FailedLoginAttempts = 0,
-                            Gender = null,
-                            Geohash = null,
-                            IsActive = true,
-                            IsDelete = false,
-                            IsEmailValid = false,
-                            IsMobileValid = false,
-                            LastActiveDatetime = DateTime.UtcNow,
-                            LastLoginDatetime = DateTime.UtcNow,
-                            LastLoginIp = null,
-                            Lat = null,
-                            Lng = null,
-                            LoginCount = 0,
-                            Mobile = null,
-                            OnlineTimeCount = 0,
-                            Password = _encryptionService.CreateSaltKey(10),
-                            PasswordSalt = _encryptionService.CreateSaltKey(6),
-                            RegionCode = null,
-                            RegisterDatetime = DateTime.UtcNow,
-                            RegisterIp = null,
-                            Username = $"{request?.Data.UserInfo?.Nickname}_{identify}"
-                        }).ExecuteReturnBigIdentity();
+                            Avatar = request.Data.UserInfo.Avatar,
+                            Username = $"{request.Data.Provider.ToString()}_{identify}"
+                        }); 
                         tran.Insertable(new ExternalAuthentication()
                         {
                             Openid = request.Data.OpenId,
                             Provider = request.Data.Provider,
                             AccessToken = request.Data.AccessToken,
                             ExpireDt = request.Data.ExpireDt,
-                            MemberId = memberId,
+                            MemberId = registerMemberResult.Data.Id,
                             RefreshToken = request.Data.RefreshToken
                         }).ExecuteCommand();
+                        memberUId = registerMemberResult.Data.UId;
                         return true;
                     });
                 }

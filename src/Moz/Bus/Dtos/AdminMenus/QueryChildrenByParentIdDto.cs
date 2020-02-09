@@ -1,22 +1,15 @@
 using System.Collections.Generic;
+using Moz.Bus.Models.AdminMenus;
 
 namespace Moz.Bus.Dtos.AdminMenus
 {
-    public class QueryChildrenByParentIdRequest
+    public class QueryChildrenByParentIdDto
     {
          public long? ParentId { get; set; }
     }
 
-    public class QueryChildrenByParentIdResponse
+    public class QueryChildrenByParentIdApo
     {
-        public List<SimpleAdminMenu> AllSubs { get; set; }
-    }
-
-    public class SimpleAdminMenu
-    {
-        public long Id { get; set; }
-        public string Name { get; set; }
-        public bool Status { get; set; }
-        public List<SimpleAdminMenu> Children { get; set; }
+        public List<AdminMenuTree> AllSubs { get; set; }
     }
 }

@@ -8,20 +8,14 @@ namespace Moz.Bus.Dtos.ScheduleTasks
     /// <summary>
     /// tab_schedule_task
     /// </summary>
-    [Validator(typeof(PagedQueryScheduleTaskRequestValidator))]
-    public class PagedQueryScheduleTaskRequest
+    [Validator(typeof(PagedQueryScheduleTaskDtoValidator))]
+    public class PagedQueryScheduleTaskDto
     {
         #region 属性
         public int? Page { get; set; }
         public int? PageSize { get; set; }
         public string Keyword{ get;set; }
         #endregion     
-    }
-    
-    
-    public class PagedQueryScheduleTaskResponse: PagedList<QueryScheduleTaskItem>
-    {
-    
     }
     
     public class QueryScheduleTaskItem
@@ -81,12 +75,12 @@ namespace Moz.Bus.Dtos.ScheduleTasks
         /// 
         /// </summary>
         public string LastSuccessTimeString => LastSuccessTime?.ToString("yyyy-MM-dd HH:mm:ss");
-        
+
     }
     
-    public class PagedQueryScheduleTaskRequestValidator : MozValidator<PagedQueryScheduleTaskRequest>
+    public class PagedQueryScheduleTaskDtoValidator : MozValidator<PagedQueryScheduleTaskDto>
     {
-        public PagedQueryScheduleTaskRequestValidator(ILocalizationService localizationService)
+        public PagedQueryScheduleTaskDtoValidator(ILocalizationService localizationService)
         {
             
         }

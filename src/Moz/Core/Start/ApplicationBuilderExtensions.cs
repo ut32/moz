@@ -17,6 +17,7 @@ using Moz.Aop.Middlewares;
 using Moz.Bus.Dtos;
 using Moz.Core;
 using Moz.Core.Options;
+using Moz.DataBase;
 using Moz.Exceptions;
 using Moz.TaskSchedule;
 using Moz.Utils.Types;
@@ -61,9 +62,12 @@ namespace Microsoft.AspNetCore.Builder
             application.UseMiddleware<JwtInHeaderMiddleware>();
             
             //定时任务
-            if(options.IsEnableScheduling)
-                application.UseTaskSchedule();
-            
+            if (options.IsEnableScheduling && DbFactory.CheckInstalled(options))
+            {
+                var taskScheduleManager = application.ApplicationServices.GetService(typeof(ITaskScheduleManager)) as ITaskScheduleManager;
+                taskScheduleManager?.Init();
+            }
+
             application.UseMozStaticFiles();
             
             application.UseAuthentication();
@@ -95,11 +99,6 @@ namespace Microsoft.AspNetCore.Builder
                 context.Response.StatusCode = 404;
                 return Task.CompletedTask;
             });
-        }
-
-        private static void UseTaskSchedule(this IApplicationBuilder application)
-        {
-            TaskScheduleManager.Instance.Init().GetAwaiter().GetResult();
         }
 
         private static void UseMozStaticFiles(this IApplicationBuilder application)
