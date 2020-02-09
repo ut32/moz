@@ -41,9 +41,12 @@ Install-Package Moz.Admin.Layui
 
 数据库文件位于 : https://github.com/ut32/moz/tree/master/db/
 
+超级管理员 
+用户名：admin  密码：620389!
+
 ### 文档
 官方文档，暂时不齐，后边慢慢补充
 
-https://ut32.com/post/moz_home
+https://ut32.com/category/opensource/moz
 
 
