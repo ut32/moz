@@ -27,15 +27,55 @@
  
 ### 如何使用
 
-使用 nuget 安装核心包
-```
-Install-Package Moz
-```
+- 新建.NetCore Web项目
 
-使用 nuget 安装后台
-```
-Install-Package Moz.Admin.Layui
-```
+- Nuget安装
+
+  使用 nuget 安装核心包
+  ```
+  Install-Package Moz
+  ```
+
+  使用 nuget 安装后台
+  ```
+  Install-Package Moz.Admin.Layui
+  ```
+
+- 编辑项目文件
+
+  ```
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <PreserveCompilationReferences>true</PreserveCompilationReferences>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+  </PropertyGroup>
+  ```
+
+- 修改Startup文件
+
+  ```
+  public void ConfigureServices(IServiceCollection services)
+  {
+        services.AddMoz(options =>
+        { 
+            options.EncryptKey = "jEeESr7VySYru5c2";
+            options.Admin.Path = "myadmin";
+            options.Db.Add(new DbOptions
+            {
+                MasterConnectionString = Configuration["ConnectionString"]
+            });
+        });
+    }
+
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        app.UseMoz(env);
+   }
+  ```
+### Demo
+
+可参考Demo，https://github.com/ut32/moz/tree/master/samples/WebApp
 
 ### 数据库文件
 
