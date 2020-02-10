@@ -17,7 +17,7 @@ namespace Moz.Validation
                     .FirstOrDefault();
                 if (errMsg.IsNullOrEmpty()) 
                     errMsg = "发生未知错误(验证不通过)";
-                throw new MozException(errMsg,777);
+                throw new AlertException(errMsg);
             }
             base.OnActionExecuting(context);
         }
