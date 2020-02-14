@@ -1,7 +1,9 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moz.Bus.Dtos;
@@ -9,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace Moz.Exceptions
 {
-    public abstract class AbstractExceptionHandler<T>:IExceptionHandler
+    public abstract class AbstractExceptionHandler<T> : IExceptionHandler
     {
         private readonly ILogger<T> _logger;
         private readonly IWebHostEnvironment _webHostEnvironment;
@@ -22,11 +24,6 @@ namespace Moz.Exceptions
 
         public async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            var isAjaxRequest = context.Request.IsAjaxRequest();
-            var isAcceptJson = context.Request.Headers["Accept"]
-                                   .ToString()?
-                                   .Contains("application/json", StringComparison.OrdinalIgnoreCase) ?? false;
-
             var res = new ExceptionResult();
             switch (exception)
             {
@@ -37,7 +34,7 @@ namespace Moz.Exceptions
                 case FatalException fatalException:
                     res.Code = fatalException.ErrorCode;
                     res.Message = fatalException.Message;
-                    _logger.LogError("致命错误",exception);
+                    _logger.LogError("致命错误", exception);
                     break;
                 case MozAspectInvocationException aspectInvocationException:
                     res.Code = aspectInvocationException.ErrorCode;
@@ -50,13 +47,25 @@ namespace Moz.Exceptions
                 default:
                     res.Code = 20000;
                     res.Message = exception.Message;
-                    _logger.LogError("系统错误",exception);
+                    _logger.LogError("系统错误", exception);
                     break;
             }
-                
-            if (isAjaxRequest || isAcceptJson)
+            await this.OnExceptionAsync(context, exception, res);
+        }
+
+        protected virtual async Task OnExceptionAsync(HttpContext context, Exception exception, ExceptionResult result)
+        {
+            var isAjaxRequest = context.Request.IsAjaxRequest();
+            var isAcceptJson = context.Request.Headers["Accept"]
+                                   .ToString()?
+                                   .Contains("application/json", StringComparison.OrdinalIgnoreCase) ?? false;
+            var isApiController = context.GetEndpoint().Metadata.GetOrderedMetadata<ApiControllerAttribute>().Any();
+
+            if (isAjaxRequest || isAcceptJson || isApiController)
             {
-                await this.OnApiCallAsync(context, res);
+                context.Response.ContentType = "application/json;charset=utf-8";
+                context.Response.StatusCode = 200;
+                await context.Response.WriteAsync(JsonConvert.SerializeObject(result));
             }
             else
             {
@@ -64,22 +73,10 @@ namespace Moz.Exceptions
                 {
                     throw exception;
                 }
-                await OnPageCallAsync(context, res);
+                context.Response.ContentType = "text/html;charset=utf-8";
+                context.Response.StatusCode = 200;
+                await context.Response.WriteAsync($"错误:{result.Message}({result.Code})");
             }
-        }
-
-        protected virtual async Task OnApiCallAsync(HttpContext context, ExceptionResult result)
-        {
-            context.Response.ContentType = "application/json;charset=utf-8"; 
-            context.Response.StatusCode = 200;
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(result));
-        }
-        
-        protected virtual async Task OnPageCallAsync(HttpContext context, ExceptionResult result)
-        {
-            context.Response.ContentType = "text/html;charset=utf-8";
-            context.Response.StatusCode = 200;
-            await context.Response.WriteAsync($"错误:{result.Message}({result.Code})");
         }
     }
 }
