@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Moz.Core.Options;
+using Moz.Exceptions;
 using Moz.Service.Security;
 
 namespace Moz.Auth.Impl
@@ -31,6 +32,9 @@ namespace Moz.Auth.Impl
         /// <returns></returns>
         public string GenerateJwtToken(string memberUId)
         {
+            if (string.IsNullOrEmpty(memberUId))
+                throw new FatalException("member UId 不能为空");
+
             var claims = new[] 
             {
                 new Claim(JwtRegisteredClaimNames.Jti,memberUId),

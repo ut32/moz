@@ -47,7 +47,7 @@ namespace Moz.Core.Engine
                     {
                         var service = Resolve(parameter.ParameterType);
                         if (service == null)
-                            throw new MozException("Unknown dependency");
+                            throw new FatalException("Unknown dependency");
                         return service;
                     });
 
@@ -58,7 +58,7 @@ namespace Moz.Core.Engine
                     innerException = ex;
                 }
 
-            throw new MozException("No constructor was found that had all the dependencies satisfied.", innerException);
+            throw new FatalException("No constructor was found that had all the dependencies satisfied.");
         }
 
         #endregion

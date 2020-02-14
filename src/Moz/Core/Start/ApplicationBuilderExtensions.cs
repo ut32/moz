@@ -36,28 +36,28 @@ namespace Microsoft.AspNetCore.Builder
                 throw new ArgumentNullException(nameof (options));
             
             if (env.IsDevelopment())
-            {
                 application.UseDeveloperExceptionPage();
-            }
 
             application.UseMiddleware<ErrorHandlingMiddleware>();
 
+            
             application.UseStatusCodePages(async context =>
             {
                 var registerType = options.StatusCodePageHandlerType;
-                if (registerType != null &&
-                    application.ApplicationServices.GetService(registerType) is IStatusCodePageHandler handler)
+                if (registerType != null && application.ApplicationServices.GetService(registerType) is IStatusCodePageHandler handler)
                 {
-                    await handler.Process(context.HttpContext);
+                    await handler.Process(context);
                 }
                 else
                 {
                     if (application.ApplicationServices.GetService(typeof(MozStatusCodePageHandler)) is IStatusCodePageHandler mozHandler)
                     {
-                        await mozHandler.Process(context.HttpContext);
+                        await mozHandler.Process(context);
                     }
                 }
             });
+            
+           
             
             application.UseMiddleware<JwtInHeaderMiddleware>();
             

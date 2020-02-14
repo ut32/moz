@@ -62,7 +62,7 @@ namespace Moz.Administration.Controllers
             var articleModel = _articleModelService.GetArticleModelDetail(request);
             if (articleModel == null)
             {
-                throw new MozException("信息不存在，可能被删除");
+                throw new AlertException("信息不存在，可能被删除");
             }
             var model = new  Moz.Administration.Models.ArticleModels.UpdateModel()
             {

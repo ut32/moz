@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Moz.Core;
 using Moz.Exceptions;
 using SqlSugar;
@@ -20,7 +21,7 @@ namespace Moz.DataBase
                 SlaveConnectionConfigs = slaveConnectionConfigs
             })
         {
-            var hostingEnvironment = EngineContext.Current.Resolve<IHostingEnvironment>();
+            var hostingEnvironment = EngineContext.Current.Resolve<IWebHostEnvironment>();
             if (hostingEnvironment.IsDevelopment())
             {
                 Aop.OnLogExecuting = (sql, pars) =>
@@ -36,7 +37,6 @@ namespace Moz.DataBase
                 {
                     Console.WriteLine("SqlSugar Exception : ",exp);
                 };
-                
             }
         }
 
@@ -52,7 +52,7 @@ namespace Moz.DataBase
             catch (Exception ex)
             {
                 Ado.RollbackTran();
-                throw new MozException(ex.Message, ex);
+                throw new FatalException(ex.Message);
             }
         }
     }

@@ -1,11 +1,10 @@
-﻿using System;﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
 using Moz.Bus.Dtos.AdPlaces;
 using Moz.Bus.Services.Ads;
 using Moz.Exceptions;
 
-namespace Moz.Administration.Controllers
+namespace Moz.Admin.Layui.Controllers
 {
     //[AdminAuthorize(Permissions = "admin.adPlace")]
     public class AdPlaceController : AdminAuthBaseController
@@ -59,7 +58,7 @@ namespace Moz.Administration.Controllers
             var adPlace = _adService.GetAdPlaceDetail(request);
             if (adPlace == null)
             {
-                throw new MozException("信息不存在，可能被删除");
+                throw new AlertException("信息不存在，可能被删除");
             }
             var model = new  Moz.Administration.Models.AdPlaces.UpdateModel()
             {

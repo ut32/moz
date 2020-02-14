@@ -84,7 +84,7 @@ namespace Moz.Admin.Layui.Controllers
         {
             var article = _articleService.GetArticleDetail(request);
             if (article == null)
-                throw new MozException("信息不存在，可能被删除");
+                throw new AlertException("信息不存在，可能被删除");
             
             
             var articleModel = _articleService.GetArticleModelDetail(new Domain.Dtos.Articles.ArticleModels.GetArticleModelDetailRequest()
@@ -92,7 +92,7 @@ namespace Moz.Admin.Layui.Controllers
                 Id = article.ArticleTypeId
             });
             if (articleModel == null)
-                throw new MozException("找不到文章模型");
+                throw new AlertException("找不到文章模型");
             
             
             var model = new  Moz.Administration.Models.Articles.UpdateModel()

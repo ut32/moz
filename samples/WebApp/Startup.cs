@@ -32,6 +32,7 @@ namespace WebApp
                 {
                     MasterConnectionString = Configuration["ConnectionString"]
                 });
+                options.ErrorPage.DefaultRedirect = "/error/{0}";
             });
         }
 

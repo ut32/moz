@@ -30,7 +30,7 @@ namespace Moz.Aop.Interceptor
                             if (!validationResult.IsValid && validationResult.Errors.Any())
                             {
                                 var error = validationResult.Errors.First();
-                                throw new MozException(error.ErrorMessage, 777);
+                                throw new AlertException(error.ErrorMessage);
                             }
                         }
                     }
@@ -39,11 +39,11 @@ namespace Moz.Aop.Interceptor
             }
             catch (MozException ex)
             {
-                throw new MozAspectInvocationException(context, ex, ex.ErrorCode);
+                //throw new MozAspectInvocationException(context, ex, ex.ErrorCode);
             }
             catch (Exception ex)
             {
-                throw new MozAspectInvocationException(context, ex, 999);
+                //throw new MozAspectInvocationException(context, ex, 999);
             }
         }
     }

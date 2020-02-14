@@ -101,7 +101,7 @@ namespace Moz.Bus.Services.Ads
                 var ad = client.Queryable<Ad>().InSingle(request.Id);
                 if (ad == null)
                 {
-                    throw new MozException("找不到该条信息");
+                    throw new AlertException("找不到该条信息");
                 }
 
                 //ad.AdPlaceId = request.AdPlaceId;
@@ -128,7 +128,7 @@ namespace Moz.Bus.Services.Ads
                 var ad = client.Queryable<Ad>().InSingle(request.Id);
                 if (ad == null)
                 {
-                    throw new MozException("找不到该条信息");
+                    throw new AlertException("找不到该条信息");
                 }
 
                 client.Deleteable<Ad>(request.Id).ExecuteCommand();
@@ -200,7 +200,7 @@ namespace Moz.Bus.Services.Ads
             {
                 var ad = client.Queryable<Ad>().Select(it => new {it.Id}).First(it=>it.Id == request.Id);
                 if (ad==null)
-                    throw new MozException("找不到该条信息");
+                    throw new AlertException("找不到该条信息");
 
                 client.Updateable<Ad>()
                     .UpdateColumns(it => new Ad {OrderIndex = request.OrderIndex})
@@ -223,7 +223,7 @@ namespace Moz.Bus.Services.Ads
             {
                 var ad = client.Queryable<Ad>().Select(it => new {it.Id}).First(it=>it.Id == request.Id);
                 if (ad==null)
-                    throw new MozException("找不到该条信息");
+                    throw new AlertException("找不到该条信息");
 
                 client.Updateable<Ad>()
                     .UpdateColumns(it => new Ad { IsShow = request.IsShow })
@@ -332,7 +332,7 @@ namespace Moz.Bus.Services.Ads
                 var adPlace = client.Queryable<AdPlace>().InSingle(request.Id);
                 if (adPlace == null)
                 {
-                    throw new MozException("找不到该条信息");
+                    throw new AlertException("找不到该条信息");
                 }
 
                 adPlace.Title = request.Title;
@@ -357,7 +357,7 @@ namespace Moz.Bus.Services.Ads
                 var adPlace = client.Queryable<AdPlace>().InSingle(request.Id);
                 if (adPlace == null)
                 {
-                    throw new MozException("找不到该条信息");
+                    throw new AlertException("找不到该条信息");
                 }
 
                 client.Deleteable<AdPlace>(request.Id).ExecuteCommand();

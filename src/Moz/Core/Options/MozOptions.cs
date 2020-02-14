@@ -15,7 +15,7 @@ namespace Moz.Core.Options
                 LoginView = "",
                 WelcomeView = "" 
             };
-            
+            ErrorPage = new ErrorPageOptions();
             Db = new List<DbOptions>();
         }
 
@@ -45,6 +45,11 @@ namespace Moz.Core.Options
         /// 后台配置
         /// </summary>
         public AdminOptions Admin { get; }
+        
+        /// <summary>
+        /// 错误页面配置
+        /// </summary>
+        public ErrorPageOptions ErrorPage { get; } 
         
         /// <summary>
         /// 异常Http Code处理

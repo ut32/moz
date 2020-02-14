@@ -17,7 +17,7 @@ namespace Moz.Utils
         public static string MD5(string input)
         {
             if (input.IsNullOrEmpty())
-                throw new MozException("空字符串不能MD5");
+                throw new AlertException("空字符串不能MD5");
 
             var data = Encoding.UTF8.GetBytes(input);
             var sha = System.Security.Cryptography.MD5.Create();

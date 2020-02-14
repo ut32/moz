@@ -188,7 +188,7 @@ namespace Moz.Bus.Services.Articles
                 var article = client.Queryable<Article>().InSingle(request.Id);
                 if (article == null)
                 {
-                    throw new MozException("找不到该条信息");
+                    throw new AlertException("找不到该条信息");
                 }
                 article.CategoryId = request.CategoryId;
                 article.Title = request.Title;
@@ -255,7 +255,7 @@ namespace Moz.Bus.Services.Articles
                 var article = client.Queryable<Article>().InSingle(request.Id);
                 if (article == null)
                 {
-                    throw new MozException("找不到该条信息");
+                    throw new AlertException("找不到该条信息");
                 }
 
                 client.Deleteable<Article>(request.Id).ExecuteCommand();
@@ -305,7 +305,7 @@ namespace Moz.Bus.Services.Articles
             }
 
             if (model == null)
-                throw new MozException("找不到文章模型");
+                throw new AlertException("找不到文章模型");
 
             //设置字段
             var articleProperties = GenericCache<ArticleTypeInfo>
@@ -467,7 +467,7 @@ namespace Moz.Bus.Services.Articles
                 var articleModel = client.Queryable<ArticleModel>().InSingle(request.Id);
                 if (articleModel == null)
                 {
-                    throw new MozException("找不到该条信息");
+                    throw new AlertException("找不到该条信息");
                 }
 
                 articleModel.Name = request.Name;
@@ -495,7 +495,7 @@ namespace Moz.Bus.Services.Articles
                 var articleModel = client.Queryable<ArticleModel>().InSingle(request.Id);
                 if (articleModel == null)
                 {
-                    throw new MozException("找不到该条信息");
+                    throw new AlertException("找不到该条信息");
                 }
 
                 client.Deleteable<ArticleModel>(request.Id).ExecuteCommand();

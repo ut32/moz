@@ -44,12 +44,11 @@ namespace Moz.Aop.Interceptor
             }
             catch (MozException zoException)
             {
-                throw new MozAspectInvocationException(context, new Exception(zoException.Message),
-                    zoException.ErrorCode);
+                
             }
             catch (Exception ex)
             {
-                throw new MozAspectInvocationException(context, ex, 999);
+                
             }
         }
     }

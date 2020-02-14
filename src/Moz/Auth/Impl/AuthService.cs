@@ -113,7 +113,7 @@ namespace Moz.Auth.Impl
                 var mRole = client.Queryable<MemberRole>()
                     .Single(t => t.MemberId == memberId && t.RoleId == roleId);
                 if (mRole != null)
-                    throw new MozException("已添加");
+                    throw new AlertException("已添加");
 
                 var id = client.Insertable(new MemberRole
                 {

@@ -1,12 +1,11 @@
-﻿using System;﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
 using Moz.Biz.Dtos.Ads;
 using Moz.Bus.Dtos.Ads;
 using Moz.Bus.Services.Ads;
 using Moz.Exceptions;
 
-namespace Moz.Administration.Controllers
+namespace Moz.Admin.Layui.Controllers
 {
     //[AdminAuthorize(Permissions = "admin.ad")]
     public class AdController : AdminAuthBaseController
@@ -20,7 +19,7 @@ namespace Moz.Administration.Controllers
         //[AdminAuthorize(Permissions = "admin.ad.index")]
         public IActionResult Index(long adPlaceId) 
         {
-            var model = new Models.Ads.IndexModel
+            var model = new Administration.Models.Ads.IndexModel
             {
                 AdPlaceId = adPlaceId
             };
@@ -66,7 +65,7 @@ namespace Moz.Administration.Controllers
             var ad = _adService.GetAdDetail(request);
             if (ad == null)
             {
-                throw new MozException("信息不存在，可能被删除");
+                throw new AlertException("信息不存在，可能被删除");
             }
             var model = new  Moz.Administration.Models.Ads.UpdateModel()
             {

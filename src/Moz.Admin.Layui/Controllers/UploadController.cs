@@ -29,7 +29,7 @@ namespace Moz.Admin.Layui.Controllers
         {
             var member = _workContext.CurrentMember;
             if(member==null)
-                throw new MozException("未登录");
+                throw new AlertException("未登录");
             
             var guid = Guid.NewGuid().ToString("N");
             var extension = "png";

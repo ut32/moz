@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
+using Moz.Bus.Dtos;
 using Moz.Exceptions;
 
 namespace Moz.WebApi
@@ -22,23 +23,9 @@ namespace Moz.WebApi
             var exception = context.Exception;
             if (exception == null)
             {
-                if (context.Result is ObjectResult result)
-                {
-                    context.Result = new JsonResult(new {
-                        Code = 0,
-                        Message = "",
-                        Data = result.Value
-                    });
-                }else if (context.Result is OkResult)
-                {
-                    context.Result = new JsonResult(new
-                    {
-                        Code = 0,
-                        Message = "",
-                    });
-                }
+                
             }
-            else
+            else 
             {
                 var errorCode = 600;
                 string errorMessage;
