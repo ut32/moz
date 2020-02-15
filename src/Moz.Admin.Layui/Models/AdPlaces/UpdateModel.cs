@@ -1,8 +1,10 @@
-﻿namespace Moz.Administration.Models.AdPlaces
+﻿using Moz.Bus.Dtos.AdPlaces;
+
+namespace Moz.Admin.Layui.Models.AdPlaces
 {
     public class UpdateModel
     {
-         public Moz.Biz.Dtos.AdPlaces.GetAdPlaceDetailResponse AdPlace { get; set; }
+         public GetAdPlaceDetailApo AdPlace { get; set; }
     }
     
 }

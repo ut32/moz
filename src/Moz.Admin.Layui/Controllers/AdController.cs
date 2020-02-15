@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
-using Moz.Biz.Dtos.Ads;
+using Moz.Admin.Layui.Models.Ads;
+using Moz.Auth.Attributes;
 using Moz.Bus.Dtos.Ads;
 using Moz.Bus.Services.Ads;
 using Moz.Exceptions;
 
 namespace Moz.Admin.Layui.Controllers
 {
-    //[AdminAuthorize(Permissions = "admin.ad")]
+    [AdminAuth(Permissions = "admin.ad")]
     public class AdController : AdminAuthBaseController
     {
         private readonly IAdService _adService;
@@ -16,34 +17,34 @@ namespace Moz.Admin.Layui.Controllers
             this._adService = adService;
         }
 
-        //[AdminAuthorize(Permissions = "admin.ad.index")]
+        [AdminAuth(Permissions = "admin.ad.index")]
         public IActionResult Index(long adPlaceId) 
         {
-            var model = new Administration.Models.Ads.IndexModel
+            var model = new IndexModel
             {
                 AdPlaceId = adPlaceId
             };
             return View("~/Administration/Views/Ad/Index.cshtml",model);
         }
         
-        //[AdminAuthorize(Permissions = "admin.ad.index")]
-        public IActionResult PagedList(PagedQueryAdRequest request)
+        [AdminAuth(Permissions = "admin.ad.index")]
+        public IActionResult PagedList(PagedQueryAdsDto request)
         {
             var list = _adService.PagedQueryAds(request);
             var result = new
             {
                 Code = 0,
                 Message = "",
-                Total = list.TotalCount,
-                Data = list.List
+                Total = list.Data.TotalCount,
+                Data = list.Data.List
             };
             return Json(result);
         }
         
-        //[AdminAuthorize(Permissions = "admin.ad.create")]
+        [AdminAuth(Permissions = "admin.ad.create")]
         public IActionResult Create(long adPlaceId)
         {
-            var model = new Moz.Administration.Models.Ads.CreateModel
+            var model = new CreateModel
             {
                 AdPlaceId = adPlaceId
             };
@@ -52,59 +53,59 @@ namespace Moz.Admin.Layui.Controllers
         
 
         [HttpPost]
-        //[AdminAuthorize(Permissions = "admin.ad.create")]
-        public IActionResult Create(Moz.Biz.Dtos.Ads.CreateAdRequest request)
+        [AdminAuth(Permissions = "admin.ad.create")]
+        public IActionResult Create(CreateAdDto dto)
         {
-            var resp = _adService.CreateAd(request);
-            return RespJson(resp);
+            var result = _adService.CreateAd(dto);
+            return Json(result);
         }
         
-        //[AdminAuthorize(Permissions = "admin.ad.update")]
-        public IActionResult Update(Moz.Biz.Dtos.Ads.GetAdDetailRequest request)
+        [AdminAuth(Permissions = "admin.ad.update")]
+        public IActionResult Update(GetAdDetailDto dto)
         {
-            var ad = _adService.GetAdDetail(request);
-            if (ad == null)
+            var getAdResult = _adService.GetAdDetail(dto);
+            if (getAdResult.Code > 0)
             {
-                throw new AlertException("信息不存在，可能被删除");
-            }
-            var model = new  Moz.Administration.Models.Ads.UpdateModel()
+                return Json(getAdResult);
+            } 
+            var model = new UpdateModel()
             {
-                Ad = ad
+                Ad = getAdResult.Data
             };
             return View("~/Administration/Views/Ad/Update.cshtml",model);
         }
         
 
         [HttpPost]
-        //[AdminAuthorize(Permissions = "admin.ad.update")]
-        public IActionResult Update(Moz.Biz.Dtos.Ads.UpdateAdRequest request)
+        [AdminAuth(Permissions = "admin.ad.update")]
+        public IActionResult Update(UpdateAdDto dto)
         {
-            var resp = _adService.UpdateAd(request);
-            return RespJson(resp);
+            var result = _adService.UpdateAd(dto);
+            return Json(result);
         }
         
         [HttpPost]
-        //[AdminAuthorize(Permissions = "admin.ad.delete")]
-        public IActionResult Delete(Moz.Biz.Dtos.Ads.DeleteAdRequest request)
+        [AdminAuth(Permissions = "admin.ad.delete")]
+        public IActionResult Delete(DeleteAdDto dto)
         {
-            var resp = _adService.DeleteAd(request);
-            return RespJson(resp);
+            var result = _adService.DeleteAd(dto);
+            return Json(result);
         }
         
         [HttpPost]
-        //[AdminAuthorize(Permissions = "admin.ad.setisactive")]
-        public IActionResult SetIsShow(SetAdIsShowRequest request)
+        [AdminAuth(Permissions = "admin.ad.setIsActive")]
+        public IActionResult SetIsShow(SetAdIsShowDto dto)
         {
-            var resp = _adService.SetAdIsShow(request);
-            return RespJson(resp);
+            var result = _adService.SetAdIsShow(dto);
+            return Json(result);
         }
         
         [HttpPost]
-        //[AdminAuthorize(Permissions = "admin.ad.setorderindex")]
-        public IActionResult SetOrderIndex(SetAdOrderRequest request)
+        [AdminAuth(Permissions = "admin.ad.setOrderIndex")]
+        public IActionResult SetOrderIndex(SetAdOrderDto dto)
         {
-            var resp = _adService.SetAdOrder(request);
-            return RespJson(resp);
+            var result = _adService.SetAdOrder(dto);
+            return Json(result);
         }
     }
 }

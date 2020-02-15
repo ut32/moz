@@ -1,17 +1,15 @@
-﻿using System;
-using System.Linq;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
 using Moz.Validation;
 
-namespace Moz.Biz.Dtos.AdPlaces
+namespace Moz.Bus.Dtos.AdPlaces
 {
     /// <summary>
     /// tab_ad_place
     /// </summary>
-    [Validator(typeof(UpdateAdPlaceRequestValidator))]
-    public class UpdateAdPlaceRequest
+    [Validator(typeof(UpdateAdPlaceDtoValidator))]
+    public class UpdateAdPlaceDto
     {
         #region 属性
         
@@ -42,33 +40,14 @@ namespace Moz.Biz.Dtos.AdPlaces
         
         #endregion     
     }
-    
-    
-    public class UpdateAdPlaceResponse
+
+    public class UpdateAdPlaceDtoValidator : MozValidator<UpdateAdPlaceDto>
     {
-    
-    }
-    
-    
-    public class UpdateAdPlaceRequestValidator : MozValidator<UpdateAdPlaceRequest>
-    {
-        public UpdateAdPlaceRequestValidator(ILocalizationService localizationService)
+        public UpdateAdPlaceDtoValidator(ILocalizationService localizationService)
         {
-            
-            RuleFor(x => x.Id).Must(t=>true).WithMessage("发生错误");
-            
-            
-             RuleFor(x => x.Title).NotEmpty().WithMessage("不能为空");
-            
-            
-             RuleFor(x => x.Code).NotEmpty().WithMessage("不能为空");
-            
-            
-             RuleFor(x => x.Desc).NotEmpty().WithMessage("不能为空");
-            
-            
-            RuleFor(x => x.Addtime).Must(t=>true).WithMessage("发生错误");
-            
+            RuleFor(x => x.Id).Must(t => true).WithMessage("发生错误");
+            RuleFor(x => x.Title).NotEmpty().WithMessage("标题不能为空");
+
         }
     }
     

@@ -1,8 +1,10 @@
-﻿namespace Moz.Administration.Models.Ads
+﻿using Moz.Bus.Dtos.Ads;
+
+namespace Moz.Admin.Layui.Models.Ads
 {
     public class UpdateModel
     {
-         public Moz.Biz.Dtos.Ads.GetAdDetailResponse Ad { get; set; }
+         public GetAdDetailApo Ad { get; set; }
     }
     
 }

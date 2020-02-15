@@ -7,8 +7,8 @@ namespace Moz.Bus.Dtos.Ads
     /// <summary>
     /// tab_ad
     /// </summary>
-    [Validator(typeof(PagedQueryAdRequestValidator))]
-    public class PagedQueryAdRequest
+    [Validator(typeof(PagedQueryAdsDtoValidator))]
+    public class PagedQueryAdsDto
     {
         #region 属性
         public int? Page { get; set; }
@@ -19,13 +19,7 @@ namespace Moz.Bus.Dtos.Ads
         public string Keyword{ get;set; }
         #endregion     
     }
-    
-    
-    public class PagedQueryAdResponse: PagedList<QueryAdItem>
-    {
-    
-    }
-    
+
     public class QueryAdItem
     {
         /// <summary>
@@ -58,9 +52,9 @@ namespace Moz.Bus.Dtos.Ads
         public bool IsShow { get;set; }  
     }
     
-    public class PagedQueryAdRequestValidator : MozValidator<PagedQueryAdRequest>
+    public class PagedQueryAdsDtoValidator : MozValidator<PagedQueryAdsDto>
     {
-        public PagedQueryAdRequestValidator(ILocalizationService localizationService)
+        public PagedQueryAdsDtoValidator(ILocalizationService localizationService)
         {
             
         }

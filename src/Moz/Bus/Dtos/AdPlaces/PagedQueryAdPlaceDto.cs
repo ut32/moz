@@ -7,8 +7,8 @@ namespace Moz.Bus.Dtos.AdPlaces
     /// <summary>
     /// tab_ad_place
     /// </summary>
-    [Validator(typeof(PagedQueryAdPlaceRequestValidator))]
-    public class PagedQueryAdPlaceRequest
+    [Validator(typeof(PagedQueryAdPlaceDtoValidator))]
+    public class PagedQueryAdPlaceDto
     {
         #region 属性
         public int? Page { get; set; }
@@ -16,13 +16,7 @@ namespace Moz.Bus.Dtos.AdPlaces
         public string Keyword{ get;set; }
         #endregion     
     }
-    
-    
-    public class PagedQueryAdPlaceResponse: PagedList<QueryAdPlaceItem>
-    {
-    
-    }
-    
+
     public class QueryAdPlaceItem
     {
         /// <summary>
@@ -44,14 +38,14 @@ namespace Moz.Bus.Dtos.AdPlaces
         /// <summary>
         /// 
         /// </summary>
-        public System.DateTime Addtime { get;set; }
+        public System.DateTime AddTime { get;set; }
 
-        public string AddtimeString => Addtime.ToString("yyyy-MM-dd");
+        public string AddTimeString => AddTime.ToString("yyyy-MM-dd");
     }
     
-    public class PagedQueryAdPlaceRequestValidator : MozValidator<PagedQueryAdPlaceRequest>
+    public class PagedQueryAdPlaceDtoValidator : MozValidator<PagedQueryAdPlaceDto>
     {
-        public PagedQueryAdPlaceRequestValidator(ILocalizationService localizationService)
+        public PagedQueryAdPlaceDtoValidator(ILocalizationService localizationService)
         {
             
         }

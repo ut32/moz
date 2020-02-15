@@ -1,6 +1,6 @@
 ﻿
 
-@model Moz.Administration.Models.AdPlaces.UpdateModel
+@model Moz.Admin.Layui.Models.AdPlaces.UpdateModel
 @{
   Layout = null;
   var guid = Guid.NewGuid().ToString("N");
@@ -45,7 +45,7 @@
                 <div class="layui-form-item">
                   <label class="layui-form-label">addtime</label>
                   <div class="layui-input-inline">
-                    <input type="text" name="addtime" value="@Model.AdPlace.Addtime" lay-verify="required|date" placeholder="请输入" autocomplete="off" class="layui-date">
+                    <input type="text" name="addtime" value="@Model.AdPlace.AddTime" lay-verify="required|date" placeholder="请输入" autocomplete="off" class="layui-date">
                   </div>
                   <div class="layui-form-mid layui-word-aux">辅助文字</div>
                 </div>   

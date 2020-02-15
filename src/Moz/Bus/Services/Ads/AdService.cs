@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.Caching.Distributed;
-using Moz.Biz.Dtos.AdPlaces;
-using Moz.Biz.Dtos.Ads;
+using Moz.Bus.Dtos;
 using Moz.Bus.Dtos.AdPlaces;
 using Moz.Bus.Dtos.Ads;
 using Moz.Bus.Models.Ads;
@@ -13,18 +12,21 @@ using SqlSugar;
 
 namespace Moz.Bus.Services.Ads
 {
-    public partial class AdService : IAdService
+    public partial class AdService : BaseService, IAdService
     {
         #region Constants
 
         #endregion
 
         #region Fields
+
         private readonly IEventPublisher _eventPublisher;
         private readonly IDistributedCache _distributedCache;
+
         #endregion
 
         #region Ctor
+
         public AdService(
             IEventPublisher eventPublisher,
             IDistributedCache distributedCache)
@@ -32,6 +34,7 @@ namespace Moz.Bus.Services.Ads
             _eventPublisher = eventPublisher;
             _distributedCache = distributedCache;
         }
+
         #endregion
 
         #region 广告
@@ -41,24 +44,25 @@ namespace Moz.Bus.Services.Ads
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public GetAdDetailResponse GetAdDetail(GetAdDetailRequest request)
+        public ServResult<GetAdDetailApo> GetAdDetail(ServRequest<GetAdDetailDto> request)
         {
             using (var client = DbFactory.GetClient())
             {
-                 var ad = client.Queryable<Ad>().InSingle(request.Id);
-                 if(ad == null)
-                 {
-                    return null;
-                 }
-                 var resp = new GetAdDetailResponse();
-                 resp.Id = ad.Id;
-                 resp.AdPlaceId = ad.AdPlaceId;
-                 resp.Title = ad.Title;
-                 resp.ImagePath = ad.ImagePath;
-                 resp.TargetUrl = ad.TargetUrl;
-                 resp.Order = ad.OrderIndex;
-                 resp.IsShow = ad.IsShow;
-                 return resp;
+                var ad = client.Queryable<Ad>().InSingle(request.Data.Id);
+                if (ad == null)
+                {
+                    return Error("找不到此信息");
+                }
+
+                var resp = new GetAdDetailApo();
+                resp.Id = ad.Id;
+                resp.AdPlaceId = ad.AdPlaceId;
+                resp.Title = ad.Title;
+                resp.ImagePath = ad.ImagePath;
+                resp.TargetUrl = ad.TargetUrl;
+                resp.Order = ad.OrderIndex;
+                resp.IsShow = ad.IsShow;
+                return resp;
             }
         }
 
@@ -67,52 +71,52 @@ namespace Moz.Bus.Services.Ads
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public CreateAdResponse CreateAd(CreateAdRequest request)
+        public ServResult CreateAd(ServRequest<CreateAdDto> request)
         {
             using (var client = DbFactory.GetClient())
             {
                 var ad = new Ad
                 {
-                    AdPlaceId = request.AdPlaceId,
-                    Title = request.Title,
-                    ImagePath = request.ImagePath,
-                    TargetUrl = request.TargetUrl,
+                    AdPlaceId = request.Data.AdPlaceId,
+                    Title = request.Data.Title,
+                    ImagePath = request.Data.ImagePath,
+                    TargetUrl = request.Data.TargetUrl,
                     OrderIndex = 0,
                     IsShow = true
                 };
                 ad.Id = client.Insertable(ad).ExecuteReturnBigIdentity();
-                
+
                 _eventPublisher.EntityCreated(ad);
-                return new CreateAdResponse();
+                return Ok();
             }
         }
-        
-        
+
+
 
         /// <summary>
         /// 更新
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public UpdateAdResponse UpdateAd(UpdateAdRequest request)
+        public ServResult UpdateAd(ServRequest<UpdateAdDto> request)
         {
             using (var client = DbFactory.GetClient())
             {
-                var ad = client.Queryable<Ad>().InSingle(request.Id);
+                var ad = client.Queryable<Ad>().InSingle(request.Data.Id);
                 if (ad == null)
                 {
-                    throw new AlertException("找不到该条信息");
+                    return Error("找不到该条信息");
                 }
 
                 //ad.AdPlaceId = request.AdPlaceId;
-                ad.Title = request.Title;
-                ad.ImagePath = request.ImagePath;
-                ad.TargetUrl = request.TargetUrl;
+                ad.Title = request.Data.Title;
+                ad.ImagePath = request.Data.ImagePath;
+                ad.TargetUrl = request.Data.TargetUrl;
                 ////ad.Order = request.Order;
                 //ad.IsShow = request.IsShow;
-                client.Updateable( ad).ExecuteCommand();    
+                client.Updateable(ad).ExecuteCommand();
                 _eventPublisher.EntityUpdated(ad);
-                return new UpdateAdResponse();
+                return Ok();
             }
         }
 
@@ -121,19 +125,19 @@ namespace Moz.Bus.Services.Ads
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public DeleteAdResponse DeleteAd(DeleteAdRequest request)
+        public ServResult DeleteAd(ServRequest<DeleteAdDto> request)
         {
             using (var client = DbFactory.GetClient())
             {
-                var ad = client.Queryable<Ad>().InSingle(request.Id);
+                var ad = client.Queryable<Ad>().InSingle(request.Data.Id);
                 if (ad == null)
                 {
-                    throw new AlertException("找不到该条信息");
+                    return Error("找不到该条信息");
                 }
 
-                client.Deleteable<Ad>(request.Id).ExecuteCommand();
+                client.Deleteable<Ad>(request.Data.Id).ExecuteCommand();
                 _eventPublisher.EntityDeleted(ad);
-                return new DeleteAdResponse();
+                return Ok();
             }
         }
 
@@ -142,13 +146,13 @@ namespace Moz.Bus.Services.Ads
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public BulkDeleteAdsResponse BulkDeleteAds(BulkDeleteAdsRequest request)
+        public ServResult BulkDeleteAds(ServRequest<BulkDeleteAdsDto> request)
         {
             using (var client = DbFactory.GetClient())
             {
-                client.Deleteable<Ad>().In(request.Ids).ExecuteCommand();
-                _eventPublisher.EntitiesDeleted<Ad>(request.Ids);         
-                return new BulkDeleteAdsResponse();
+                client.Deleteable<Ad>().In(request.Data.Ids).ExecuteCommand();
+                _eventPublisher.EntitiesDeleted<Ad>(request.Data.Ids);
+                return Ok();
             }
         }
 
@@ -157,29 +161,29 @@ namespace Moz.Bus.Services.Ads
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public PagedQueryAdResponse PagedQueryAds(PagedQueryAdRequest request)
+        public ServResult<PagedList<QueryAdItem>> PagedQueryAds(ServRequest<PagedQueryAdsDto> request)
         {
-            var page = request.Page ?? 1;
-            var pageSize = request.PageSize ?? 20;
+            var page = request.Data.Page ?? 1;
+            var pageSize = request.Data.PageSize ?? 20;
             using (var client = DbFactory.GetClient())
             {
                 var total = 0;
                 var list = client.Queryable<Ad>()
-                    .Where(it=>it.AdPlaceId== request.AdPlaceId)
-                    .WhereIF(!request.Keyword.IsNullOrEmpty(), it=>it.Title.Contains(request.Keyword))
-                    .Select(t=>new QueryAdItem()
+                    .Where(it => it.AdPlaceId == request.Data.AdPlaceId)
+                    .WhereIF(!request.Data.Keyword.IsNullOrEmpty(), it => it.Title.Contains(request.Data.Keyword))
+                    .Select(t => new QueryAdItem()
                     {
-                        Id = t.Id, 
-                        AdPlaceId = t.AdPlaceId, 
-                        Title = t.Title, 
-                        ImagePath = t.ImagePath, 
-                        TargetUrl = t.TargetUrl, 
-                        Order = t.OrderIndex, 
-                        IsShow = t.IsShow, 
+                        Id = t.Id,
+                        AdPlaceId = t.AdPlaceId,
+                        Title = t.Title,
+                        ImagePath = t.ImagePath,
+                        TargetUrl = t.TargetUrl,
+                        Order = t.OrderIndex,
+                        IsShow = t.IsShow,
                     })
                     .OrderBy("order_index ASC,id DESC")
-                    .ToPageList(page, pageSize,ref total);
-                return new PagedQueryAdResponse()
+                    .ToPageList(page, pageSize, ref total);
+                return new PagedList<QueryAdItem>
                 {
                     List = list,
                     Page = page,
@@ -194,20 +198,20 @@ namespace Moz.Bus.Services.Ads
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public SetAdOrderResponse SetAdOrder(SetAdOrderRequest request)
+        public ServResult SetAdOrder(ServRequest<SetAdOrderDto> request)
         {
             using (var client = DbFactory.GetClient())
             {
-                var ad = client.Queryable<Ad>().Select(it => new {it.Id}).First(it=>it.Id == request.Id);
-                if (ad==null)
-                    throw new AlertException("找不到该条信息");
+                var ad = client.Queryable<Ad>().Select(it => new {it.Id}).First(it => it.Id == request.Data.Id);
+                if (ad == null)
+                    return Error("找不到该条信息");
 
                 client.Updateable<Ad>()
-                    .UpdateColumns(it => new Ad {OrderIndex = request.OrderIndex})
-                    .Where(it => it.Id == request.Id)
+                    .SetColumns(it => new Ad {OrderIndex = request.Data.OrderIndex})
+                    .Where(it => it.Id == request.Data.Id)
                     .ExecuteCommand();
 
-                return new SetAdOrderResponse();
+                return Ok();
             }
         }
 
@@ -217,20 +221,20 @@ namespace Moz.Bus.Services.Ads
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="MozException"></exception>
-        public SetAdIsShowResponse SetAdIsShow(SetAdIsShowRequest request)
+        public ServResult SetAdIsShow(ServRequest<SetAdIsShowDto> request)
         {
             using (var client = DbFactory.GetClient())
             {
-                var ad = client.Queryable<Ad>().Select(it => new {it.Id}).First(it=>it.Id == request.Id);
-                if (ad==null)
-                    throw new AlertException("找不到该条信息");
+                var ad = client.Queryable<Ad>().Select(it => new {it.Id}).First(it => it.Id == request.Data.Id);
+                if (ad == null)
+                    return Error("找不到该条信息");
 
                 client.Updateable<Ad>()
-                    .UpdateColumns(it => new Ad { IsShow = request.IsShow })
-                    .Where(it => it.Id == request.Id)
+                    .SetColumns(it => new Ad {IsShow = request.Data.IsShow})
+                    .Where(it => it.Id == request.Data.Id)
                     .ExecuteCommand();
 
-                return new SetAdIsShowResponse();
+                return Ok();
             }
         }
 
@@ -239,7 +243,7 @@ namespace Moz.Bus.Services.Ads
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public GetAdsByCodeResponse GetAdsByCode(GetAdsByCodeRequest request)
+        public ServResult<GetAdsByCodeApo> GetAdsByCode(ServRequest<GetAdsByCodeDto> request)
         {
             using (var client = DbFactory.GetClient())
             {
@@ -247,7 +251,8 @@ namespace Moz.Bus.Services.Ads
                     {
                         JoinType.Left, ad.AdPlaceId == place.Id
                     })
-                    .Where((ad, place) => ad.IsShow && place.Code.Equals(request.Code, StringComparison.OrdinalIgnoreCase))
+                    .Where((ad, place) =>
+                        ad.IsShow && place.Code.Equals(request.Data.Code, StringComparison.OrdinalIgnoreCase))
                     .Select((ad, place) => new
                     {
                         Id = ad.Id,
@@ -257,7 +262,7 @@ namespace Moz.Bus.Services.Ads
                     })
                     .OrderBy("order_index ASC,id DESC")
                     .ToList();
-                return new GetAdsByCodeResponse()
+                return new GetAdsByCodeApo()
                 {
                     Ads = list.Select(it => new GetAdsByCodeItem
                     {
@@ -271,30 +276,33 @@ namespace Moz.Bus.Services.Ads
         }
 
         #endregion
-        
-        #region 广告位置 
+
+        #region 广告位置
 
         /// <summary>
         /// 获取详细
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public GetAdPlaceDetailResponse GetAdPlaceDetail(GetAdPlaceDetailRequest request)
+        public ServResult<GetAdPlaceDetailApo> GetAdPlaceDetail(ServRequest<GetAdPlaceDetailDto> request)
         {
             using (var client = DbFactory.GetClient())
             {
-                 var adPlace = client.Queryable<AdPlace>().InSingle(request.Id);
-                 if(adPlace == null)
-                 {
-                    return null;
-                 }
-                 var resp = new GetAdPlaceDetailResponse();
-                 resp.Id = adPlace.Id;
-                 resp.Title = adPlace.Title;
-                 resp.Code = adPlace.Code;
-                 resp.Desc = adPlace.Desc;
-                 resp.Addtime = adPlace.Addtime;
-                 return resp;
+                var adPlace = client.Queryable<AdPlace>().InSingle(request.Data.Id);
+                if (adPlace == null)
+                {
+                    return Error("找不到此信息");
+                }
+
+                var resp = new GetAdPlaceDetailApo
+                {
+                    Id = adPlace.Id,
+                    Title = adPlace.Title,
+                    Code = adPlace.Code,
+                    Desc = adPlace.Desc,
+                    AddTime = adPlace.Addtime
+                };
+                return resp;
             }
         }
 
@@ -303,45 +311,48 @@ namespace Moz.Bus.Services.Ads
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public CreateAdPlaceResponse CreateAdPlace(CreateAdPlaceRequest request)
+        public ServResult CreateAdPlace(ServRequest<CreateAdPlaceDto> request)
         {
             using (var client = DbFactory.GetClient())
             {
                 var adPlace = new AdPlace
                 {
-                    Title = request.Title, Code = request.Code, Desc = request.Desc, Addtime = DateTime.Now
+                    Title = request.Data.Title,
+                    Code = request.Data.Code,
+                    Desc = request.Data.Desc,
+                    Addtime = DateTime.Now
                 };
                 adPlace.Id = client.Insertable(adPlace).ExecuteReturnBigIdentity();
-                
+
                 _eventPublisher.EntityCreated(adPlace);
-                return new CreateAdPlaceResponse();
+                return Ok();
             }
         }
-        
-        
+
+
 
         /// <summary>
         /// 更新
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public UpdateAdPlaceResponse UpdateAdPlace(UpdateAdPlaceRequest request)
+        public ServResult UpdateAdPlace(ServRequest<UpdateAdPlaceDto> request)
         {
             using (var client = DbFactory.GetClient())
             {
-                var adPlace = client.Queryable<AdPlace>().InSingle(request.Id);
+                var adPlace = client.Queryable<AdPlace>().InSingle(request.Data.Id);
                 if (adPlace == null)
                 {
                     throw new AlertException("找不到该条信息");
                 }
 
-                adPlace.Title = request.Title;
-                adPlace.Code = request.Code;
-                adPlace.Desc = request.Desc;
-                adPlace.Addtime = request.Addtime;
-                client.Updateable( adPlace).ExecuteCommand();    
+                adPlace.Title = request.Data.Title;
+                adPlace.Code = request.Data.Code;
+                adPlace.Desc = request.Data.Desc;
+
+                client.Updateable(adPlace).ExecuteCommand();
                 _eventPublisher.EntityUpdated(adPlace);
-                return new UpdateAdPlaceResponse();
+                return Ok();
             }
         }
 
@@ -350,19 +361,19 @@ namespace Moz.Bus.Services.Ads
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public DeleteAdPlaceResponse DeleteAdPlace(DeleteAdPlaceRequest request)
+        public ServResult DeleteAdPlace(ServRequest<DeleteAdPlaceDto> request)
         {
             using (var client = DbFactory.GetClient())
             {
-                var adPlace = client.Queryable<AdPlace>().InSingle(request.Id);
+                var adPlace = client.Queryable<AdPlace>().InSingle(request.Data.Id);
                 if (adPlace == null)
                 {
-                    throw new AlertException("找不到该条信息");
+                    return Error("找不到该条信息");
                 }
 
-                client.Deleteable<AdPlace>(request.Id).ExecuteCommand();
+                client.Deleteable<AdPlace>(request.Data.Id).ExecuteCommand();
                 _eventPublisher.EntityDeleted(adPlace);
-                return new DeleteAdPlaceResponse();
+                return Ok();
             }
         }
 
@@ -371,13 +382,13 @@ namespace Moz.Bus.Services.Ads
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public BulkDeleteAdPlacesResponse BulkDeleteAdPlaces(BulkDeleteAdPlacesRequest request)
+        public ServResult BulkDeleteAdPlaces(ServRequest<BulkDeleteAdPlacesDto> request)
         {
             using (var client = DbFactory.GetClient())
             {
-                client.Deleteable<AdPlace>().In(request.Ids).ExecuteCommand();
-                _eventPublisher.EntitiesDeleted<AdPlace>(request.Ids);         
-                return new BulkDeleteAdPlacesResponse();
+                client.Deleteable<AdPlace>().In(request.Data.Ids).ExecuteCommand();
+                _eventPublisher.EntitiesDeleted<AdPlace>(request.Data.Ids);
+                return Ok();
             }
         }
 
@@ -386,26 +397,26 @@ namespace Moz.Bus.Services.Ads
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public PagedQueryAdPlaceResponse PagedQueryAdPlaces(PagedQueryAdPlaceRequest request)
+        public ServResult<PagedList<QueryAdPlaceItem>> PagedQueryAdPlaces(ServRequest<PagedQueryAdPlaceDto> request)
         {
-            var page = request.Page ?? 1;
-            var pageSize = request.PageSize ?? 20;
+            var page = request.Data.Page ?? 1;
+            var pageSize = request.Data.PageSize ?? 20;
             using (var client = DbFactory.GetClient())
             {
                 var total = 0;
                 var list = client.Queryable<AdPlace>()
-                    //.WhereIF(!request.Keyword.IsNullOrEmpty(), t => t.Name.Contains(request.Keyword))
-                    .Select(t=>new QueryAdPlaceItem()
+                    .WhereIF(!request.Data.Keyword.IsNullOrEmpty(), t => t.Title.Contains(request.Data.Keyword))
+                    .Select(t => new QueryAdPlaceItem()
                     {
-                        Id = t.Id, 
-                        Title = t.Title, 
-                        Code = t.Code, 
-                        Desc = t.Desc, 
-                        Addtime = t.Addtime, 
+                        Id = t.Id,
+                        Title = t.Title,
+                        Code = t.Code,
+                        Desc = t.Desc,
+                        AddTime = t.Addtime,
                     })
                     .OrderBy("id DESC")
-                    .ToPageList(page, pageSize,ref total);
-                return new PagedQueryAdPlaceResponse()
+                    .ToPageList(page, pageSize, ref total);
+                return new PagedList<QueryAdPlaceItem>
                 {
                     List = list,
                     Page = page,
@@ -414,6 +425,7 @@ namespace Moz.Bus.Services.Ads
                 };
             }
         }
+
         #endregion
     }
 }

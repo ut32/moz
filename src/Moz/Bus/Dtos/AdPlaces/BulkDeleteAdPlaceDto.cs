@@ -1,31 +1,24 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using FluentValidation;
 using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
 using Moz.Validation;
 
-namespace Moz.Biz.Dtos.AdPlaces
+namespace Moz.Bus.Dtos.AdPlaces
 {
     /// <summary>
     /// tab_ad_place
     /// </summary>
-    [Validator(typeof(BulkDeleteAdPlacesRequestValidator))]
-    public class BulkDeleteAdPlacesRequest
+    [Validator(typeof(BulkDeleteAdPlacesDtoValidator))]
+    public class BulkDeleteAdPlacesDto
     {
         public long[] Ids {get;set;}   
     }
-    
-    
-    public class BulkDeleteAdPlacesResponse
+
+
+    public class BulkDeleteAdPlacesDtoValidator : MozValidator<BulkDeleteAdPlacesDto>
     {
-    
-    }
-    
-    
-    public class BulkDeleteAdPlacesRequestValidator : MozValidator<BulkDeleteAdPlacesRequest>
-    {
-        public BulkDeleteAdPlacesRequestValidator(ILocalizationService localizationService)
+        public BulkDeleteAdPlacesDtoValidator(ILocalizationService localizationService)
         {
              RuleFor(x => x.Ids).Must(x=>x.Any()).WithMessage("至少选择一项");
         }

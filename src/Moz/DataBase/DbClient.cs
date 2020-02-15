@@ -55,5 +55,20 @@ namespace Moz.DataBase
                 throw new FatalException(ex.Message);
             }
         }
+        
+        public void UseTran(Action<SqlSugarClient> fun)
+        {
+            try
+            {
+                Ado.BeginTran();
+                fun(this);
+                Ado.CommitTran();
+            }
+            catch (Exception ex)
+            {
+                Ado.RollbackTran();
+                throw new FatalException(ex.Message);
+            }
+        }
     }
 }

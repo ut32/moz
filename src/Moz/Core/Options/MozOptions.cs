@@ -54,7 +54,7 @@ namespace Moz.Core.Options
         /// <summary>
         /// 异常Http Code处理
         /// </summary>
-        public Type StatusCodePageHandlerType { get; private set; }
+        internal Type StatusCodePageHandlerType { get; private set; }
 
         /// <summary>
         /// 

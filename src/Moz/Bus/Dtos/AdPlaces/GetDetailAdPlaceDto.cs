@@ -1,23 +1,21 @@
-﻿using System;
-using System.Linq;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
 using Moz.Validation;
 
-namespace Moz.Biz.Dtos.AdPlaces
+namespace Moz.Bus.Dtos.AdPlaces
 {
     /// <summary>
     /// tab_ad_place
     /// </summary>
-    [Validator(typeof(GetAdPlaceDetailRequestValidator))]
-    public class GetAdPlaceDetailRequest
+    [Validator(typeof(GetAdPlaceDetailDtoValidator))]
+    public class GetAdPlaceDetailDto
     {
         public long Id {get;set;}      
     }
     
     
-    public class GetAdPlaceDetailResponse
+    public class GetAdPlaceDetailApo
     {
         /// <summary>
         /// 
@@ -42,14 +40,14 @@ namespace Moz.Biz.Dtos.AdPlaces
         /// <summary>
         /// 
         /// </summary>
-        public System.DateTime Addtime { get;set; } 
+        public System.DateTime AddTime { get;set; } 
         
     }
     
     
-    public class GetAdPlaceDetailRequestValidator : MozValidator<GetAdPlaceDetailRequest>
+    public class GetAdPlaceDetailDtoValidator : MozValidator<GetAdPlaceDetailDto>
     {
-        public GetAdPlaceDetailRequestValidator(ILocalizationService localizationService)
+        public GetAdPlaceDetailDtoValidator(ILocalizationService localizationService)
         {
             RuleFor(x => x.Id).GreaterThan(0).WithMessage("参数错误");
         }

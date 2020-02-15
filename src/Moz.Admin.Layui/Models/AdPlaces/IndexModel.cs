@@ -1,5 +1,5 @@
 ﻿
-namespace Moz.Administration.Models.AdPlaces
+namespace Moz.Admin.Layui.Models.AdPlaces
 {
     public class IndexModel
     {

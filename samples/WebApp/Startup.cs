@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moz.Core.Options;
+using SqlSugar;
 
 namespace WebApp
 {
@@ -26,13 +27,52 @@ namespace WebApp
         {
             services.AddMoz(options =>
             { 
+                /*
+                 ==全局配置==
+                 EncryptKey: 涉及到应用安全，必须配置，长度为16位
+                 IsEnableScheduling: 是否开启定时任务，可选配置，开启后后台才可操作，默认未开启。
+                 IsEnablePerformanceMonitor: 是否开启性能监视，可选配置，开启后后台才有数据，默认未开启。
+                 */
                 options.EncryptKey = "jEeESr7VySYru5c2";
+                options.IsEnableScheduling = false;
+                options.IsEnablePerformanceMonitor = false;
+
+                /*
+                 ==后台配置==
+                 Path: 后台路径，可选配置
+                 LoginView: 后台自定义登录页，可选配置
+                 WelcomeView: 后台自定义首页，可选配置
+                 */
                 options.Admin.Path = "myadmin";
+                options.Admin.LoginView = "";
+                options.Admin.WelcomeView = "";
+                
+                /*
+                 ==数据库配置==
+                 使用以下方式配置，默认数据库类型为MySql,名称为Default。
+                 如果有多数据库，依次在后边添加，但主要须指定不同名称。
+                 */
                 options.Db.Add(new DbOptions
                 {
                     MasterConnectionString = Configuration["ConnectionString"]
                 });
+                options.Db.Add(new DbOptions
+                {
+                    MasterConnectionString = "",
+                    Name = "usr", 
+                    Type = DbType.SqlServer
+                });
+                
+                /*
+                 ==错误页配置==
+                 错误页包括程序抛错，鉴权失败，404等。以下配置均为可选配置
+                 DefaultRedirect: 错误默认跳转地址
+                 LoginRedirect: 遇401跳转
+                 NotFoundRedirect: 遇404跳转
+                 */
                 options.ErrorPage.DefaultRedirect = "/error/{0}";
+                options.ErrorPage.LoginRedirect = "/login";
+                options.ErrorPage.NotFoundRedirect = "/404";
             });
         }
 

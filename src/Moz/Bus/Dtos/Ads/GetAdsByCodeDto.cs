@@ -10,14 +10,14 @@ namespace Moz.Bus.Dtos.Ads
     /// <summary>
     /// tab_ad
     /// </summary>
-    [Validator(typeof(GetAdsByCodeRequestValidator))]
-    public class GetAdsByCodeRequest
+    [Validator(typeof(GetAdsByCodeDtoValidator))]
+    public class GetAdsByCodeDto
     {
         public string Code {get;set;}
     }
     
     
-    public class GetAdsByCodeResponse
+    public class GetAdsByCodeApo
     {
         public List<GetAdsByCodeItem> Ads { get; set; }
     }
@@ -33,9 +33,9 @@ namespace Moz.Bus.Dtos.Ads
     }
     
     
-    public class GetAdsByCodeRequestValidator : MozValidator<GetAdsByCodeRequest>
+    public class GetAdsByCodeDtoValidator : MozValidator<GetAdsByCodeDto>
     {
-        public GetAdsByCodeRequestValidator(ILocalizationService localizationService)
+        public GetAdsByCodeDtoValidator(ILocalizationService localizationService)
         {
             RuleFor(x => x.Code).NotEmpty().WithMessage("标识码不能为空");
         } 
