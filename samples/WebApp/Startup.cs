@@ -56,12 +56,6 @@ namespace WebApp
                 {
                     MasterConnectionString = Configuration["ConnectionString"]
                 });
-                options.Db.Add(new DbOptions
-                {
-                    MasterConnectionString = "",
-                    Name = "usr", 
-                    Type = DbType.SqlServer
-                });
                 
                 /*
                  ==错误页配置==

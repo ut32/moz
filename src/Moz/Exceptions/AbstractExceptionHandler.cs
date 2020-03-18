@@ -41,10 +41,6 @@ namespace Moz.Exceptions
                     _exceptionResult.Message = fatalException.Message;
                     _logger.LogError("致命错误", exception);
                     break;
-                case MozException mozException:
-                    _exceptionResult.Code = mozException.ErrorCode;
-                    _exceptionResult.Message = mozException.Message;
-                    break;
                 default:
                     _exceptionResult.Code = 20000;
                     _exceptionResult.Message = exception.Message;

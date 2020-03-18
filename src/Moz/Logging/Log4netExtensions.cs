@@ -1,19 +1,57 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Moz.Logging
 {
     public static class Log4NetExtensions
     {
-        public static ILoggerFactory AddLog4Net(this ILoggerFactory factory, string log4NetConfigFile)
+        /// <summary>
+        /// Adds the log4net logging provider.
+        /// </summary>
+        /// <param name="builder">The logging builder instance.</param>
+        /// <returns>The <see ref="ILoggingBuilder" /> passed as parameter with the new provider registered.</returns>
+        public static ILoggingBuilder AddLog4Net(this ILoggingBuilder builder)
         {
-            factory.AddProvider(new Log4netProvider(log4NetConfigFile));
-            return factory;
+			var options = new Log4NetProviderOptions();
+			return builder.AddLog4Net(options);
         }
 
-        public static ILoggerFactory AddLog4Net(this ILoggerFactory factory)
+        /// <summary>
+        /// Adds the log4net logging provider.
+        /// </summary>
+        /// <param name="builder">The logging builder instance.</param>
+        /// <param name="log4NetConfigFile">The log4net Config File.</param>
+        /// <returns>The <see ref="ILoggingBuilder" /> passed as parameter with the new provider registered.</returns>
+        public static ILoggingBuilder AddLog4Net(this ILoggingBuilder builder, string log4NetConfigFile)
         {
-            factory.AddProvider(new Log4netProvider("log4net.config"));
-            return factory;
+			var options = new Log4NetProviderOptions(log4NetConfigFile);
+			return builder.AddLog4Net(options);
+		}
+
+        /// <summary>
+        /// Adds the log4net logging provider.
+        /// </summary>
+        /// <param name="builder">The logging builder instance.</param>
+        /// <param name="log4NetConfigFile">The log4net Config File.</param>
+        /// <param name="watch">if set to <c>true</c>, the configuration will be reloaded when the xml configuration file changes.</param>
+        /// <returns>
+        /// The <see ref="ILoggingBuilder" /> passed as parameter with the new provider registered.
+        /// </returns>
+        public static ILoggingBuilder AddLog4Net(this ILoggingBuilder builder, string log4NetConfigFile, bool watch)
+        {
+			var options = new Log4NetProviderOptions(log4NetConfigFile, watch);
+			return builder.AddLog4Net(options);
+		}
+
+        /// <summary>
+        /// Adds the log4net logging provider.
+        /// </summary>
+        /// <param name="builder">The logging builder instance.</param>
+        /// <param name="log4NetConfigFile">The log4net Config File.</param>
+        /// <returns>The <see ref="ILoggingBuilder" /> passed as parameter with the new provider registered.</returns>
+        public static ILoggingBuilder AddLog4Net(this ILoggingBuilder builder, Log4NetProviderOptions options)
+        {
+			//builder.Services.AddSingleton<ILoggerProvider>(new Log4NetProvider(options));
+            return builder; 
         }
     }
 }

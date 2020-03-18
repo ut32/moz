@@ -213,22 +213,54 @@ namespace Moz.Auth.Impl
                     db.UseTran(tran =>
                     {
                         var identify = tran.Insertable(new Identify()).ExecuteReturnBigIdentity();
-                        var registerMemberResult = _memberService.CreateMember(new CreateMemberDto
+                        memberUId = Guid.NewGuid().ToString("N");
+                        var member = new Member 
                         {
+                            UId = Guid.NewGuid().ToString("N"),
+                            Address = null,
                             Avatar = request.Data.UserInfo.Avatar,
+                            Nickname = request.Data.UserInfo.Nickname,
+                            Birthday = null,
+                            CannotLoginUntilDate = null,
+                            Email = null,
+                            FailedLoginAttempts = 0,
+                            Gender = GenderEnum.Man,
+                            Geohash = null,
+                            IsActive = true,
+                            IsDelete = false,
+                            IsEmailValid = false,
+                            IsMobileValid = false,
+                            LastActiveDatetime = DateTime.Now,
+                            LastLoginDatetime = DateTime.Now,
+                            LastLoginIp = null,
+                            Lat = null,
+                            Lng = null,
+                            LoginCount = 0,
+                            Mobile = null,
+                            OnlineTimeCount = 0,
+                            Password = $"pwd_{identify}",
+                            PasswordSalt = "123", 
+                            RegionCode = null,
+                            RegisterDatetime = DateTime.Now,
+                            RegisterIp = null,
                             Username = $"{request.Data.Provider.ToString()}_{identify}"
-                        }); 
+                        };
+                        member.Id = tran.Insertable(member).ExecuteReturnBigIdentity();
+                        tran.Insertable(new MemberRole
+                        {
+                            ExpireDate = null,
+                            MemberId = member.Id,
+                            RoleId = 3
+                        }).ExecuteCommand();
                         tran.Insertable(new ExternalAuthentication()
                         {
                             Openid = request.Data.OpenId,
                             Provider = request.Data.Provider,
                             AccessToken = request.Data.AccessToken,
                             ExpireDt = request.Data.ExpireDt,
-                            MemberId = registerMemberResult.Data.Id,
+                            MemberId = member.Id,
                             RefreshToken = request.Data.RefreshToken
                         }).ExecuteCommand();
-                        memberUId = registerMemberResult.Data.UId;
-                        return true;
                     });
                 }
             }
@@ -259,8 +291,6 @@ namespace Moz.Auth.Impl
                                 .Where(it => it.Id == memberId)
                                 .ExecuteCommand();
                         }
-
-                        return 0;
                     });
 
                     memberUId = member.UId;
