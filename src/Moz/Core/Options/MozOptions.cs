@@ -31,10 +31,10 @@ namespace Moz.Core.Options
         public bool IsEnablePerformanceMonitor { get; set; }
           
         /// <summary>
-        /// 加密KEY,关系到应用安全，很重要
+        /// EncryptKey, 要求为16-32位 ，关系到应用安全，很重要
         /// 在线生成 https://ut32.com/tool/pwd
         /// </summary>
-        public string EncryptKey { get; set; }
+        public string EncryptKey { get; set; } 
 
         /// <summary>
         /// 数据库相关配置

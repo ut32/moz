@@ -1,14 +1,14 @@
 layui.define(['layer', 'form','element','jquery'], function(exports){
-    var layer = layui.layer
+    let layer = layui.layer
         ,form = layui.form
         ,element = layui.element
         ,$ = layui.jquery;
 
 
-    var AjaxManager = function () {
-        var _this = this;
+    let AjaxManager = function () {
+        let _this = this;
         _this.ajax = function (url,method,data,sucFunc,failFunc) {
-            var options = {
+            let options = {
                 url:url,
                 type:method,
                 cache:false,
@@ -23,7 +23,7 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
                         }
                         return;
                     }
-                    var ct = xhr.getResponseHeader("content-type") || "";
+                    let ct = xhr.getResponseHeader("content-type") || "";
                     if (ct.indexOf('html') > -1) {
                         if ($.isFunction(sucFunc)){
                             sucFunc("html",result);
@@ -31,7 +31,9 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
                     }else if (ct.indexOf('json') > -1) {
                         if (result.Code>0){
                             if (result.Code===401) {
-                                location.href = "/manage";
+                                layer.alert("会话过期，需重新登录！", {icon: 5},function (idx) {
+                                    location.href = adminIndex;
+                                });
                             }else if(result.Code===403){
                                 layer.alert("权限不足", {icon: 5});
                             }else {
@@ -63,8 +65,8 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
             $.ajax(options);
         };
     };
-    var NavTabManager = function(){
-        var _this = this;
+    let NavTabManager = function(){
+        let _this = this;
         _this.currentLayId = "";
         _this.clearTimer = 0;
         _this.left = 0;
@@ -72,10 +74,10 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
         _this.refresh = function (layId) {
             if (layId){
                 getContent(layId,function (html) {
-                    var $item = $("#zui-admin-content .item[page-id='"+layId+"']");
+                    let $item = $("#zui-admin-content .item[page-id='"+layId+"']");
                     if ($item.size()===1){
                         $item.remove();
-                        var $html = $("<div class='item' page-id='"+layId+"'>"+html+"</div>");
+                        let $html = $("<div class='item' page-id='"+layId+"'>"+html+"</div>");
                         $html.appendTo($("#zui-admin-content"));
                         initUI($html);
                     }
@@ -87,7 +89,7 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
                 getContent(layId,function (html) {
                     if ($("#zui-admin-content .item[page-id='"+layId+"']").size()===0){
                         $("#zui-admin-content .item").hide();
-                        var $html = $("<div class='item' page-id='"+layId+"'>"+html+"</div>");
+                        let $html = $("<div class='item' page-id='"+layId+"'>"+html+"</div>");
                         $html.appendTo($("#zui-admin-content"));
                         initUI($html);
                     }
@@ -110,11 +112,11 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
             }
         };
         _this.closeOtherTabs = function(){
-            var curLayId = _this.currentLayId;
-            var allTabs = $("#zui-admin-header-tabs .layui-tab-title li[lay-id]");
+            let curLayId = _this.currentLayId;
+            let allTabs = $("#zui-admin-header-tabs .layui-tab-title li[lay-id]");
             allTabs.each(function (i, v) {
-                var $tab = $(v);
-                var layId = $tab.attr("lay-id");
+                let $tab = $(v);
+                let layId = $tab.attr("lay-id");
                 if (layId && layId!=="home/welcome" && layId!==curLayId) {
                     element.tabDelete('zui-admin-header-tabs', layId);
                 }
@@ -123,10 +125,10 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
             _this.ajdustTabLeft();
         };
         _this.closeAllTabs = function(){
-            var allTabs = $("#zui-admin-header-tabs .layui-tab-title li[lay-id]");
+            let allTabs = $("#zui-admin-header-tabs .layui-tab-title li[lay-id]");
             allTabs.each(function (i, v) {
-                var $tab = $(v);
-                var layId = $tab.attr("lay-id");
+                let $tab = $(v);
+                let layId = $tab.attr("lay-id");
                 if (layId && layId!=="home/welcome") {
                     element.tabDelete('zui-admin-header-tabs', layId);
                 }
@@ -152,11 +154,11 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
                 window.clearTimeout(_this.clearTimer);
             }
             _this.clearTimer = setTimeout(function () {
-                var allTabs = $("#zui-admin-header-tabs .layui-tab-title li[lay-id]");
-                var allContents = $("#zui-admin-content .item");
+                let allTabs = $("#zui-admin-header-tabs .layui-tab-title li[lay-id]");
+                let allContents = $("#zui-admin-content .item");
                 allContents.each(function (i,v) {
-                    var $content = $(v);
-                    var isMatch = allTabs.filter("[lay-id='"+$content.attr("page-id")+"']").size()>0;
+                    let $content = $(v);
+                    let isMatch = allTabs.filter("[lay-id='"+$content.attr("page-id")+"']").size()>0;
                     if (!isMatch){
                         $content.remove();
                     }
@@ -165,9 +167,9 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
             },500);
         };
         _this.gotoLeft = function () {
-            var $ul = $("#zui-admin-header-tabs .layui-tab ul.layui-tab-title");
-            var tabWidth = getTabWidth();
-            var ulWidth = getUlWidth();
+            let $ul = $("#zui-admin-header-tabs .layui-tab ul.layui-tab-title");
+            let tabWidth = getTabWidth();
+            let ulWidth = getUlWidth();
             if (ulWidth>tabWidth){
                 _this.left = _this.left +300;
                 if (_this.left>0) _this.left=0;
@@ -178,9 +180,9 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
             }
         };
         _this.gotoRight = function () {
-            var $ul = $("#zui-admin-header-tabs .layui-tab ul.layui-tab-title");
-            var tabWidth = getTabWidth();
-            var ulWidth = getUlWidth();
+            let $ul = $("#zui-admin-header-tabs .layui-tab ul.layui-tab-title");
+            let tabWidth = getTabWidth();
+            let ulWidth = getUlWidth();
             if (ulWidth>tabWidth){
                 _this.left = _this.left - 300;
                 if (_this.left < (tabWidth - ulWidth)) {
@@ -189,19 +191,19 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
                 $ul.css({"left":_this.left});
             }
         };
-        var getTabWidth = function () {
+        let getTabWidth = function () {
             return $("#zui-admin-header-tabs .layui-tab").width()|0;
         };
-        var getUlWidth = function () {
-            var $lis = $("#zui-admin-header-tabs .layui-tab ul.layui-tab-title li");
+        let getUlWidth = function () {
+            let $lis = $("#zui-admin-header-tabs .layui-tab ul.layui-tab-title li");
             return eval($lis.toArray().map(function (v) {
                 return $(v).outerWidth() | 0;
             }).join('+'));
         };
         _this.ajdustTabLeft = function () {
-            var $ul = $("#zui-admin-header-tabs .layui-tab ul.layui-tab-title");
-            var tabWidth = getTabWidth();
-            var ulWidth = getUlWidth();
+            let $ul = $("#zui-admin-header-tabs .layui-tab ul.layui-tab-title");
+            let tabWidth = getTabWidth();
+            let ulWidth = getUlWidth();
             if (tabWidth>ulWidth) {
                 _this.left = 0;
                 $ul.css({"left":_this.left});
@@ -210,7 +212,7 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
                 $ul.css({"left":_this.left});
             }
         };
-        var getContent = function (layId,func) {
+        let getContent = function (layId,func) {
             ajaxManager.ajax(layId,"GET",{},function (type, result) {
                 if ($.isFunction(func)){
                     if (type==="html"){
@@ -220,12 +222,12 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
             });
         };
     };
-    var DialogManager = function () {
-        var _this = this;
-        var _zindex = 1000;
+    let DialogManager = function () {
+        let _this = this;
+        let _zindex = 1000;
         _this.create = function(url,title,width,height){
             if (url){
-                var newTitle = title || "标题";
+                let newTitle = title || "标题";
                 _zindex = _zindex + 5;
                 ajaxManager.ajax(url,"GET",{},function (type, result) {
                     if (type==="html"){
@@ -245,21 +247,23 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
             }
         };
     };
-    var initUI = function($p){
+    let initUI = function($p){
         $("textarea.editor", $p).each(function () {
             if (CKEDITOR)
                 CKEDITOR.replace( this );
         });
     };
 
-    var navTabManager = new NavTabManager();
-    var ajaxManager = new AjaxManager();
-    var dialogManager = new DialogManager();
-    
-    var isFullScreen = false;
-    
-    var obj = {
-        init:function () {
+    let navTabManager = new NavTabManager();
+    let ajaxManager = new AjaxManager();
+    let dialogManager = new DialogManager();
+
+    let isFullScreen = false;
+    let adminIndex = '';
+
+    let obj = {
+        init:function (_adminIndex) {
+            adminIndex = _adminIndex; 
             //ajax 相关
             $(document).ajaxStart(function(){
                 NProgress.start();
@@ -277,20 +281,20 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
 
                 event.preventDefault();
 
-                var $this = $(this);
-                var type = $this.attr("zui-type");
-                var href = $this.attr("zui-href");
-                var title = $this.attr("title") || $this.text() || "无标题";
+                let $this = $(this);
+                let type = $this.attr("zui-type");
+                let href = $this.attr("zui-href");
+                let title = $this.attr("title") || $this.text() || "无标题";
                 if (type === "dialog"){
-                    var width = $this.attr("zui-width") || "800px";
-                    var height = $this.attr("zui-height") || "500px";
+                    let width = $this.attr("zui-width") || "800px";
+                    let height = $this.attr("zui-height") || "500px";
                     if (href){
                         dialogManager.create(href,title,width,height);
                     }
                     return false;
                 }else if (type==="tab"){
                     if (href) {
-                        var count = $("#zui-admin-header-tabs [lay-id='"+href+"']").size();
+                        let count = $("#zui-admin-header-tabs [lay-id='"+href+"']").size();
                         if (count>0){
                             element.tabChange('zui-admin-header-tabs', href);
                         }else{
@@ -299,12 +303,12 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
                     }
                     return false;
                 }else if(type==="ajax"){
-                    var fun = function () {
+                    let fun = function () {
                         ajaxManager.ajax(href,"POST",{},function (type, result) {
                             navTabManager.refreshCurrentTab();
                         });
                     };
-                    var confirm = $this.attr("zui-confirm");
+                    let confirm = $this.attr("zui-confirm");
                     if(confirm){
                         layer.confirm(confirm, {icon: 3, title:'提示'}, function(index){
                             fun();
@@ -323,10 +327,10 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
 
                 event.preventDefault();
 
-                var $_form = $(this);
-                var url = $_form.attr("action");
+                let $_form = $(this);
+                let url = $_form.attr("action");
                 if (url){
-                    var next = function ($form) {
+                    let next = function ($form) {
                         if(CKEDITOR){
                             for ( instance in CKEDITOR.instances )
                             {
@@ -342,7 +346,7 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
                                 if (result.Code === 0){
                                     layer.alert(result.Message || "操作成功", {icon: 1});
                                 }
-                                var onSuccessCallBack = $form.attr("onSuccessCallBack");
+                                let onSuccessCallBack = $form.attr("onSuccessCallBack");
                                 if (onSuccessCallBack) {
                                     if($.isFunction(window[onSuccessCallBack]))
                                         window[onSuccessCallBack](result);
@@ -356,7 +360,7 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
                         });
                     };
 
-                    var onBeforePost = $_form.attr("onBeforePost");
+                    let onBeforePost = $_form.attr("onBeforePost");
                     if (onBeforePost){
                         window[onBeforePost](next,$_form);
                     }else{
@@ -374,13 +378,13 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
 
             //tab标签按钮监听
             element.on("tab(zui-admin-header-tabs)",function (data) {
-                var layId = $(this).attr('lay-id');
+                let layId = $(this).attr('lay-id');
                 if (layId){
                     navTabManager.select(layId);
                 }
             });
             element.on('tabDelete(zui-admin-header-tabs)', function(data){
-                var layId = $(this).parent().attr("lay-id");
+                let layId = $(this).parent().attr("lay-id");
                 if (layId){
                     $("#zui-admin-content .item[page-id='"+layId+"']").remove();
                     navTabManager.ajdustTabLeft();
@@ -389,7 +393,7 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
 
             //tab刷新
             $(document).on("click","a[zui-event='refresh']",function (event) {
-                var $ls = $(this);
+                let $ls = $(this);
                 if($ls.hasClass("refreshtag")){
                     $ls.removeClass("refreshtag");
                     $(this).find(".refreshicon").css({'transform': 'rotate(0deg)'});
@@ -415,7 +419,7 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
                     }
                 }else{
                     isFullScreen = true;
-                    var element = document.documentElement;
+                    let element = document.documentElement;
                     if (element.requestFullscreen) {
                         element.requestFullscreen();
                     } else if (element.msRequestFullscreen) {
@@ -455,7 +459,7 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
              **/
             //侧边伸缩监听
             $(document).on("click","a[zui-event='flexible']",function (event) {
-                var $ls = $("#zui-admin-leftside");
+                let $ls = $("#zui-admin-leftside");
                 if($ls.hasClass("flexible")){
                     $ls.removeClass("flexible");
                     $(this).find(".flexibleicon").css({'transform': 'rotate(0deg)'});
@@ -481,8 +485,8 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
         },
         
         onSwitch:function (url,data,obj,form,filter,sucFunc,failFunc) {
-            var callback = function(data) {
-                var result = obj.elem.checked;
+            let callback = function(data) {
+                let result = obj.elem.checked;
                 if (data.Code !== 0) {
                     if ($.isFunction(failFunc)){
                         failFunc(data);
@@ -516,7 +520,7 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
         },
         
         onCellEdit:function (url,data,obj,sucFunc,failFunc) {
-            var callback = function(data) {
+            let callback = function(data) {
                 if (data.Code !== 0) {
                     if ($.isFunction(failFunc)){
                         failFunc(data);

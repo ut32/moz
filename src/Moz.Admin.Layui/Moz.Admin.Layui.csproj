@@ -25,4 +25,8 @@
     <EmbeddedResource Include="Administration\Views\**\*.cshtml" />
     <EmbeddedResource Include="Administration\Assets\**\*.*" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Administration\Assets\css\nprogress.css" />
+    <Content Include="Administration\Assets\js\nprogress.min.js" />
+  </ItemGroup>
 </Project>

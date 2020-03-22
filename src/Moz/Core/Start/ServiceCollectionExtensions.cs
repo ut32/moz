@@ -60,15 +60,15 @@ namespace Microsoft.Extensions.DependencyInjection
             //验证mozOptions
             var options = buildServiceProvider.GetService<IOptions<MozOptions>>();
             if (options?.Value == null)
-                throw new Exception(nameof(MozOptions));
+                throw new ArgumentNullException(nameof(MozOptions));
 
             //必须配置EncryptKey
             if (options.Value.EncryptKey.IsNullOrEmpty())
                 throw new Exception(nameof(options.Value.EncryptKey));
 
-            //必须为16位
-            if (options.Value.EncryptKey.Length != 16)
-                throw new Exception("加密KEY位数不正确，必须为16位");
+            //必须为16-32位
+            if (options.Value.EncryptKey.Length < 16 || options.Value.EncryptKey.Length>32)
+                throw new Exception("加密KEY位数不正确，必须为16-32位");
 
             //检查是否已安装数据库
             DbFactory.CheckInstalled(options.Value);
@@ -104,7 +104,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
                     cfg.Events = new JwtBearerEvents
                     {
-                        OnAuthenticationFailed = o => throw new AlertException("auth failure")
+                        //OnAuthenticationFailed = o => throw new AlertException("auth failure")
                     };
                 });
 

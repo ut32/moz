@@ -1,11 +1,14 @@
-﻿@{
+﻿@using Microsoft.Extensions.Options
+@using Moz.Core.Options
+@{
     Layout = null;
 }
+@inject IOptions<MozOptions> Options
 <!DOCTYPE html>
 <html lang="zh-cn">
 <head>
     <meta charset="UTF-8">
-    <title>后台系统</title>
+    <title>@Options.Value.Admin.Title</title>
     <style>
         html,
         body {
@@ -92,14 +95,6 @@
             opacity: 0.7;
         }
         
-        .bg-video {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
         #error{ color: #ff3300; }
     </style>
 </head>
@@ -127,10 +122,6 @@
         </div>
     </div>
 </form>
-<div class="bg-video">
-    <video id="video" muted="muted" class="video" autoplay="autoplay" loop="loop" src="//qzonestyle.gtimg.cn/qz-proj/wy-pc-v2/static/img/web/top.webm">
-    </video>
-</div>
 </body>
 </html>
 <script type="text/javascript" src="~/Administration/Assets/js/jquery.min.js"></script>

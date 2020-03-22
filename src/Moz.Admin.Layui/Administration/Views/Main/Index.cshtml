@@ -6,6 +6,7 @@
 @model Moz.Administration.Models.Main.IndexRspModel
 @inject IWorkContext WorkContext
 @inject IAdminMenuService AdminMenuService
+@inject IOptions<MozOptions> Options
 @{
     Layout = null;
 }
@@ -13,12 +14,12 @@
 <html lang="zh-cn">
 <head>
     <meta charset="utf-8">
-    <title>后台管理系统</title>
+    <title>@Options.Value.Admin.Title</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link rel="stylesheet" href="~/Administration/Assets/layui/css/layui.css" media="all">
-    <link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/nprogress/0.2.0/nprogress.css">
+    <link rel="stylesheet" type="text/css" href="~/Administration/Assets/css/nprogress.css">
     <link rel="stylesheet" href="~/Administration/Assets/css/admin.min.css" media="all">
     <link rel="stylesheet" href="~/Administration/Assets/ztree/css/zTreeStyle/zTreeStyle.css" type="text/css">
 </head>
@@ -29,7 +30,7 @@
             <h1 class="logo">
                 <a href="javascript:;">
                     <i class="layui-icon layui-icon-tree"></i>
-                    <cite>后台管理系统</cite>
+                    <cite>@Options.Value.Admin.Title</cite>
                 </a>
             </h1>
             <ul class="layui-nav layui-nav-tree">
@@ -222,7 +223,7 @@
 <script type="text/javascript" src="~/Administration/Assets/layui/layui.js"></script>
 <script type="text/javascript" src="~/Administration/Assets/ckeditor4/ckeditor.js" ></script>
 <script type="text/javascript" src="~/Administration/Assets/ckeditor4/config.js" ></script>
-<script type="text/javascript" src="//cdn.bootcss.com/nprogress/0.2.0/nprogress.min.js"></script>
+<script type="text/javascript" src="~/Administration/Assets/js/nprogress.min.js"></script>
 <script type="text/javascript"  src="~/Administration/Assets/ztree/js/jquery.ztree.all.min.js"></script>
 <script>
     layui.config({
@@ -233,8 +234,8 @@
         selectM: 'select_ext/selectM',
         admin: 'admin'
     }).use(['element','form','treetable','admin'], function() {
-        var admin = layui.admin;
-        admin.init();
+        let admin = layui.admin;
+        admin.init('@Url.Action("index","home")');
     });
 </script> 
 </body>
