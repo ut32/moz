@@ -1,4 +1,4 @@
-﻿using Moz.Configuration;
+﻿using Moz.Settings;
 
 namespace Moz.Bus.Models.Members
 {

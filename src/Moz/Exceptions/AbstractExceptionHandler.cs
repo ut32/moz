@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moz.Bus.Dtos;
 using Moz.Core;
-using Moz.Core.Options;
+using Moz.Core.Config;
 using Newtonsoft.Json;
 
 namespace Moz.Exceptions
@@ -120,7 +120,7 @@ namespace Moz.Exceptions
             {
                 throw exception;
             }
-            var options = EngineContext.Current.Resolve<IOptions<MozOptions>>()?.Value;
+            var options = EngineContext.Current.Resolve<IOptions<AppConfig>>()?.Value;
             var pathFormat = options?.ErrorPage?.DefaultRedirect;
             if (string.IsNullOrEmpty(pathFormat))
             {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Moz.Logging.Scope;
 
-namespace Moz.Logging
+namespace Moz.Logging.Log4net
 {
     /// <summary>
     /// The log4Net provider options.

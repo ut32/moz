@@ -5,27 +5,27 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Moz.Core.Options;
+using Moz.Core.Config;
 using Moz.Exceptions;
 using Moz.Service.Security;
 
 namespace Moz.Auth.Impl
 {
-    public class JwtService:IJwtService
+    public class JwtService : IJwtService
     {
-        private readonly IOptions<MozOptions> _mozOptions;
+        private readonly IOptions<AppConfig> _appConfig;
         private readonly IEncryptionService _encryptionService;
         private readonly DateTime _expireDateTime; 
 
-        public JwtService(IOptions<MozOptions> mozOptions, IEncryptionService encryptionService)
+        public JwtService(IOptions<AppConfig> appConfig, IEncryptionService encryptionService)
         {
-            _mozOptions = mozOptions;
+            _appConfig = appConfig;
             _encryptionService = encryptionService;
-            _expireDateTime = DateTime.Now.AddDays(30).ToUniversalTime();
+            _expireDateTime = DateTime.Now.AddDays(_appConfig.Value.Token.Expire).ToUniversalTime();
         }
-        
+         
         /// <summary>
-        /// 
+        /// Generate JWT Token
         /// </summary>
         /// <param name="memberUId"></param>
         /// <returns></returns>
@@ -40,12 +40,12 @@ namespace Moz.Auth.Impl
                 new Claim(JwtRegisteredClaimNames.Exp,_expireDateTime.ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_mozOptions.Value.EncryptKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appConfig.Value.AppSecret));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
             var token = new JwtSecurityToken(
-                "https://ut32.com",
-                "moz_application",
+                _appConfig.Value.Token.Issuer,
+                _appConfig.Value.Token.Audience,
                 claims,
                 expires: _expireDateTime,
                 signingCredentials: credentials);
@@ -61,27 +61,27 @@ namespace Moz.Auth.Impl
         }
 
         /// <summary>
-        /// 
+        /// Generate Refresh Token
         /// </summary>
         /// <returns></returns>
         private string GenerateRefreshToken(string memberUId)
         {
             var guid = Guid.NewGuid().ToString("N");
-            var finalText = $"{_mozOptions.Value.EncryptKey}|{memberUId}|{guid}";
-            return _encryptionService.EncryptText(finalText);
+            var finalText = $"{_appConfig.Value.AppSecret}|{memberUId}|{guid}";
+            return _encryptionService.EncryptText(finalText,_appConfig.Value.AppSecret);
         }
 
         /// <summary>
-        /// 
+        /// Return TokenValidationParameters
         /// </summary>
         /// <returns></returns>
         public TokenValidationParameters GetTokenValidationParameters()
         {
             return new TokenValidationParameters
             {
-                ValidIssuer = "https://ut32.com",
-                ValidAudience = "moz_application",
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_mozOptions.Value.EncryptKey))
+                ValidIssuer = _appConfig.Value.Token.Issuer,
+                ValidAudience =_appConfig.Value.Token.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appConfig.Value.AppSecret))
             };
         }
     }

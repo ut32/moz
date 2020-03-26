@@ -5,9 +5,9 @@ using Moz.Bus.Models;
 using Moz.Bus.Models.Localization;
 using Moz.Bus.Models.Members;
 using Moz.CMS.Services.Settings;
-using Moz.Configuration;
 using Moz.Core;
 using Moz.Domain.Services.Settings;
+using Moz.Settings;
 using Moz.Utils;
 
 namespace Moz.Bus.Services.Localization

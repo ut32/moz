@@ -6,7 +6,7 @@ using Moz.Admin.Layui.Common;
 using Moz.Administration.Models.Members;
 using Moz.Auth;
 using Moz.Bus.Dtos.Auth;
-using Moz.Core.Options;
+using Moz.Core.Config;
 using Moz.Exceptions;
 
 namespace Moz.Admin.Layui.Controllers
@@ -14,12 +14,12 @@ namespace Moz.Admin.Layui.Controllers
     public class HomeController : AdminBaseController
     {
         private readonly IAuthService _authService;
-        private readonly IOptions<MozOptions> _mozOptions;
+        private readonly IOptions<AppConfig> _mozOptions;
 
         public HomeController(IAuthService passportService,
             IAuthService authenticationService,
             IHttpContextAccessor httpContextAccessor,
-            IOptions<MozOptions> mozOptions)
+            IOptions<AppConfig> mozOptions)
         {
             _authService = passportService;
             _mozOptions = mozOptions;

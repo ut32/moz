@@ -20,15 +20,15 @@ using Moz.Auth;
 using Moz.Auth.Attributes;
 using Moz.Auth.Handlers;
 using Moz.CMS.Services.Settings;
-using Moz.Configuration;
 using Moz.Core;
 using Moz.Core.Attributes;
-using Moz.Core.Options;
+using Moz.Core.Config;
 using Moz.Core.WorkContext;
 using Moz.DataBase;
 using Moz.Events;
 using Moz.Events.Publishers;
 using Moz.Exceptions;
+using Moz.Settings;
 using Moz.TaskSchedule;
 using Moz.Utils;
 using Moz.Utils.FileManager;
@@ -42,7 +42,7 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class ServiceCollectionExtensions
     {
 
-        public static void AddMoz(this IServiceCollection services, Action<MozOptions> configure)
+        public static void AddMoz(this IServiceCollection services, Action<AppConfig> configure)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
@@ -57,28 +57,28 @@ namespace Microsoft.Extensions.DependencyInjection
             var configuration = buildServiceProvider.GetService<IConfiguration>();
             var webHostEnvironment = buildServiceProvider.GetService<IWebHostEnvironment>();
 
-            //验证mozOptions
-            var options = buildServiceProvider.GetService<IOptions<MozOptions>>();
-            if (options?.Value == null)
-                throw new ArgumentNullException(nameof(MozOptions));
+            //验证appConfig
+            var appConfig = buildServiceProvider.GetService<IOptions<AppConfig>>();
+            if (appConfig?.Value == null)
+                throw new ArgumentNullException(nameof(AppConfig));
 
             //必须配置EncryptKey
-            if (options.Value.EncryptKey.IsNullOrEmpty())
-                throw new Exception(nameof(options.Value.EncryptKey));
+            if (appConfig.Value.AppSecret.IsNullOrEmpty())
+                throw new Exception(nameof(appConfig.Value.AppSecret));
 
             //必须为16-32位
-            if (options.Value.EncryptKey.Length < 16 || options.Value.EncryptKey.Length>32)
+            if (appConfig.Value.AppSecret.Length < 16 || appConfig.Value.AppSecret.Length>32)
                 throw new Exception("加密KEY位数不正确，必须为16-32位");
 
             //检查是否已安装数据库
-            DbFactory.CheckInstalled(options.Value);
+            DbFactory.CheckInstalled(appConfig.Value);
             
-            var serviceProvider = ConfigureServices(services, configuration, webHostEnvironment, options.Value);
+            var serviceProvider = ConfigureServices(services, configuration, webHostEnvironment, appConfig.Value);
             EngineContext.Create(serviceProvider);
         }
 
         private static IServiceProvider ConfigureServices(IServiceCollection services, IConfiguration configuration,
-            IWebHostEnvironment webHostEnvironment, MozOptions mozOptions)
+            IWebHostEnvironment webHostEnvironment, AppConfig mozOptions)
         {
             ServicePointManager.SecurityProtocol =
                 SecurityProtocolType.Tls12 |
@@ -202,8 +202,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #endregion
 
-            //获取所有的 IMozStartup
-            var startupConfigurations = TypeFinder.FindClassesOfType<IMozStartup>();
+            //获取所有的 IAppStartup
+            var startupConfigurations = TypeFinder.FindClassesOfType<IAppStartup>();
 
             //添加嵌入cshtml资源
             services.Configure<MvcRazorRuntimeCompilationOptions>(options =>
@@ -214,7 +214,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             //执行各个模块的启动类
             var instances = startupConfigurations
-                .Select(startup => (IMozStartup) Activator.CreateInstance(startup.Type))
+                .Select(startup => (IAppStartup) Activator.CreateInstance(startup.Type))
                 .OrderBy(startup => startup.Order);
             foreach (var instance in instances)
                 instance.ConfigureServices(services, configuration, webHostEnvironment, mozOptions);

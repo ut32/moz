@@ -1,16 +1,16 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Moz.Core.Options;
+using Moz.Core.Config;
 
 namespace Moz.Admin.Layui.Controllers
 {
     public class AdminWelcomeViewComponent:ViewComponent
     {
-        private readonly IOptions<MozOptions> _mozOptions;
+        private readonly IOptions<AppConfig> _mozOptions;
         
         
-        public AdminWelcomeViewComponent(IOptions<MozOptions> mozOptions)
+        public AdminWelcomeViewComponent(IOptions<AppConfig> mozOptions)
         {
             _mozOptions = mozOptions;
         }

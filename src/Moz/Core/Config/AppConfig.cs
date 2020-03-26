@@ -1,22 +1,17 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
 using Moz.Exceptions;
 
-namespace Moz.Core.Options
+namespace Moz.Core.Config
 {
-    public class MozOptions
+    public class AppConfig
     {
-        public MozOptions()
+        public AppConfig()
         {
-            Admin = new AdminOptions
-            {
-                Path = "admin",
-                LoginView = "",
-                WelcomeView = "" 
-            };
-            ErrorPage = new ErrorPageOptions();
-            Db = new List<DbOptions>();
+            Admin = new AdminConfig();
+            ErrorPage = new ErrorPageConfig();
+            Db = new List<DbConfig>();
+            Token = new TokenConfig();
         }
 
 
@@ -31,25 +26,30 @@ namespace Moz.Core.Options
         public bool IsEnablePerformanceMonitor { get; set; }
           
         /// <summary>
-        /// EncryptKey, 要求为16-32位 ，关系到应用安全，很重要
+        /// AppSecret, 要求为16-32位 ，关系到应用安全，非常重要
         /// 在线生成 https://ut32.com/tool/pwd
         /// </summary>
-        public string EncryptKey { get; set; } 
+        public string AppSecret { get; set; } 
 
         /// <summary>
         /// 数据库相关配置
         /// </summary>
-        public List<DbOptions> Db { get; }  
+        public List<DbConfig> Db { get; }  
         
         /// <summary>
         /// 后台配置
         /// </summary>
-        public AdminOptions Admin { get; }
+        public AdminConfig Admin { get; }
         
         /// <summary>
         /// 错误页面配置
         /// </summary>
-        public ErrorPageOptions ErrorPage { get; } 
+        public ErrorPageConfig ErrorPage { get; } 
+        
+        /// <summary>
+        /// JWT配置
+        /// </summary>
+        public TokenConfig Token { get; set; }
         
         /// <summary>
         /// 异常Http Code处理

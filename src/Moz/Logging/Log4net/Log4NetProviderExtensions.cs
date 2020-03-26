@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 
-namespace Moz.Logging
+namespace Moz.Logging.Log4net
 {
     /// <summary>
     /// Log4Net provider extensions.

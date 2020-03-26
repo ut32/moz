@@ -10,10 +10,10 @@ using Moz.Bus.Dtos.Members;
 using Moz.Bus.Dtos.Roles;
 using Moz.Bus.Services.Members;
 using Moz.Bus.Services.Roles;
-using Moz.Configuration;
 using Moz.Core;
 using Moz.Exceptions;
 using Moz.Presentation.Administration.Models.Articles;
+using Moz.Settings;
 
 namespace Moz.Admin.Layui.Controllers
 {

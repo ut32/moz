@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Moz.Core.Options;
+using Moz.Core.Config;
 using Moz.Service.Security;
 
 namespace Moz.Aop.Middlewares
@@ -12,9 +12,9 @@ namespace Moz.Aop.Middlewares
     {
         private readonly RequestDelegate _next;
         private readonly IEncryptionService _encryptionService;
-        private readonly IOptions<MozOptions> _options;
+        private readonly IOptions<AppConfig> _options;
 
-        public JwtInHeaderMiddleware(RequestDelegate next,IEncryptionService encryptionService, IOptions<MozOptions> options)
+        public JwtInHeaderMiddleware(RequestDelegate next,IEncryptionService encryptionService, IOptions<AppConfig> options)
         {
             _next = next;
             _encryptionService = encryptionService;
@@ -28,7 +28,7 @@ namespace Moz.Aop.Middlewares
 
             if (!string.IsNullOrEmpty(cookie) && !(context.Request?.Headers?.ContainsKey("Authorization") ?? false))
             {
-                var key = _options.Value.EncryptKey ?? "gvPXwK50tpE9b6P7";
+                var key = _options.Value.AppSecret ?? "gvPXwK50tpE9b6P7";
                 try
                 {
                     var decryptString = _encryptionService.DecryptText(cookie, key);

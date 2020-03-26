@@ -17,7 +17,7 @@ using Moz.Bus.Models.Common;
 using Moz.Bus.Models.Members;
 using Moz.Bus.Services;
 using Moz.Bus.Services.Members;
-using Moz.Core.Options;
+using Moz.Core.Config;
 using Moz.DataBase;
 using Moz.Exceptions;
 using Moz.Service.Security;
@@ -30,20 +30,20 @@ namespace Moz.Auth.Impl
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMemberService _memberService;
         private readonly IEncryptionService _encryptionService;
-        private readonly IOptions<MozOptions> _mozOptions;
+        private readonly IOptions<AppConfig> _appConfig;
         private readonly IDistributedCache _distributedCache;
         private readonly IJwtService _jwtService;
 
         public AuthService(IHttpContextAccessor httpContextAccessor,
             IMemberService memberService,
             IEncryptionService encryptionService,
-            IOptions<MozOptions> mozOptions,
+            IOptions<AppConfig> appConfig,
             IDistributedCache distributedCache, IJwtService jwtService)
         { 
             _httpContextAccessor = httpContextAccessor;
             _memberService = memberService;
             _encryptionService = encryptionService;
-            _mozOptions = mozOptions;
+            _appConfig = appConfig;
             _distributedCache = distributedCache;
             _jwtService = jwtService;
         }
@@ -346,7 +346,7 @@ namespace Moz.Auth.Impl
             if(request.Data.Token.IsNullOrEmpty())
                 return Error("Token不能为空");
             
-            var key = _mozOptions.Value.EncryptKey ?? "gvPXwK50tpE9b6P7";
+            var key = _appConfig.Value.AppSecret ?? "gvPXwK50tpE9b6P7";
             var encryptToken = _encryptionService.EncryptText(request.Data.Token, key);
             
             _httpContextAccessor.HttpContext?.Response?.Cookies?.Append("__moz__token",encryptToken,new CookieOptions()

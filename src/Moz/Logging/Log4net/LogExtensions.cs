@@ -1,7 +1,7 @@
 ﻿using System;
 using log4net;
 
-namespace Moz.Logging
+namespace Moz.Logging.Log4net
 {
 	/// <summary>
 	/// The <see cref="ILogExtensions"/> class.

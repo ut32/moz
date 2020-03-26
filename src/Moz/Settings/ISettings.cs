@@ -1,4 +1,4 @@
-﻿namespace Moz.Configuration
+﻿namespace Moz.Settings
 {
     public interface ISettings
     {

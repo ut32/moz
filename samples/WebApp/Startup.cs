@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Moz.Core.Options;
+using Moz.Core.Config;
 using SqlSugar;
 
 namespace WebApp
@@ -33,7 +33,7 @@ namespace WebApp
                  IsEnableScheduling: 是否开启定时任务，可选配置，开启后后台才可操作，默认未开启。
                  IsEnablePerformanceMonitor: 是否开启性能监视，可选配置，开启后后台才有数据，默认未开启。
                  */
-                options.EncryptKey = "jEeESr7VySYru5c2jEeESr7VySYru5c2";
+                options.AppSecret = "jEeESr7VySYru5c2jEeESr7VySYru5c2";
                 options.IsEnableScheduling = false;
                 options.IsEnablePerformanceMonitor = false;
 
@@ -52,7 +52,7 @@ namespace WebApp
                  使用以下方式配置，默认数据库类型为MySql,名称为Default。
                  如果有多数据库，依次在后边添加，但主要须指定不同名称。
                  */
-                options.Db.Add(new DbOptions
+                options.Db.Add(new DbConfig
                 {
                     MasterConnectionString = Configuration["ConnectionString"]
                 });

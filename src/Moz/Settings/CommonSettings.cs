@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using Moz.Bus.Models.Common;
 
-namespace Moz.Configuration
+namespace Moz.Settings
 {
     public enum UploaderEnum
     {

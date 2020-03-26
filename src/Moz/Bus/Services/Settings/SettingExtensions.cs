@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Moz.CMS.Services.Settings;
-using Moz.Configuration;
+using Moz.Settings;
 
 namespace Moz.Domain.Services.Settings
 {

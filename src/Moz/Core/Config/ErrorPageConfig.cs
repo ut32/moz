@@ -1,6 +1,6 @@
-namespace Moz.Core.Options
+namespace Moz.Core.Config
 {
-    public class ErrorPageOptions
+    public class ErrorPageConfig
     { 
         /// <summary>
         /// 登录页，遇401将跳转

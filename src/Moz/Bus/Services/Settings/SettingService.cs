@@ -6,9 +6,9 @@ using System.Linq.Expressions;
 using Microsoft.Extensions.Caching.Distributed;
 using Moz.Bus.Models.Configuration;
 using Moz.CMS.Services.Settings;
-using Moz.Configuration;
 using Moz.DataBase;
 using Moz.Events;
+using Moz.Settings;
 using Moz.Utils;
 
 namespace Moz.Bus.Services.Settings

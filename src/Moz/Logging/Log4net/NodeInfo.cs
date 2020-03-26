@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Moz.Logging
+namespace Moz.Logging.Log4net
 {
     /// <summary>
     ///  Class to store information of a log4net xml config file node.

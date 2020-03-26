@@ -2,11 +2,11 @@
 @using Moz.Bus.Dtos.AdminMenus
 @using Moz.Bus.Services.AdminMenus
 @using Moz.Core
-@using Moz.Core.Options
+@using Moz.Core.Config
 @model Moz.Administration.Models.Main.IndexRspModel
 @inject IWorkContext WorkContext
 @inject IAdminMenuService AdminMenuService
-@inject IOptions<MozOptions> Options
+@inject IOptions<AppConfig> Options
 @{
     Layout = null;
 }

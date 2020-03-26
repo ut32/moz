@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Moz.Logging.Log4net;
 
-namespace Moz.Logging
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.Logging
 {
 	/// <summary>
 	/// The log4net extensions class.
@@ -50,7 +52,7 @@ namespace Moz.Logging
         /// Adds the log4net logging provider.
         /// </summary>
         /// <param name="builder">The logging builder instance.</param>
-        /// <param name="log4NetConfigFile">The log4net Config File.</param>
+        /// <param name="options"></param>
         /// <returns>The <see ref="ILoggingBuilder" /> passed as parameter with the new provider registered.</returns>
         public static ILoggingBuilder AddLog4Net(this ILoggingBuilder builder, Log4NetProviderOptions options)
         {

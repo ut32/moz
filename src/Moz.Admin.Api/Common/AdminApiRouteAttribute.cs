@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moz.Core;
-using Moz.Core.Options;
+using Moz.Core.Config;
 
 namespace Moz.Admin.Api.Common
 {
@@ -16,7 +16,7 @@ namespace Moz.Admin.Api.Common
 
         static ApiAdminRouteAttribute()
         {
-            AdminPath = EngineContext.Current.Resolve<IOptions<MozOptions>>()?.Value?.Admin.Path ?? "myadmin";
+            AdminPath = EngineContext.Current.Resolve<IOptions<AppConfig>>()?.Value?.Admin.Path ?? "myadmin";
         }
     }
 }

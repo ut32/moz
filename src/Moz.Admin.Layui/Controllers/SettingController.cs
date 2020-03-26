@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
 using Moz.Administration.Models.Settings;
 using Moz.CMS.Services.Settings;
-using Moz.Configuration;
 using Moz.Domain.Services.Settings;
+using Moz.Settings;
 using Moz.Utils.Types;
 
 namespace Moz.Administration.Controllers

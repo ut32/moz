@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using SqlSugar;
 
-namespace Moz.Core.Options
+namespace Moz.Core.Config
 {
-    public class DbOptions
+    public class DbConfig
     {
         /// <summary>
         /// 名称
@@ -25,6 +25,6 @@ namespace Moz.Core.Options
         /// key   : 链接字符串
         /// value : 权重
         /// </summary>
-        public Dictionary<string,int> SlavesConnectionStrings { get; set; } = new Dictionary<string, int>();
+        public Dictionary<string,int> SlavesConnectionStrings { get; } = new Dictionary<string, int>();
     }
 }

@@ -7,10 +7,10 @@ using System.Xml;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Moz.Bus.Models.Localization;
-using Moz.Configuration;
 using Moz.Core;
 using Moz.DataBase;
 using Moz.Events;
+using Moz.Settings;
 
 namespace Moz.Bus.Services.Localization
 {

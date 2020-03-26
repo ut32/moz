@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
 using Moz.Administration.Models.Main;
 using Moz.Auth.Attributes;
-using Moz.Configuration;
 using Moz.Core;
+using Moz.Settings;
 using Moz.Utils.Types;
 
 namespace Moz.Admin.Layui.Controllers

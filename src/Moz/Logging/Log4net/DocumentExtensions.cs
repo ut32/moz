@@ -2,7 +2,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace Moz.Logging
+namespace Moz.Logging.Log4net
 {
     /// <summary>
     /// Class with XmlDocument and XDocument extensions.

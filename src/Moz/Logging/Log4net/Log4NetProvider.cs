@@ -13,7 +13,7 @@ using log4net.Repository;
 using Microsoft.Extensions.Logging;
 using Moz.Logging.Scope;
 
-namespace Moz.Logging
+namespace Moz.Logging.Log4net
 {
     /// <summary>
     /// The log4net provider class.

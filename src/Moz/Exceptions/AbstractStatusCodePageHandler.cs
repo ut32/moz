@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moz.Bus.Dtos;
 using Moz.Core;
-using Moz.Core.Options;
+using Moz.Core.Config;
 using Newtonsoft.Json;
 
 namespace Moz.Exceptions
@@ -62,7 +62,7 @@ namespace Moz.Exceptions
 
         protected virtual async Task OnWebCallAsync(StatusCodeContext context, int statusCode)
         {
-            var options = EngineContext.Current.Resolve<IOptions<MozOptions>>()?.Value;
+            var options = EngineContext.Current.Resolve<IOptions<AppConfig>>()?.Value;
             var pathFormat = options?.ErrorPage?.DefaultRedirect;
             if (statusCode == 401 && !string.IsNullOrEmpty(options?.ErrorPage?.LoginRedirect))
                 pathFormat = options?.ErrorPage?.LoginRedirect;

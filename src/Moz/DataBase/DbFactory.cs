@@ -5,9 +5,8 @@ using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Extensions.Options;
 using Moz.Common;
-using Moz.Configuration;
 using Moz.Core;
-using Moz.Core.Options;
+using Moz.Core.Config;
 using Moz.Utils;
 using SqlSugar;
 using DbType = SqlSugar.DbType;
@@ -21,7 +20,7 @@ namespace Moz.DataBase
         public static DbClient GetClient(string name = "default")
         {
 
-            var options = EngineContext.Current.Resolve<IOptions<MozOptions>>()?.Value;
+            var options = EngineContext.Current.Resolve<IOptions<AppConfig>>()?.Value;
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
 
@@ -40,7 +39,7 @@ namespace Moz.DataBase
             return client;
         }
         
-        public static bool CheckInstalled(MozOptions mozOptions) 
+        public static bool CheckInstalled(AppConfig mozOptions) 
         {
             if(_isInstalled != null && _isInstalled.Value) return true;
             try 

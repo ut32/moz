@@ -2,7 +2,7 @@
 using log4net;
 using Microsoft.Extensions.Logging;
 
-namespace Moz.Logging
+namespace Moz.Logging.Log4net
 {
     /// <summary>
     /// The log4net logger class.

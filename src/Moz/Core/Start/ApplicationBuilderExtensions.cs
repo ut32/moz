@@ -16,7 +16,7 @@ using Microsoft.Net.Http.Headers;
 using Moz.Aop.Middlewares;
 using Moz.Bus.Dtos;
 using Moz.Core;
-using Moz.Core.Options;
+using Moz.Core.Config;
 using Moz.DataBase;
 using Moz.Exceptions;
 using Moz.TaskSchedule;
@@ -31,7 +31,7 @@ namespace Microsoft.AspNetCore.Builder
         public static void UseMoz(this IApplicationBuilder application,IWebHostEnvironment env)
         {
             var configuration = application.ApplicationServices.GetService(typeof(IConfiguration)) as IConfiguration;
-            var options = (application.ApplicationServices.GetService(typeof(IOptions<MozOptions>)) as IOptions<MozOptions>)?.Value;
+            var options = (application.ApplicationServices.GetService(typeof(IOptions<AppConfig>)) as IOptions<AppConfig>)?.Value;
             if(options == null)
                 throw new ArgumentNullException(nameof (options));
             
@@ -78,10 +78,10 @@ namespace Microsoft.AspNetCore.Builder
 
             application.UseAuthorization();
 
-            //获取所有的 IMozStartup,执行各个模块的启动类
-            var startupConfigurations = TypeFinder.FindClassesOfType<IMozStartup>();
+            //获取所有的 IAppStartup,执行各个模块的启动类
+            var startupConfigurations = TypeFinder.FindClassesOfType<IAppStartup>();
             var instances = startupConfigurations
-                .Select(startup => (IMozStartup)Activator.CreateInstance(startup.Type))
+                .Select(startup => (IAppStartup)Activator.CreateInstance(startup.Type))
                 .OrderBy(startup => startup.Order);
             foreach (var instance in instances) 
                 instance.Configure(application,configuration, env, options);
