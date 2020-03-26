@@ -5,11 +5,7 @@ namespace Moz.Auth
 {
     public interface IJwtService
     {
-        DateTime ExpireDateTime { get; set; } 
-        
-        string GenerateRefreshToken(string memberUId); 
-        
-        string GenerateJwtToken(string memberUId);
+        TokenInfo GenerateTokenInfo(string memberUId);
 
         TokenValidationParameters GetTokenValidationParameters();
     }

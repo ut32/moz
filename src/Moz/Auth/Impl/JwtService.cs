@@ -15,30 +15,29 @@ namespace Moz.Auth.Impl
     {
         private readonly IOptions<MozOptions> _mozOptions;
         private readonly IEncryptionService _encryptionService;
+        private readonly DateTime _expireDateTime; 
 
         public JwtService(IOptions<MozOptions> mozOptions, IEncryptionService encryptionService)
         {
             _mozOptions = mozOptions;
             _encryptionService = encryptionService;
-            ExpireDateTime = DateTime.Now.AddDays(90);
+            _expireDateTime = DateTime.Now.AddDays(30).ToUniversalTime();
         }
-        
-        public DateTime ExpireDateTime { get; set; }
         
         /// <summary>
         /// 
         /// </summary>
         /// <param name="memberUId"></param>
         /// <returns></returns>
-        public string GenerateJwtToken(string memberUId)
+        public TokenInfo GenerateTokenInfo(string memberUId)
         {
             if (string.IsNullOrEmpty(memberUId))
-                throw new FatalException("member UId 不能为空");
+                throw new FatalException("member uid required");
 
             var claims = new[] 
             {
                 new Claim(JwtRegisteredClaimNames.Jti,memberUId),
-                new Claim(JwtRegisteredClaimNames.Exp,ExpireDateTime.ToUniversalTime().ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64)
+                new Claim(JwtRegisteredClaimNames.Exp,_expireDateTime.ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_mozOptions.Value.EncryptKey));
@@ -48,20 +47,27 @@ namespace Moz.Auth.Impl
                 "https://ut32.com",
                 "moz_application",
                 claims,
-                expires: ExpireDateTime,
+                expires: _expireDateTime,
                 signingCredentials: credentials);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return new TokenInfo
+            {
+                JwtToken = tokenString, 
+                RefreshToken = GenerateRefreshToken(memberUId), 
+                ExpireDateTime = _expireDateTime.ToUnixTime()
+            };
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public string GenerateRefreshToken(string memberUId)
+        private string GenerateRefreshToken(string memberUId)
         {
             var guid = Guid.NewGuid().ToString("N");
-            var finalText = $"{DateTime.Now.ToUnixTime()}|{memberUId}|{guid}";
+            var finalText = $"{_mozOptions.Value.EncryptKey}|{memberUId}|{guid}";
             return _encryptionService.EncryptText(finalText);
         }
 

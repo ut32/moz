@@ -29,7 +29,7 @@ namespace WebApp
             { 
                 /*
                  ==全局配置==
-                 EncryptKey: 涉及到应用安全，必须配置，长度为16位
+                 EncryptKey: 涉及到应用安全，必须配置，长度为16-32位
                  IsEnableScheduling: 是否开启定时任务，可选配置，开启后后台才可操作，默认未开启。
                  IsEnablePerformanceMonitor: 是否开启性能监视，可选配置，开启后后台才有数据，默认未开启。
                  */

@@ -1,5 +1,8 @@
+
 using log4net.Appender;
 using log4net.Core;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace Moz.Logging.Appenders
 {
