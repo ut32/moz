@@ -1,10 +1,14 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Moz.Logging.Scope;
 
 namespace Moz.Logging
 {
-    public class Log4NetProviderOptions
-    {
-        /// <summary>
+    /// <summary>
+    /// The log4Net provider options.
+    /// </summary>
+    public sealed class Log4NetProviderOptions
+	{
+		/// <summary>
 		/// The default log4 net file name
 		/// </summary>
 		private const string DefaultLog4NetFileName = "log4net.config";
@@ -37,7 +41,7 @@ namespace Moz.Logging
 
 			this.OverrideCriticalLevelWith = string.Empty;
 			this.Name = string.Empty;
-			//this.PropertyOverrides = new List<NodeInfo>();
+			this.PropertyOverrides = new List<NodeInfo>();
             this.ExternalConfigurationSetup = false;
 		}
 
@@ -64,7 +68,7 @@ namespace Moz.Logging
 		/// <summary>
 		/// Gets or sets the property overrides.
 		/// </summary>
-		//public List<NodeInfo> PropertyOverrides { get; set; }
+		public List<NodeInfo> PropertyOverrides { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="Log4NetProviderOptions"/> is watch.
@@ -74,7 +78,7 @@ namespace Moz.Logging
         /// <summary>
         /// Gets or sets the scope factory.
         /// </summary>
-        //public Log4NetScopeFactory ScopeFactory { get; set; }
+        public Log4NetScopeFactory ScopeFactory { get; set; }
 
         /// <summary>
         /// Let user setup log4net externally

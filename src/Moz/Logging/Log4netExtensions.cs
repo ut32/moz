@@ -1,10 +1,14 @@
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Moz.Logging
 {
-    public static class Log4NetExtensions
-    {
-        /// <summary>
+	/// <summary>
+	/// The log4net extensions class.
+	/// </summary>
+	public static class Log4NetExtensions
+	{
+		/// <summary>
         /// Adds the log4net logging provider.
         /// </summary>
         /// <param name="builder">The logging builder instance.</param>
@@ -50,8 +54,8 @@ namespace Moz.Logging
         /// <returns>The <see ref="ILoggingBuilder" /> passed as parameter with the new provider registered.</returns>
         public static ILoggingBuilder AddLog4Net(this ILoggingBuilder builder, Log4NetProviderOptions options)
         {
-			//builder.Services.AddSingleton<ILoggerProvider>(new Log4NetProvider(options));
+			builder.Services.AddSingleton<ILoggerProvider>(new Log4NetProvider(options));
             return builder; 
         }
-    }
+	}
 }

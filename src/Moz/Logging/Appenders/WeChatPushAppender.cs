@@ -1,7 +1,7 @@
 using log4net.Appender;
 using log4net.Core;
 
-namespace Moz.Log.Appenders
+namespace Moz.Logging.Appenders
 {
     public class WeChatPushAppender:AppenderSkeleton
     {
