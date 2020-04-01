@@ -61,10 +61,8 @@ namespace Moz.Bus.Models.Members
             }
         }
 
-        public bool IsAdmin()
-        {
-            return Roles?.Any(t => t.IsAdmin) ?? false;
-        }
+        public bool IsAdmin => Roles?.Any(t => t.IsAdmin) ?? false;
+        
 
         public bool HasPermission(string permissionCode)
         {

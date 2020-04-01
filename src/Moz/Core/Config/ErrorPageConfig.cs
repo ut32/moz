@@ -1,20 +1,14 @@
+using System.Collections.Generic;
+
 namespace Moz.Core.Config
 {
     public class ErrorPageConfig
     { 
         /// <summary>
-        /// 登录页，遇401将跳转
+        /// 默认跳转
         /// </summary>
-        public string LoginRedirect { get; set; }
+        public string DefaultRedirect { get; set; }
         
-        /// <summary>
-        /// 404页面，遇404将跳转
-        /// </summary>
-        public string NotFoundRedirect { get; set; }
-        
-        /// <summary>
-        /// 默认跳转页
-        /// </summary>
-        public string DefaultRedirect { get; set; }  
+        public List<HttpError> HttpErrors { get; set; } 
     } 
 }

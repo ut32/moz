@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moz.Core.Config;
 using SqlSugar;
+using WebApp.Models;
 
 namespace WebApp
 {
@@ -29,7 +30,7 @@ namespace WebApp
             { 
                 /*
                  ==全局配置==
-                 EncryptKey: 涉及到应用安全，必须配置，长度为16-32位
+                 AppSecret: 涉及到应用安全，必须配置，长度为16-32位
                  IsEnableScheduling: 是否开启定时任务，可选配置，开启后后台才可操作，默认未开启。
                  IsEnablePerformanceMonitor: 是否开启性能监视，可选配置，开启后后台才有数据，默认未开启。
                  */
@@ -61,12 +62,14 @@ namespace WebApp
                  ==错误页配置==
                  错误页包括程序抛错，鉴权失败，404等。以下配置均为可选配置
                  DefaultRedirect: 错误默认跳转地址
-                 LoginRedirect: 遇401跳转
-                 NotFoundRedirect: 遇404跳转
+                 HttpErrors: 状态码配置表
                  */
-                options.ErrorPage.DefaultRedirect = "/error/{0}";
-                options.ErrorPage.LoginRedirect = "/login";
-                options.ErrorPage.NotFoundRedirect = "/404";
+                //options.ErrorPage.DefaultRedirect = "/error/{0}??{2}";
+                //Execute 模式不支持 ？
+                options.ErrorPage.HttpErrors = new List<HttpError>
+                {
+                    new HttpError{ StatusCode = 404, Path = "/error/{0}", Mode = ResponseMode.Execute}
+                };
             });
         }
 

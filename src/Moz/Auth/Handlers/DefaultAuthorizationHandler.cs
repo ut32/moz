@@ -48,7 +48,7 @@ namespace Moz.Auth.Handlers
 
             if (requirement.AdminOrMember == "admin")
             {
-                if (!member.IsAdmin())
+                if (!member.IsAdmin)
                 {
                     context.Fail();
                     return Task.CompletedTask;
@@ -68,7 +68,7 @@ namespace Moz.Auth.Handlers
                 return Task.CompletedTask;
             }
 
-            //检查权限
+            //检查角色
             var isRoleAuth = CheckRole(member, attributes);
             var isPermissionAuth = CheckPermission(member, attributes);
             if (isRoleAuth && isPermissionAuth)

@@ -62,26 +62,47 @@ namespace Moz.Exceptions
 
         protected virtual async Task OnWebCallAsync(StatusCodeContext context, int statusCode)
         {
-            var options = EngineContext.Current.Resolve<IOptions<AppConfig>>()?.Value;
-            var pathFormat = options?.ErrorPage?.DefaultRedirect;
-            if (statusCode == 401 && !string.IsNullOrEmpty(options?.ErrorPage?.LoginRedirect))
-                pathFormat = options?.ErrorPage?.LoginRedirect;
-            if(statusCode == 404&& !string.IsNullOrEmpty(options?.ErrorPage?.NotFoundRedirect))
-                pathFormat = options?.ErrorPage?.NotFoundRedirect;
+            var appConfig = EngineContext.Current.Resolve<IOptions<AppConfig>>()?.Value;
+            
+            var pathFormat = appConfig?.ErrorPage?.DefaultRedirect;
+            var mode = ResponseMode.Redirect;
+            
+            var httpErrorConfig = appConfig?.ErrorPage?.HttpErrors?.FirstOrDefault(it => it.StatusCode == statusCode);
+            if (httpErrorConfig != null)
+            {
+                pathFormat = httpErrorConfig.Path;
+                mode = httpErrorConfig.Mode;
+            }
             
             if (string.IsNullOrEmpty(pathFormat))
             {
                 context.HttpContext.Response.ContentType = "text/html;charset=utf-8";
                 context.HttpContext.Response.StatusCode = 200;
-                await context.HttpContext.Response.WriteAsync($"哦豁！系统不想理你，并扔了一个 {statusCode} 页面给你。");
+                await context.HttpContext.Response.WriteAsync($"系统不想理你，并扔了一个 {statusCode} 页面给你。");
             }
             else
             {
-                var newPath = new PathString(string.Format(CultureInfo.InvariantCulture, pathFormat, context.HttpContext.Response.StatusCode));
-
                 var originalPath = context.HttpContext.Request.Path;
                 var originalQueryString = context.HttpContext.Request.QueryString;
-                // Store the original paths so the app can check it.
+                
+                //替换 ?? 为 #question_mark#
+                pathFormat = pathFormat.Replace("??", "__question_mark__");
+  
+                var newPath = new PathString(string.Format(CultureInfo.InvariantCulture, 
+                    pathFormat, 
+                    context.HttpContext.Response.StatusCode,
+                    originalPath.Value,
+                    originalQueryString.HasValue ? originalQueryString.Value : null));
+                
+                //替换 #question_mark# 为 ?
+                var newPath1 = newPath.ToString().Replace("__question_mark__", "?");
+
+                if (mode == ResponseMode.Redirect)
+                {
+                    context.HttpContext.Response.Redirect(newPath1);
+                    return;
+                }
+                
                 context.HttpContext.Features.Set<IStatusCodeReExecuteFeature>(new StatusCodeReExecuteFeature()
                 {
                     OriginalPathBase = context.HttpContext.Request.PathBase.Value,
@@ -89,14 +110,11 @@ namespace Moz.Exceptions
                     OriginalQueryString = originalQueryString.HasValue ? originalQueryString.Value : null,
                 });
 
-                // An endpoint may have already been set. Since we're going to re-invoke the middleware pipeline we need to reset
-                // the endpoint and route values to ensure things are re-calculated.
                 context.HttpContext.SetEndpoint(endpoint: null);
                 var routeValuesFeature = context.HttpContext.Features.Get<IRouteValuesFeature>();
                 routeValuesFeature?.RouteValues?.Clear();
 
-                context.HttpContext.Request.Path = newPath;
-                //context.HttpContext.Request.QueryString = newQueryString;
+                context.HttpContext.Request.Path = new PathString(newPath1);
                 try
                 {
                     await context.Next(context.HttpContext);

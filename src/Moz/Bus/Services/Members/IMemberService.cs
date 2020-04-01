@@ -16,7 +16,7 @@ namespace Moz.Bus.Services.Members
         /// </summary>
         /// <param name="uid"></param>
         /// <returns></returns>
-        SimpleMember GetSimpleMemberByUId(string uid);
+        SimpleMember GetSimpleMemberByUId(string uid); 
 
         /// <summary> 
         /// 重置密码

@@ -120,18 +120,35 @@ namespace Moz.Exceptions
             {
                 throw exception;
             }
+            
+            context.Response.StatusCode = 200;
+            
             var options = EngineContext.Current.Resolve<IOptions<AppConfig>>()?.Value;
             var pathFormat = options?.ErrorPage?.DefaultRedirect;
             if (string.IsNullOrEmpty(pathFormat))
             {
                 context.Response.ContentType = "text/html;charset=utf-8";
-                context.Response.StatusCode = 200;
-                await context.Response.WriteAsync($"错误:{_exceptionResult.Message}({_exceptionResult.Code})");
+                await context.Response.WriteAsync($"<h1>错误({_exceptionResult.Code})</h1><p>{_exceptionResult.Message}</p>");
             }
             else
             {
-                //context.Response.StatusCode = 200;
-                context.Response.Redirect(string.Format(CultureInfo.InvariantCulture,pathFormat,500)); 
+                var originalPath = context.Request.Path;
+                var originalQueryString = context.Request.QueryString;
+                
+                //替换 ?? 为 __question_mark__
+                
+                pathFormat = pathFormat.Replace("??", "__question_mark__");
+  
+                var newPath = new PathString(string.Format(CultureInfo.InvariantCulture, 
+                    pathFormat, 
+                    context.Response.StatusCode,
+                    originalPath.Value,
+                    originalQueryString.HasValue ? originalQueryString.Value : null));
+                
+                //替换 __question_mark__ 为 ?
+                
+                var newPath1 = newPath.ToString().Replace("__question_mark__", "?");
+                context.Response.Redirect(newPath1);
             }
         }
     }

@@ -58,9 +58,10 @@ namespace Moz.Auth.Impl
             var savedPassword = _encryptionService.CreatePasswordHash(enteredPassword, salt,"SHA512");
             return passwordInDb.Equals(savedPassword, StringComparison.OrdinalIgnoreCase);
         }
+        #endregion
 
         /// <summary>
-        /// 
+        /// 获取uid
         /// </summary>
         /// <returns></returns>
         public ServResult<string> GetAuthenticatedUId()
@@ -68,6 +69,7 @@ namespace Moz.Auth.Impl
             var result = _httpContextAccessor 
                 .HttpContext
                 .AuthenticateAsync(MozAuthAttribute.MozAuthorizeSchemes)
+                .ConfigureAwait(false)
                 .GetAwaiter()
                 .GetResult();
             if (!result?.Principal?.Identity?.IsAuthenticated??false) 
@@ -80,8 +82,6 @@ namespace Moz.Auth.Impl
             return claim.Value;
         }
 
-        #endregion
-
         /// <summary>
         /// 
         /// </summary>
@@ -91,7 +91,10 @@ namespace Moz.Auth.Impl
             var result = GetAuthenticatedUId();
             if (result.Code>0)
                 return Error(result.Message,result.Code);
-
+            
+            if(string.IsNullOrEmpty(result.Data))
+                return Error("未登陆",401);
+            
             var member = _memberService.GetSimpleMemberByUId(result.Data);
             
             if (member == null)
@@ -105,26 +108,8 @@ namespace Moz.Auth.Impl
 
             return member;
         }
-
-        public bool AddRoleToMemberId(long memberId, long roleId, DateTime? expDatetime=null) 
-        { 
-            using (var client = DbFactory.GetClient())
-            { 
-                var mRole = client.Queryable<MemberRole>()
-                    .Single(t => t.MemberId == memberId && t.RoleId == roleId);
-                if (mRole != null)
-                    throw new AlertException("已添加");
-
-                var id = client.Insertable(new MemberRole
-                {
-                    ExpireDate = expDatetime ?? new DateTime(2099, 1, 1),
-                    MemberId = memberId,
-                    RoleId = roleId
-                }).ExecuteReturnBigIdentity();
-                return id > 0;
-            }
-        }
-
+        
+        
         /// <summary>
         /// 用户名密码登录
         /// </summary>

@@ -22,13 +22,30 @@ namespace WebApp.Controllers
 
         public IActionResult Index()
         {
+            throw new ArgumentException();
             return View();
         }
 
-        //[MemberAuth]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        //[HttpGet("login")]
+        public IActionResult Login(string returnUrl)
+        {
+            return Content("登录页面");
+        }
+
+        [Route("notfound")]
+        public IActionResult NotFound()
+        {
+            return Content("没有找到数据");
+        }
+
+        [MemberAuth]
         public IActionResult Privacy()
         {
-            throw new AlertException("用户名不能为空");
+            //throw new AlertException("用户名不能为空");
             return View();
         }
 
@@ -36,7 +53,7 @@ namespace WebApp.Controllers
         [Route("error/{code:int}")]
         public IActionResult Error(int code)
         {
-            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
+            return Content("错误页面");
         }
     }
 }

@@ -25,7 +25,6 @@ namespace Moz.Bus.Services.Members
         private readonly IEncryptionService _encryptionService;
         private readonly IEventPublisher _eventPublisher;
         private readonly MemberSettings _memberSettings;
-        private IMemberService _memberServiceImplementation;
 
         public MemberService(
             IDistributedCache distributedCache,
@@ -182,7 +181,8 @@ namespace Moz.Bus.Services.Members
             }
             
             var currentMember =  GetSimpleMember(uid);
-            if (currentMember == null) return null;
+            if (currentMember == null) 
+                return null;
 
             currentMember.Roles = GetRolesByMemberId(currentMember.Id) ?? new List<Role>();
             currentMember.Permissions = new List<Permission>();
