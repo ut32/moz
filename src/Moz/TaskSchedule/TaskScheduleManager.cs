@@ -6,13 +6,15 @@ using Moz.Bus.Models.ScheduleTasks;
 using Moz.DataBase;
 using Quartz;
 using Quartz.Impl;
+using Quartz.Spi;
 
 namespace Moz.TaskSchedule
 {
     internal class TaskScheduleManager:ITaskScheduleManager
     {
+        
         private readonly IScheduler _scheduler;
-        public TaskScheduleManager()
+        public TaskScheduleManager(IJobFactory jobFactory)
         {
             var props = new NameValueCollection
             {
@@ -20,6 +22,7 @@ namespace Moz.TaskSchedule
             };
             var factory = new StdSchedulerFactory(props);
             _scheduler = factory.GetScheduler().GetAwaiter().GetResult();
+            _scheduler.JobFactory = jobFactory;
             _scheduler.ListenerManager.AddJobListener(new DefaultJobListener());
         }
         
