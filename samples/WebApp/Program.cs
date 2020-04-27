@@ -20,8 +20,8 @@ namespace WebApp
             Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(builder =>
                 {
-                    builder.ClearProviders();
-                    builder.AddLog4Net();
+                    //builder.ClearProviders();
+                    //builder.AddLog4Net();
                 })
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
     }

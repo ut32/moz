@@ -34,6 +34,8 @@ using Moz.Utils;
 using Moz.Utils.FileManager;
 using Moz.Utils.Types;
 using Moz.Validation;
+using Quartz;
+using Quartz.Spi;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -146,6 +148,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEventPublisher, DefaultEventPublisher>();
             services.AddSingleton<ITaskScheduleManager, TaskScheduleManager>();
             services.AddSingleton<IAuthorizationHandler, DefaultAuthorizationHandler>();
+            services.AddSingleton<IJobFactory, JobFactory>();
 
             //注入服务类 查找所有Service结尾的类进行注册
             var allServiceInterfaces = TypeFinder.GetAllTypes()
@@ -156,6 +159,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 var service = TypeFinder.FindClassesOfType(serviceInterface.Type)?.FirstOrDefault();
                 if (service != null) services.AddTransient(serviceInterface.Type, service.Type);
             }
+            
+            //注入所有Job类
+            var jobTypes = TypeFinder.FindClassesOfType<IJob>().ToList();
+            foreach (var jobType in jobTypes)
+                services.AddSingleton(jobType.Type);
+            
 
 
             //注册settings

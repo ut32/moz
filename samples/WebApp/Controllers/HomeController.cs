@@ -22,7 +22,6 @@ namespace WebApp.Controllers
 
         public IActionResult Index()
         {
-            throw new ArgumentException();
             return View();
         }
 

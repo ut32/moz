@@ -63,13 +63,13 @@ namespace WebApp
                  错误页包括程序抛错，鉴权失败，404等。以下配置均为可选配置
                  DefaultRedirect: 错误默认跳转地址
                  HttpErrors: 状态码配置表
-                 */
+                 
                 //options.ErrorPage.DefaultRedirect = "/error/{0}??{2}";
                 //Execute 模式不支持 ？
                 options.ErrorPage.HttpErrors = new List<HttpError>
                 {
                     new HttpError{ StatusCode = 404, Path = "/error/{0}", Mode = ResponseMode.Execute}
-                };
+                };*/
             });
         }
 
