@@ -21,16 +21,19 @@ namespace Moz.Admin.Layui.Controllers
     public class MemberController : AdminAuthBaseController
     {
         private readonly IMemberService _memberService;
-        private readonly AdminSettings _adminSettings;
         private readonly IWorkContext _workContext;
         private readonly IRoleService _roleService;
-        
-        public MemberController(IMemberService memberService,AdminSettings adminSettings,IWorkContext workContext, IRoleService roleService)
+        private readonly GlobalSettings _globalSettings;
+
+        public MemberController(IMemberService memberService,
+            IWorkContext workContext, 
+            IRoleService roleService,
+            GlobalSettings globalSettings)
         {
-            _adminSettings = adminSettings;
             _memberService = memberService;
             _workContext = workContext;
             _roleService = roleService;
+            _globalSettings = globalSettings;
         }
 
         [AdminAuth(Permissions = "admin.member.index")]
@@ -150,8 +153,8 @@ namespace Moz.Admin.Layui.Controllers
         public IActionResult ResetPwd(long[] ids)
         {
             var newPwd = "66669999";
-            if (!_adminSettings.ResetPassword.IsNullOrEmpty())
-                newPwd = _adminSettings.ResetPassword;
+            if (!_globalSettings.ResetPassword.IsNullOrEmpty())
+                newPwd = _globalSettings.ResetPassword;
             
             var dto = _memberService.ResetPassword(new ResetPasswordDto()
             {

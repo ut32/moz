@@ -2,7 +2,7 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using Moz.Domain.Models.Security;
+using Moz.Exceptions;
 using Moz.Service.Security;
 
 namespace Moz.Bus.Services.Security
@@ -11,7 +11,7 @@ namespace Moz.Bus.Services.Security
     {
         #region Fields
 
-        private readonly SecuritySettings _securitySettings;
+        
 
         #endregion
 
@@ -20,10 +20,9 @@ namespace Moz.Bus.Services.Security
         /// <summary>
         ///     Ctor
         /// </summary>
-        /// <param name="securitySettings">Security settings</param>
-        public EncryptionService(SecuritySettings securitySettings)
+        public EncryptionService()
         {
-            _securitySettings = securitySettings;
+            
         }
 
         #endregion
@@ -154,13 +153,13 @@ namespace Moz.Bus.Services.Security
         /// <param name="plainText"></param>
         /// <param name="encryptionPrivateKey"></param>
         /// <returns></returns>
-        public virtual string EncryptText(string plainText, string encryptionPrivateKey = "")
+        public virtual string EncryptText(string plainText, string encryptionPrivateKey)
         {
             if (string.IsNullOrEmpty(plainText))
                 return plainText;
 
             if (string.IsNullOrEmpty(encryptionPrivateKey))
-                encryptionPrivateKey = _securitySettings.EncryptionKey;
+                throw new AlertException("加密Key不能为空");
 
             using (var provider = new TripleDESCryptoServiceProvider())
             {
@@ -178,13 +177,13 @@ namespace Moz.Bus.Services.Security
         /// <param name="cipherText"></param>
         /// <param name="encryptionPrivateKey"></param>
         /// <returns></returns>
-        public virtual string DecryptText(string cipherText, string encryptionPrivateKey = "")
+        public virtual string DecryptText(string cipherText, string encryptionPrivateKey)
         {
             if (string.IsNullOrEmpty(cipherText))
                 return cipherText;
 
             if (string.IsNullOrEmpty(encryptionPrivateKey))
-                encryptionPrivateKey = _securitySettings.EncryptionKey;
+                throw new AlertException("加密Key不能为空");
 
             using (var provider = new TripleDESCryptoServiceProvider())
             {

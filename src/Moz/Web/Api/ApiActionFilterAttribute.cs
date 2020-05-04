@@ -1,12 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
-using Moz.Bus.Dtos;
 using Moz.Exceptions;
 
-namespace Moz.WebApi
+namespace Moz.Web.Api
 {
     public class ApiActionFilterAttribute:ActionFilterAttribute
     {
@@ -15,17 +12,11 @@ namespace Moz.WebApi
         {
             _logger = logger;
         }
-        
-        
 
         public override void OnActionExecuted(ActionExecutedContext context)
         {
             var exception = context.Exception;
-            if (exception == null)
-            {
-                
-            }
-            else 
+            if (exception != null && !context.ExceptionHandled)
             {
                 var errorCode = 600;
                 string errorMessage;
@@ -38,24 +29,24 @@ namespace Moz.WebApi
                     case FatalException fatalException:
                         errorCode = fatalException.ErrorCode;
                         errorMessage = fatalException.Message;
-                        _logger.LogError(errorMessage,exception);
+                        _logger.LogError(errorMessage, exception);
                         break;
                     default:
                         errorCode = 20000;
                         errorMessage = context.Exception.Message;
-                        _logger.LogError(errorMessage,exception);
+                        _logger.LogError(errorMessage, exception);
                         break;
                 }
-                
+
                 context.Result = new JsonResult(new
                 {
                     Code = errorCode,
                     Message = errorMessage
                 });
                 context.ExceptionHandled = true;
+
             }
             base.OnActionExecuted(context);
         }
-        
     }
 }

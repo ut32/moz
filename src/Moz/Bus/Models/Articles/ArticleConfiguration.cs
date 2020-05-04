@@ -1,4 +1,5 @@
 ﻿using System;
+using Moz.Common.Form;
 
 namespace Moz.Bus.Models.Articles
 {
@@ -8,7 +9,7 @@ namespace Moz.Bus.Models.Articles
         public string FiledName { get; set; }
         public string DisplayName { get; set; }
         public bool IsEnable { get; set; }
-        public FieldTypeEnum DisplayType { get; set; }
+        public FormFieldType DisplayType { get; set; }
         
         public string Options { get; set; }
         public string Description { get; set; }

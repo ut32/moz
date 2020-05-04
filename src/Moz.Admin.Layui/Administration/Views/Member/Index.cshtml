@@ -1,14 +1,14 @@
 ﻿@using Moz.Settings
 @model Moz.Administration.Models.Members.IndexModel
-@inject AdminSettings AdminSettings
+@inject GlobalSettings GlobalSetting
 @{
     Layout = null;
     var guid = Guid.NewGuid().ToString("N");
 
     var newResetPwd = "66669999";
-    if (!AdminSettings.ResetPassword.IsNullOrEmpty())
+    if (!GlobalSetting.ResetPassword.IsNullOrEmpty())
     {
-        newResetPwd = AdminSettings.ResetPassword;
+        newResetPwd = GlobalSetting.ResetPassword;
     }
 }
 <div class="zui-page layui-form" lay-filter="form-@guid">

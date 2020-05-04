@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
+using Moz.Common;
+using Moz.Common.Types;
 using Moz.Utils;
-using Moz.Utils.Types;
 using StackExchange.Redis;
 
 namespace Moz.DataBase.Redis

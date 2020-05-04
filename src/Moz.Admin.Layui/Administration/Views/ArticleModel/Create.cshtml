@@ -1,4 +1,5 @@
 ﻿@using Moz.Bus.Models.Articles
+@using Moz.Common.Form
 @model Moz.Administration.Models.ArticleModels.CreateModel
 @{
     Layout = null;
@@ -105,11 +106,11 @@
                                     </td>
                                     <td>
                                         <select name="configs[@index].DisplayType" lay-ignore>
-                                            @foreach (var enu in Enum.GetValues(typeof(FieldTypeEnum)))
+                                            @foreach (var enu in Enum.GetValues(typeof(FormFieldType)))
                                             {
-                                                if ((fieldAttribute.FieldType & (FieldTypeEnum) enu) > 0)
+                                                if ((fieldAttribute.FieldType & (FormFieldType) enu) > 0)
                                                 {
-                                                    <option value="@enu">@(((FieldTypeEnum) enu).GetDisplayName())</option>
+                                                    <option value="@enu">@(((FormFieldType) enu).GetDisplayName())</option>
                                                 }
                                             }
                                         </select>

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Caching.Distributed;
 using Moz.Bus.Models.Configuration;
-using Moz.CMS.Services.Settings;
 using Moz.DataBase;
 using Moz.Events;
 using Moz.Settings;
@@ -13,11 +12,9 @@ using Moz.Utils;
 
 namespace Moz.Bus.Services.Settings
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
     public class SettingService : ISettingService
     {
-
-        // ReSharper disable once InconsistentNaming
+        
         private const string SETTING_CACHE_KEY_ALL = "SETTING_CACHE_KEY_ALL";
         
         private readonly IEventPublisher _eventPublisher;
@@ -58,10 +55,10 @@ namespace Moz.Bus.Services.Settings
         /// Gets all settings
         /// </summary>
         /// <returns>Settings</returns>
-        protected virtual IEnumerable<Setting> GetAllSettings()
+        protected virtual List<Setting> GetAllSettings()
         {
             using (var client = DbFactory.GetClient())
-            {
+            { 
                 return client.Queryable<Setting>().ToList();
             }
         }
@@ -330,17 +327,19 @@ namespace Moz.Bus.Services.Settings
             foreach (var propertyInfo in type.GetProperties())
             {
                 var name = propertyInfo.Name;
-                if (!dictionary.ContainsKey(name)) continue;
-
-                var key = (type.Name + "." + name).Trim().ToLowerInvariant();
-                var value = dictionary[name];
+                var key = (type.Name + "." + name).Trim();
+                
+                if(!dictionary.ContainsKey(key))
+                    continue;
+                
+                var value = dictionary[key];
 
                 if (!TypeDescriptor.GetConverter(propertyInfo.PropertyType).CanConvertFrom(typeof(string)))
                     continue;
                 if (!TypeDescriptor.GetConverter(propertyInfo.PropertyType).IsValid(value))
                     continue;
 
-                var setting = settings.FirstOrDefault(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
+                var setting = settings.FirstOrDefault(t => t.Name.Equals(key));
                 if (setting == null)
                 {
                     insertSettings.Add(new Setting

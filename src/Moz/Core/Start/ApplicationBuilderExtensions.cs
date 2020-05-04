@@ -15,12 +15,12 @@ using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Moz.Aop.Middlewares;
 using Moz.Bus.Dtos;
+using Moz.Common.Types;
 using Moz.Core;
 using Moz.Core.Config;
 using Moz.DataBase;
 using Moz.Exceptions;
 using Moz.TaskSchedule;
-using Moz.Utils.Types;
 using Newtonsoft.Json;
 
 // ReSharper disable once CheckNamespace

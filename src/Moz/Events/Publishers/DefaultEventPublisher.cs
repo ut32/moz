@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Moz.Events.Publishers
 {  
-    public class DefaultEventPublisher : IEventPublisher
+    public sealed class DefaultEventPublisher : IEventPublisher
     {
         private readonly ISubscriptionService _subscriptionService;
         private readonly ILogger<DefaultEventPublisher> _logger;
@@ -18,15 +18,15 @@ namespace Moz.Events.Publishers
             _logger = logger;
         }
 
-        public virtual void Publish<T>(T eventMessage)
+        public void Publish<T>(T eventMessage)
         {
             var subscriptions = _subscriptionService.GetSubscriptions<T>();
             var tasks = subscriptions
                 .Select(t => Task.Run(() => PublishToSubscriber(t, eventMessage)))
                 .ToList();
         }
-        
-        protected virtual void PublishToSubscriber<T>(ISubscriber<T> x, T eventMessage)
+
+        private void PublishToSubscriber<T>(ISubscriber<T> x, T eventMessage)
         {
             try
             {

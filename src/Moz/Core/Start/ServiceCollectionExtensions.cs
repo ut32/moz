@@ -19,7 +19,7 @@ using Microsoft.IdentityModel.Tokens;
 using Moz.Auth;
 using Moz.Auth.Attributes;
 using Moz.Auth.Handlers;
-using Moz.CMS.Services.Settings;
+using Moz.Common.Types;
 using Moz.Core;
 using Moz.Core.Attributes;
 using Moz.Core.Config;
@@ -31,11 +31,11 @@ using Moz.Exceptions;
 using Moz.Settings;
 using Moz.TaskSchedule;
 using Moz.Utils;
-using Moz.Utils.FileManager;
-using Moz.Utils.Types;
+using Moz.Utils.FileManage;
 using Moz.Validation;
 using Quartz;
 using Quartz.Spi;
+using ISettingService = Moz.Bus.Services.Settings.ISettingService;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -119,7 +119,10 @@ namespace Microsoft.Extensions.DependencyInjection
             });
 
             //添加MVC
-            services.AddMvc(options => { })
+            services.AddMvc(options =>
+                {
+                    
+                })
                 .AddRazorRuntimeCompilation()
                 .AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = null; })
                 .AddFluentValidation(options =>
@@ -143,7 +146,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<IWorkContext, WebWorkContext>();
-            services.AddSingleton<IFileManager, FileManager>();
+            services.AddSingleton<IFileManager, DefaultFileManager>();
             services.AddTransient<HttpContextHelper>();
             services.AddSingleton<IEventPublisher, DefaultEventPublisher>();
             services.AddSingleton<ITaskScheduleManager, TaskScheduleManager>();
@@ -153,7 +156,7 @@ namespace Microsoft.Extensions.DependencyInjection
             //注入服务类 查找所有Service结尾的类进行注册
             var allServiceInterfaces = TypeFinder.GetAllTypes()
                 .Where(t => (t?.IsInterface ?? false) && !t.IsDefined<IgnoreRegisterAttribute>(false) &&
-                            t.Name.EndsWith("Service"));
+                            t.TypeName.EndsWith("Service"));
             foreach (var serviceInterface in allServiceInterfaces)
             {
                 var service = TypeFinder.FindClassesOfType(serviceInterface.Type)?.FirstOrDefault();
@@ -163,9 +166,7 @@ namespace Microsoft.Extensions.DependencyInjection
             //注入所有Job类
             var jobTypes = TypeFinder.FindClassesOfType<IJob>().ToList();
             foreach (var jobType in jobTypes)
-                services.AddSingleton(jobType.Type);
-            
-
+                services.AddTransient(jobType.Type);
 
             //注册settings
             var settingTypes = TypeFinder.FindClassesOfType(typeof(ISettings)).ToList();
@@ -181,8 +182,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     var instance = Activator.CreateInstance(settingType.Type);
                     return instance;
                 });
-
-
+            
             //注入 ExceptionHandler
             var exceptionHandlers = TypeFinder.FindClassesOfType(typeof(IExceptionHandler))
                 .Where(it => it.Type != typeof(ErrorHandlingMiddleware))

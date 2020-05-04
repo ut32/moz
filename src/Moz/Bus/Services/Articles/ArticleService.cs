@@ -10,6 +10,7 @@ using Moz.Bus.Dtos.Articles;
 using Moz.Bus.Dtos.Articles.ArticleModels;
 using Moz.Bus.Models.Articles;
 using Moz.Bus.Services.Categories;
+using Moz.Common;
 using Moz.DataBase;
 using Moz.Domain.Dtos.Articles.ArticleModels;
 using Moz.Events;

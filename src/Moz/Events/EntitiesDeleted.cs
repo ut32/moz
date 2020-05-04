@@ -1,5 +1,4 @@
 ﻿using Moz.Bus.Models;
-using Moz.Domain.Models;
 
 namespace Moz.Events
 {

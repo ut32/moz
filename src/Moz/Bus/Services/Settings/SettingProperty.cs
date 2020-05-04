@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq.Expressions;
-using Moz.CMS.Services.Settings;
 using Moz.Settings;
 
-namespace Moz.Domain.Services.Settings
+namespace Moz.Bus.Services.Settings
 {
     public class SettingProperty<T>
         where T : ISettings, new()

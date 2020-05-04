@@ -33,7 +33,7 @@
                     <cite>@Options.Value.Admin.Title</cite>
                 </a>
             </h1>
-            <ul class="layui-nav layui-nav-tree">
+            <ul class="layui-nav layui-nav-tree" lay-shrink="all">
                 <li class="layui-nav-item">
                     <a href="javascript:" zui-href="home/welcome" zui-type="tab">
                         <i class="layui-icon layui-icon-console"></i>
@@ -44,20 +44,20 @@
                 {
                 <li class="layui-nav-item layui-nav-itemed">
                     <a href="javascript:;">
-                        <i class="layui-icon layui-icon-set"></i>
-                        <cite>保留设置</cite>
+                        <i class="layui-icon layui-icon-app"></i>
+                        <cite>系统管理</cite>
                     </a>
                     <dl class="layui-nav-child">
                         <dd>
                             <a href="javascript:;" zui-href="@Url.Action("index", "menu")" title="菜单管理" zui-type="tab">
                                 <i class="layui-icon layui-icon-template-1"></i>
-                                <cite>后台菜单管理</cite>
+                                <cite>菜单管理</cite>
                             </a>
                         </dd>
                        
                         <dd>
                             <a href="javascript:;" zui-href="@Url.Action("Index", "ArticleModel")" title="文章模型" zui-type="tab">
-                                <i class="layui-icon layui-icon-app"></i>
+                                <i class="layui-icon layui-icon-template"></i>
                                 <cite>文章模型</cite>
                             </a>
                         </dd>
@@ -70,7 +70,7 @@
                         <dd>
                             <a href="javascript:;" zui-href="@Url.Action("index", "ScheduleTask")" title="定时任务管理" zui-type="tab">
                                 <i class="zuifont icon-task" style="font-size: 13px;"></i>
-                                <cite>定时任务管理</cite>
+                                <cite>定时任务</cite>
                             </a>
                         </dd>
                         <dd>
@@ -99,9 +99,26 @@
                         </dd>
                         <dd>
                             <a href="javascript:;" zui-href="@Url.Action("index", "adplace")" title="广告管理" zui-type="tab">
-                                <i class="layui-icon layui-icon-carousel"></i>
+                                <i class="layui-icon layui-icon-picture"></i>
                                 <cite>广告管理</cite>
                             </a>
+                        </dd>
+                        <dd>
+                            <a href="javascript:;">
+                                <i class="layui-icon layui-icon-set"></i>
+                                <cite>设置中心</cite>
+                            </a>
+                            <ol class="layui-nav-child">
+                                @foreach (var menu in Model.SettingMenus)
+                                {
+                                    <li>
+                                        <a href="javascript:;" zui-href="@Url.Action("index", "setting", new {id = menu.Id})" title="@menu.Name" zui-type="tab">
+                                            <i class="layui-icon layui-icon-more"></i>
+                                            <cite>@menu.Name</cite>
+                                        </a>
+                                    </li>
+                                }
+                            </ol>
                         </dd>
                     </dl>
                 </li>

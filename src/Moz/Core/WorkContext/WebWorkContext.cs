@@ -99,8 +99,6 @@ namespace Moz.Core.WorkContext
         }
 
 
-        public bool IsAdmin => 
-            CurrentMember?.IsAdmin ?? false;
 
         #region Language
 

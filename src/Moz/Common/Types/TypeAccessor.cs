@@ -1,8 +1,8 @@
-
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
-namespace Moz.Utils.Types
+namespace Moz.Common.Types
 {
     public class TypeAccessor<T>
     {
@@ -14,7 +14,7 @@ namespace Moz.Utils.Types
 
         public MemberInfo[] Members => _type.GetMembers();
 
-        public PropertyInfo[] PropertyInfos => _type.GetProperties();
+        public IEnumerable<PropertyInfo> PropertyInfos => _type.GetProperties();
         
         public Type Type => _type;
 

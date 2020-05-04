@@ -2,7 +2,6 @@
 using Moz.Bus.Dtos;
 using Moz.Bus.Dtos.Auth;
 using Moz.Bus.Models.Members;
-using Moz.WebApi;
 
 namespace Moz.Auth
 {
@@ -32,7 +31,7 @@ namespace Moz.Auth
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        ServResult<MemberLoginApo> ExternalAuth(ServRequest<ExternalAuthDto> request); 
+        ServResult<MemberLoginApo> ExternalAuth(ServRequest<ExternalAuthInfo> request); 
  
  
         /// <summary>

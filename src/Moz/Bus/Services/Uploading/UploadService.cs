@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Moz.Utils.FileManager;
+using Moz.Utils;
+using Moz.Utils.FileManage;
 
 namespace Moz.Service.Uploading
 {

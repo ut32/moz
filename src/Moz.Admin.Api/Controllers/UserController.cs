@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Api.Common;
 using Moz.Admin.Api.Models.User;
 using Moz.Exceptions;
-using Moz.WebApi;
 
 namespace Moz.Admin.Api.Controllers
 {

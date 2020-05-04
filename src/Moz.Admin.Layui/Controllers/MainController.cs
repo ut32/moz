@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
 using Moz.Administration.Models.Main;
 using Moz.Auth.Attributes;
+using Moz.Common.Types;
 using Moz.Core;
 using Moz.Settings;
-using Moz.Utils.Types;
 
 namespace Moz.Admin.Layui.Controllers
 {
@@ -17,7 +17,7 @@ namespace Moz.Admin.Layui.Controllers
         {
             _workContext = workContext;
         }
-        
+
         public IActionResult Index()
         {
             var settingTypeInfos = TypeFinder.FindClassesOfType<ISettings>();
@@ -25,11 +25,13 @@ namespace Moz.Admin.Layui.Controllers
             var model = new IndexRspModel
             {
                 AdminUserName = _workContext.CurrentMember.Username,
-                SettingMenus = settingTypeInfos.Select(t => new SettingMenu
-                {
-                    Id = t.Guid,
-                    Name = t.DisplayName
-                }).ToList()
+                SettingMenus = settingTypeInfos
+                    .OrderBy(it => it.Order)
+                    .Select(t => new SettingMenu
+                    {
+                        Id = t.UniqueId,
+                        Name = t.DisplayName
+                    }).ToList()
             };
             return View("~/Administration/Views/Main/Index.cshtml", model);
         }

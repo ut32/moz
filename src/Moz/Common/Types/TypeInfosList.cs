@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Moz.Utils.Types
+namespace Moz.Common.Types
 {
     public class TypeInfosList : List<TypeInfo>
     {

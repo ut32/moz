@@ -1,62 +1,103 @@
-﻿@using Moz.Administration.Models.Settings
-@model Moz.Administration.Models.Settings.IndexSettingRespModel
+﻿@using Moz.Admin.Layui.Models.Settings
+@using Moz.Common.Form
+@model Moz.Admin.Layui.Models.Settings.IndexSettingRespModel
 @{
     Layout = null;
     var guid = Guid.NewGuid().ToString("N");
 }
 <style>
-
-    
-    
+    .setting-body{
+        padding: 30px 100px 20px 10px;
+    }
+    .setting-body .layui-form-label {
+        width: 100px;
+    }
+    .setting-body .layui-input-block{
+        margin-left: 130px;
+    }
 </style>
-<div style="height: 100%; overflow-y: auto;">
+<div class="zui-page layui-form" lay-filter="form-@guid" id="form-@guid">
     <div class="layui-card">
-        <div class="layui-card-header">@Model.Title</div>
+        <div class="layui-card-header" style="padding: 0 15px">@Model.Title</div>
         <div class="layui-card-body">
-            <form class="pageForm layui-form" method="post"
+            <div class="setting-body">
+                <form class="layui-form"
+                  method="post"
                   action="@Url.Action("save", "setting")"
-                  onsubmit="return validateCallback(this, navTabAjaxDone);"
-                  novalidate="novalidate">
-                <input type="hidden" name="id" value="@Model.Guid"/>
-                @foreach (var item in Model.PropertiesItems)
+                  onBeforePost=""
+                  onSuccessCallBack=""
+                  lay-filter="form-@guid">
+
+                <input type="hidden" name="id" value="@Model.UniqueId"/>
+
+                @foreach (var item in Model.SettingPropertyItems.OrderBy(it=>it.Order))
                 {
                     <div class="layui-form-item">
                         <label class="layui-form-label">@item.DisplayName</label>
-                        <div class="layui-input-inline">
-                            @if (item.PropertType == PropertType.BOOL)
+                        <div class="layui-input-block">
+                            @if (item.FieldType == FormFieldType.Select)
                             {
-                                var ischecked = item.Value?.ToLower() == "true" ? "checked" : "";
-                                <input type="checkbox" lay-filter="@(guid)_checkbox" lay-text="ON|OFF" lay-skin="switch" value="true" @ischecked>
-                                <input type="hidden" name="Setting.@item.Name" value="@item.Value">
+                                <select name="Setting[@Model.TypeName.@item.TypeName]" lay-verify="required">
+                                    <option value=""></option>
+                                    @foreach (var select in item.Data)
+                                    {
+                                        <option value="@select.Value">@select.Key</option>
+                                    }
+                                </select>
+                            }else if (item.FieldType == FormFieldType.MultipleRowsTextInput)
+                            {
+                                <textarea name="Setting[@Model.TypeName.@item.TypeName]" placeholder="请输入" class="layui-textarea">@item.Value</textarea>
+                            }else if (item.FieldType == FormFieldType.Switch)
+                            {
+                                var chk = "true".Equals(item.Value, StringComparison.OrdinalIgnoreCase) ? "checked" : "";
+                                <input type="hidden" value="@item.Value" name="Setting[@Model.TypeName.@item.TypeName]" id="switch-@item.TypeName-@guid-value">
+                                <input type="checkbox" class="switch-input" @chk lay-skin="switch" lay-filter="switch-@item.TypeName-@guid" lay-text="ON|OFF">
+                            }else if (item.FieldType == FormFieldType.DateTimeInput)
+                            {
+                                <input type="text" name="Setting[@Model.TypeName.@item.TypeName]" lay-verify="datetime" value="@item.Value" placeholder="请输入" class="layui-input datetime-input">
                             }
                             else
                             {
-                                <input type="text" name="Setting.@item.Name" value="@item.Value" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                                <input type="text" name="Setting[@Model.TypeName.@item.TypeName]" value="@item.Value" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
                             }
                         </div>
                     </div>
                 }
                 <div class="layui-form-item">
                     <div class="layui-input-block">
-                        <button class="layui-btn" lay-submit="" lay-filter="">立即提交</button>
-                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        <button class="layui-btn" lay-submit="" lay-filter="">保存</button>
                     </div>
                 </div>
             </form>
+            </div>
         </div>
     </div>
 </div>
 <script>
-    layui.use(['form', 'upload'],
+    layui.use(['form', 'upload','jquery','laydate'],
         function() {
-            var form = layui.form;
-            form.render();
-
-            form.on('switch(@(guid)_checkbox)',
-                function(obj) {
-                    var boolValue = obj.elem.checked ? "true" : "false";
-                    $(obj.othis).next().val(boolValue);
-                });
-
+            let form = layui.form;
+            let $ = layui.jquery;
+            let laydate = layui.laydate;
+            
+            form.render(null, "form-@guid");
+            
+            //日期
+            $('#form-@guid .datetime-input').each(function() {
+              laydate.render({ 
+                elem: this
+                ,type: 'datetime'
+              });
+            });
+            
+            //开关
+            $('#form-@guid .switch-input').each(function() {
+              let layFilter = $(this).attr('lay-filter');
+              form.on('switch('+layFilter+')', function(data){
+                  $('#'+layFilter+'-value').val(this.checked ? 'true' : 'false');
+              });
+            });
+            
+            
         });
 </script>

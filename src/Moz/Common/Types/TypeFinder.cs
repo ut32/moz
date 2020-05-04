@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyModel;
 
-namespace Moz.Utils.Types
+namespace Moz.Common.Types
 {
     public static class TypeFinder
     {
@@ -44,6 +45,8 @@ namespace Moz.Utils.Types
             return FindClassesOfType(typeof(T), onlyCreateClass);
         }
 
+        
+        [MethodImpl(MethodImplOptions.Synchronized)]
         internal static TypeInfosList GetAllTypes()
         {
             if (GenericCache<TypeInfosList>.Instance == null)
@@ -59,7 +62,7 @@ namespace Moz.Utils.Types
                 var entryReferencedAssembliesTypes = libs
                     .Select(t => Assembly.Load(t.Name))
                     .SelectMany(t => t.GetTypes())
-                    .Select(o => new TypeInfo {Guid = o?.FullName?.GetHashCode().ToString(), Type = o})
+                    .Select(o => new TypeInfo(o))
                     .ToList();
 
                 result.AddRange(entryReferencedAssembliesTypes);

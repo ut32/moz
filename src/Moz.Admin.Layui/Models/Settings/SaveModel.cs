@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Moz.Administration.Models.Settings
+namespace Moz.Admin.Layui.Models.Settings
 {
     public class SaveModel
     {

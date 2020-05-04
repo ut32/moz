@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Moz.Exceptions;
-using Moz.Validation;
 
-namespace Moz.WebApi
+namespace Moz.Web.Api
 {
     //[ExceptionHandler(typeof(MyExceptionHandler))] 
     //[ValidationFilter]

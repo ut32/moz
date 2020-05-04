@@ -1,15 +1,15 @@
 ﻿using Moz.Settings;
 
-namespace Moz.Utils.FileManager
+namespace Moz.Utils.FileManage
 { 
-    internal class FileManager : IFileManager
+    internal class DefaultFileManager : IFileManager
     {
-        private readonly CommonSettings _commonSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IFileManager _fileManager;
         
-        public FileManager(CommonSettings commonSettings)
+        public DefaultFileManager(GlobalSettings globalSettings)
         {
-            _commonSettings = commonSettings; 
+            _globalSettings = globalSettings; 
             //_fileManager = new AliyunOssManager();
         }
 

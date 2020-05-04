@@ -1,4 +1,5 @@
 ﻿@using Moz.Bus.Models.Articles
+@using Moz.Common.Form
 @model Moz.Administration.Models.Articles.UpdateModel
 @{
     Layout = null;
@@ -36,20 +37,20 @@
                         var value = properties.FirstOrDefault(it => it.Name.Equals(item.FiledName, StringComparison.OrdinalIgnoreCase))?.GetValue(Model.Article) ?? "";
                         <div class="layui-form-item">
                             <label class="layui-form-label">@item.DisplayName</label>
-                            @if (item.DisplayType == FieldTypeEnum.SingleRowTextInput)
+                            @if (item.DisplayType == FormFieldType.SingleRowTextInput)
                             {
                                 <div class="layui-input-inline">
                                     <input type="text" name="@item.FiledName" value="@value" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
                                 </div>
                             }
-                            else if (item.DisplayType == FieldTypeEnum.UploadSingleFile)
+                            else if (item.DisplayType == FormFieldType.UploadSingleFile)
                             {
                                 <div class="layui-input-inline">
                                     <input type="text" name="@item.FiledName" value="@value" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input"/>
                                 </div>
                                 <a class="layui-btn upload_imagePath" href="javascript:;" rel="@item.FiledName"><i class="layui-icon">&#xe681;</i> 选择文件</a>
                             }
-                            else if (item.DisplayType == FieldTypeEnum.DateTimeInput)
+                            else if (item.DisplayType == FormFieldType.DateTimeInput)
                             {
                                 var dtValue = DateTime.Now;
                                 DateTime.TryParse(value.ToString(), out dtValue);
@@ -58,7 +59,7 @@
                                     <input type="text" name="@item.FiledName" value="@dtValue.ToString("yyyy-MM-dd HH:mm:ss")" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input datetimeinput"/>
                                 </div>
                             }
-                            else if (item.DisplayType == FieldTypeEnum.Editor)
+                            else if (item.DisplayType == FormFieldType.Editor)
                             {
                                 <div class="layui-input-block">
                                     <textarea name="@item.FiledName" class="editor" rows="10">@value</textarea>

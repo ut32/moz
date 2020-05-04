@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Distributed;
 using Moz.Bus.Models.Localization;
-using Moz.CMS.Services.Settings;
 using Moz.DataBase;
 using Moz.Events;
+using ISettingService = Moz.Bus.Services.Settings.ISettingService;
 
 namespace Moz.Bus.Services.Localization
 {
@@ -14,12 +14,10 @@ namespace Moz.Bus.Services.Localization
 
         public LanguageService(IDistributedCache distributedCache,
             ISettingService settingService,
-            LocalizationSettings localizationSettings,
             IEventPublisher eventPublisher)
         {
             _distributedCache = distributedCache;
             _settingService = settingService;
-            _localizationSettings = localizationSettings;
             _eventPublisher = eventPublisher;
         }
 
@@ -29,7 +27,6 @@ namespace Moz.Bus.Services.Localization
 
         private readonly IDistributedCache _distributedCache;
         private readonly ISettingService _settingService;
-        private readonly LocalizationSettings _localizationSettings;
         private readonly IEventPublisher _eventPublisher;
 
         #endregion

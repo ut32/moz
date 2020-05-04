@@ -34,7 +34,7 @@ namespace Moz.TaskSchedule
         public async Task JobExecutionVetoed(IJobExecutionContext context,
             CancellationToken cancellationToken = new CancellationToken())
         {
-            await Task.Delay(0, cancellationToken);
+            await Task.CompletedTask;
         }
 
         public async Task JobWasExecuted(IJobExecutionContext context, JobExecutionException jobException,
@@ -50,7 +50,8 @@ namespace Moz.TaskSchedule
                 var jobKey = context.JobDetail.Key.Name;
                 using (var client = DbFactory.GetClient())
                 {
-                    var scheduleTask = client.Queryable<ScheduleTask>().Single(t => t.JobKey == jobKey);
+                    var scheduleTask = await client.Queryable<ScheduleTask>()
+                        .SingleAsync(t => t.JobKey == jobKey);
                     if (scheduleTask != null)
                     {
                         if (jobException == null)
@@ -68,14 +69,14 @@ namespace Moz.TaskSchedule
                             scheduleTask.IsEnable = false;
                         }
 
-                        client.Updateable(scheduleTask).UpdateColumns(t => new
+                        await client.Updateable(scheduleTask).UpdateColumns(t => new
                         {
                             t.Status,
                             t.StatusDesc,
                             t.LastEndTime,
                             t.LastSuccessTime,
                             t.IsEnable
-                        }).ExecuteCommand();
+                        }).ExecuteCommandAsync();
                     }
                 }
             }
@@ -84,7 +85,7 @@ namespace Moz.TaskSchedule
                 // ignored
             }
 
-            await Task.Delay(0, cancellationToken);
+            await Task.CompletedTask;
         }
 
         public string Name => "DefaultJobListener";

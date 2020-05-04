@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Moz.Utils
+namespace Moz.Common
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class GenericCache<T>

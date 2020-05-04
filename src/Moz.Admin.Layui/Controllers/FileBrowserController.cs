@@ -7,11 +7,10 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
 
-namespace Moz.Administration.Controllers
+namespace Moz.Admin.Layui.Controllers
 {
     public class UploadConfig
     {
@@ -56,9 +55,9 @@ namespace Moz.Administration.Controllers
     public class FileBrowserController : AdminAuthBaseController
     {
         
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly UploadConfig _uploadConfig;
-        public FileBrowserController(IHostingEnvironment hostingEnvironment)
+        public FileBrowserController(IWebHostEnvironment hostingEnvironment)
         {
             this._hostingEnvironment = hostingEnvironment;
             this._uploadConfig = new UploadConfig();
@@ -359,7 +358,8 @@ namespace Moz.Administration.Controllers
                 FileInfo f = new FileInfo(files[i]);
                 int w = 0, h = 0;
                 if (GetFileType(f.Extension) == "image"){
-                    try{
+                    try
+                    {
                         FileStream fs = new FileStream(f.FullName, FileMode.Open, FileAccess.Read);
                         Image img = Image.FromStream(fs);
                         w = img.Width;
@@ -368,7 +368,10 @@ namespace Moz.Administration.Controllers
                         fs.Dispose();
                         img.Dispose();
                     }
-                    catch(Exception ex){throw ex;}
+                    catch (Exception ex)
+                    {
+                        throw;
+                    }
                 }
                 _r.Append("{");
                 _r.Append("\"p\":\""+d + "/" + f.Name+"\"");

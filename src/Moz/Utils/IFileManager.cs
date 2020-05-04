@@ -1,4 +1,6 @@
-﻿namespace Moz.Utils.FileManager
+﻿using Moz.Utils.FileManage;
+
+namespace Moz.Utils
 {
     public interface IFileManager
     {

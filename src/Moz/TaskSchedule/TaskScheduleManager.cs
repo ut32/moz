@@ -86,7 +86,7 @@ namespace Moz.TaskSchedule
                         await _scheduler.ScheduleJob(job, trigger);
                     }
 
-                    client.Updateable(list).ExecuteCommand();
+                    await client.Updateable(list).ExecuteCommandAsync();
                 }
 
                 await _scheduler.Start();
@@ -134,7 +134,7 @@ namespace Moz.TaskSchedule
             
             using (var client = DbFactory.GetClient())
             {
-                client.Updateable(scheduleTask).ExecuteCommand();
+                await client.Updateable(scheduleTask).ExecuteCommandAsync();
             }
         }
         public async Task EnableJob(ScheduleTask scheduleTask)
@@ -211,7 +211,7 @@ namespace Moz.TaskSchedule
             {
                 using (var client = DbFactory.GetClient())
                 {
-                    client.Updateable(scheduleTask).ExecuteCommand();
+                    await client.Updateable(scheduleTask).ExecuteCommandAsync();
                 }
 
                 if (scheduleTask.Status == TaskRunningStatus.Error)

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Moz.Utils.FileManager;
+using Moz.Utils.FileManage;
 
 namespace Moz.Service.Uploading
 {

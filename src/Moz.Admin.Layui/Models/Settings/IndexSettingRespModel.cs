@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
+using Moz.Settings;
 
-namespace Moz.Administration.Models.Settings
+namespace Moz.Admin.Layui.Models.Settings
 {
     public class IndexSettingRespModel
     {
         public string Title { get; set; }
-        public string Guid { get; set; }
+        public string UniqueId { get; set; } 
         public string TypeName { get; set; }
-        public List<SettingPropertiesItem> PropertiesItems { get; set; }
+        public List<SettingPropertyItem> SettingPropertyItems { get; set; }
     }
 
     public class SettingPropertiesItem

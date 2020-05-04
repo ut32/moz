@@ -15,11 +15,9 @@ namespace Moz.Bus.Services.Localization
     {
         #region Ctor
 
-        public LocalizedEntityService(IDistributedCache distributedCache,
-            LocalizationSettings localizationSettings)
+        public LocalizedEntityService(IDistributedCache distributedCache)
         {
             _distributedCache = distributedCache;
-            _localizationSettings = localizationSettings;
         }
 
         #endregion
@@ -49,7 +47,6 @@ namespace Moz.Bus.Services.Localization
         #region Fields
 
         private readonly IDistributedCache _distributedCache;
-        private readonly LocalizationSettings _localizationSettings;
 
         #endregion
 

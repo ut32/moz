@@ -23,21 +23,18 @@ namespace Moz.Bus.Services.Localization
         /// </summary>
         /// <param name="distributedCache"></param>
         /// <param name="workContext"></param>
-        /// <param name="commonSettings"></param>
-        /// <param name="localizationSettings"></param>
+        /// <param name="globalSettings"></param>
         /// <param name="eventPublisher"></param>
         /// <param name="logger"></param>
         public LocalizationService(IDistributedCache distributedCache,
             IWorkContext workContext,
-            CommonSettings commonSettings,
-            LocalizationSettings localizationSettings,
+            GlobalSettings globalSettings,
             IEventPublisher eventPublisher,
             ILogger<LocalizationService> logger)
         {
             _distributedCache = distributedCache;
             _workContext = workContext;
-            _commonSettings = commonSettings;
-            _localizationSettings = localizationSettings;
+            _globalSettings = globalSettings;
             _eventPublisher = eventPublisher;
             _logger = logger;
         }
@@ -72,8 +69,7 @@ namespace Moz.Bus.Services.Localization
 
         private readonly IWorkContext _workContext;
         private readonly IDistributedCache _distributedCache;
-        private readonly CommonSettings _commonSettings;
-        private readonly LocalizationSettings _localizationSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IEventPublisher _eventPublisher;
         private readonly ILogger<LocalizationService> _logger;
 

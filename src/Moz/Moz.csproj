@@ -29,4 +29,9 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0" />
     <PackageReference Include="ZKWeb.System.Drawing" Version="4.0.1" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Moz, Version=1.0.4.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\..\customer\mpqianshan\src\MpQianShan\WebApp\bin\Debug\netcoreapp3.1\Moz.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

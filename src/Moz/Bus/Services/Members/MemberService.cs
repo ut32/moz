@@ -24,18 +24,15 @@ namespace Moz.Bus.Services.Members
         private readonly IDistributedCache _distributedCache;
         private readonly IEncryptionService _encryptionService;
         private readonly IEventPublisher _eventPublisher;
-        private readonly MemberSettings _memberSettings;
 
         public MemberService(
             IDistributedCache distributedCache,
             IEventPublisher eventPublisher,
-            IEncryptionService encryptionService,
-            MemberSettings memberSettings)
+            IEncryptionService encryptionService)
         {
             _distributedCache = distributedCache;
             _eventPublisher = eventPublisher;
             _encryptionService = encryptionService;
-            _memberSettings = memberSettings;
         }
 
         #region Utils
@@ -205,7 +202,7 @@ namespace Moz.Bus.Services.Members
 
                 var saltKey = _encryptionService.CreateSaltKey(6);
                 var newPassword = _encryptionService
-                    .CreatePasswordHash(request.Data.NewPassword, saltKey, _memberSettings.HashedPasswordFormat);
+                    .CreatePasswordHash(request.Data.NewPassword, saltKey, "SHA512");
 
                 members.ForEach(it =>
                 {
@@ -283,7 +280,7 @@ namespace Moz.Bus.Services.Members
                 {
                     var saltKey = _encryptionService.CreateSaltKey(6);
                     var newPassword = _encryptionService
-                        .CreatePasswordHash(request.Data.Password, saltKey, _memberSettings.HashedPasswordFormat);
+                        .CreatePasswordHash(request.Data.Password, saltKey, "SHA512");
 
                     member.Password = newPassword;
                     member.PasswordSalt = saltKey;
@@ -376,7 +373,7 @@ namespace Moz.Bus.Services.Members
                 {
                     var saltKey = _encryptionService.CreateSaltKey(6);
                     var newPassword = _encryptionService
-                        .CreatePasswordHash(request.Data.Password, saltKey, _memberSettings.HashedPasswordFormat);
+                        .CreatePasswordHash(request.Data.Password, saltKey, "SHA512");
 
                     member.Password = newPassword;
                     member.PasswordSalt = saltKey;
@@ -471,14 +468,14 @@ namespace Moz.Bus.Services.Members
                     return Error("找不到该用户");
                 }
                 
-                var inputEncryptOldPassword = _encryptionService.CreatePasswordHash(request.Data.OldPassword, member.PasswordSalt, _memberSettings.HashedPasswordFormat);
+                var inputEncryptOldPassword = _encryptionService.CreatePasswordHash(request.Data.OldPassword, member.PasswordSalt, "SHA512");
                 if (!inputEncryptOldPassword.Equals(member.Password, StringComparison.OrdinalIgnoreCase))
                 {
                     return Error("原密码不正确");
                 }
 
                 var saltKey = _encryptionService.CreateSaltKey(6);
-                var newPassword = _encryptionService.CreatePasswordHash(request.Data.NewPassword, saltKey, _memberSettings.HashedPasswordFormat);
+                var newPassword = _encryptionService.CreatePasswordHash(request.Data.NewPassword, saltKey, "SHA512");
 
                 member.Password = newPassword;
                 member.PasswordSalt = saltKey;

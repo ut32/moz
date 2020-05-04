@@ -13,6 +13,7 @@ using Moz.Auth.Attributes;
 using Moz.Bus.Dtos;
 using Moz.Bus.Dtos.Auth;
 using Moz.Bus.Dtos.Members;
+using Moz.Bus.Dtos.Request.Members;
 using Moz.Bus.Models.Common;
 using Moz.Bus.Models.Members;
 using Moz.Bus.Services;
@@ -21,7 +22,6 @@ using Moz.Core.Config;
 using Moz.DataBase;
 using Moz.Exceptions;
 using Moz.Service.Security;
-using Moz.WebApi;
 
 namespace Moz.Auth.Impl
 {
@@ -33,12 +33,15 @@ namespace Moz.Auth.Impl
         private readonly IOptions<AppConfig> _appConfig;
         private readonly IDistributedCache _distributedCache;
         private readonly IJwtService _jwtService;
+        private readonly IRegistrationService _registrationService;
 
         public AuthService(IHttpContextAccessor httpContextAccessor,
             IMemberService memberService,
             IEncryptionService encryptionService,
             IOptions<AppConfig> appConfig,
-            IDistributedCache distributedCache, IJwtService jwtService)
+            IDistributedCache distributedCache, 
+            IJwtService jwtService,
+            IRegistrationService registrationService)
         { 
             _httpContextAccessor = httpContextAccessor;
             _memberService = memberService;
@@ -46,6 +49,7 @@ namespace Moz.Auth.Impl
             _appConfig = appConfig;
             _distributedCache = distributedCache;
             _jwtService = jwtService;
+            _registrationService = registrationService;
         }
         
         #region Utils
@@ -183,10 +187,10 @@ namespace Moz.Auth.Impl
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ServResult<MemberLoginApo> ExternalAuth(ServRequest<ExternalAuthDto> request)
+        public ServResult<MemberLoginApo> ExternalAuth(ServRequest<ExternalAuthInfo> request)
         {
             ExternalAuthentication externalAuthentication;
-            var memberUId = string.Empty;
+            string memberUId;
             using (var db = DbFactory.GetClient())
             {
                 externalAuthentication = db.Queryable<ExternalAuthentication>()
@@ -197,61 +201,20 @@ namespace Moz.Auth.Impl
 
             if (externalAuthentication == null)
             {
-                using (var db = DbFactory.GetClient())
+                var registerResult = _registrationService.Register(new ExternalRegistrationRequest
                 {
-                    db.UseTran(tran =>
-                    {
-                        var identify = tran.Insertable(new Identify()).ExecuteReturnBigIdentity();
-                        memberUId = Guid.NewGuid().ToString("N");
-                        var member = new Member
-                        {
-                            UId = memberUId,
-                            Address = null,
-                            Avatar = request.Data.UserInfo.Avatar,
-                            Nickname = request.Data.UserInfo.Nickname,
-                            Birthday = null,
-                            CannotLoginUntilDate = null,
-                            Email = null,
-                            FailedLoginAttempts = 0,
-                            Gender = GenderEnum.Man,
-                            Geohash = null,
-                            IsActive = true,
-                            IsDelete = false,
-                            IsEmailValid = false,
-                            IsMobileValid = false,
-                            LastActiveDatetime = DateTime.Now,
-                            LastLoginDatetime = DateTime.Now,
-                            LastLoginIp = null,
-                            Lat = null,
-                            Lng = null,
-                            LoginCount = 0,
-                            Mobile = null,
-                            OnlineTimeCount = 0,
-                            Password = $"pwd_{identify}",
-                            PasswordSalt = "123",
-                            RegionCode = null,
-                            RegisterDatetime = DateTime.Now,
-                            RegisterIp = null,
-                            Username = $"{request.Data.Provider.ToString()}_{identify}"
-                        };
-                        member.Id = tran.Insertable(member).ExecuteReturnBigIdentity();
-                        tran.Insertable(new MemberRole
-                        {
-                            ExpireDate = null,
-                            MemberId = member.Id,
-                            RoleId = 3
-                        }).ExecuteCommand();
-                        tran.Insertable(new ExternalAuthentication()
-                        {
-                            Openid = request.Data.OpenId,
-                            Provider = request.Data.Provider,
-                            AccessToken = request.Data.AccessToken,
-                            ExpireDt = request.Data.ExpireDt,
-                            MemberId = member.Id,
-                            RefreshToken = request.Data.RefreshToken
-                        }).ExecuteCommand();
-                    });
+                    Provider = request.Data.Provider,
+                    AccessToken = request.Data.AccessToken,
+                    ExpireDt = request.Data.ExpireDt,
+                    OpenId = request.Data.OpenId,
+                    RefreshToken = request.Data.RefreshToken,
+                    UserInfo = request.Data.UserInfo
+                });
+                if (registerResult.Code > 0)
+                {
+                    return Error(registerResult.Message, registerResult.Code);
                 }
+                memberUId = registerResult.Data.MemberUId;
             }
             else
             {

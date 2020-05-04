@@ -1,6 +1,6 @@
 
 using Microsoft.AspNetCore.Mvc;
-using Moz.WebApi;
+using Moz.Web.Api;
 
 namespace Moz.Admin.Api.Common
 {

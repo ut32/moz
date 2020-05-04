@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using Moz.CMS.Services.Settings;
 using Moz.Settings;
 
-namespace Moz.Domain.Services.Settings
+namespace Moz.Bus.Services.Settings
 {
     public static class SettingExtensions
     {
@@ -36,10 +35,10 @@ namespace Moz.Domain.Services.Settings
             return key;
         }
 
-        public static SettingProperty<T> Use<T>(this ISettingService service)
+        public static Bus.Services.Settings.SettingProperty<T> Use<T>(this ISettingService service)
             where T : ISettings, new()
         {
-            var settingProperty = new SettingProperty<T>(service);
+            var settingProperty = new Bus.Services.Settings.SettingProperty<T>(service);
             return settingProperty;
         }
     }

@@ -6,10 +6,10 @@ using Moz.Exceptions;
 
 namespace Moz.Utils
 {
-    public static class EncryptionHelper
+    public static class EncryptHelper 
     {
         /// <summary>
-        ///     MD5加密 32位 大写
+        /// MD5加密 32位 大写
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -26,7 +26,7 @@ namespace Moz.Utils
         }
 
         /// <summary>
-        ///     AES加密
+        /// AES加密
         /// </summary>
         /// <param name="input"></param>
         /// <param name="key"></param>

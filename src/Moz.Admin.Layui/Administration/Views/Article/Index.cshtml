@@ -1,4 +1,5 @@
 ﻿@using Moz.Bus.Models.Articles
+@using Moz.Common.Form
 @model Moz.Administration.Models.Articles.IndexModel
 @{
     Layout = null;
@@ -68,11 +69,11 @@
                         {
                             if (item.IsEnable && item.IsShowedInList)
                             {
-                                if (item.DisplayType == FieldTypeEnum.UploadSingleFile)
+                                if (item.DisplayType == FormFieldType.UploadSingleFile)
                                 {
                                     
                                 }
-                                else if (item.DisplayType == FieldTypeEnum.DateTimeInput)
+                                else if (item.DisplayType == FormFieldType.DateTimeInput)
                                 {
                                     <text>{ field: '@(item.FiledName)', title: '@(item.DisplayName)', width: 170}, </text>
                                 }

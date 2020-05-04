@@ -1,16 +1,16 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
-using Moz.Administration.Models.Settings;
-using Moz.CMS.Services.Settings;
-using Moz.Domain.Services.Settings;
+using Moz.Admin.Layui.Models.Settings;
+using Moz.Bus.Services.Settings;
+using Moz.Common.Types;
 using Moz.Settings;
-using Moz.Utils.Types;
 
-namespace Moz.Administration.Controllers
+namespace Moz.Admin.Layui.Controllers
 {
     public class SettingController : AdminBaseController
     {
@@ -25,60 +25,45 @@ namespace Moz.Administration.Controllers
         {
             var typeInfo = TypeFinder
                 .FindClassesOfType<ISettings>()
-                .FirstOrDefault(t => t.Guid == id);
-            if (typeInfo == null) 
+                .FirstOrDefault(t => t.UniqueId == id);
+            if (typeInfo == null)
                 return Content("404");
 
             var setting = _settingService.LoadSetting(typeInfo.Type);
 
             var model = new IndexSettingRespModel
             {
-                Guid = id,
+                UniqueId = id,
                 Title = typeInfo.DisplayName,
-                TypeName = typeInfo.Name,
-                PropertiesItems = typeInfo.Type.GetProperties().Select(t => new SettingPropertiesItem
-                {
-                    DisplayName = GetPropertyDisplayName(t),
-                    Name = t.Name,
-                    Value = t.GetValue(setting)?.ToString(),
-                    PropertType = GetPropertType(t)
-                }).ToList()
+                TypeName = typeInfo.TypeName,
+                SettingPropertyItems = typeInfo.Type.GetProperties().Select(t =>
+                    {
+                        var val = t.GetValue(setting)?.ToString();
+                        if ((t.PropertyType == typeof(DateTime) || t.PropertyType == typeof(DateTime?)) && !string.IsNullOrEmpty(val))
+                        {
+                            if (DateTime.TryParse(val, out var dt))
+                            {
+                                val = dt.ToString("yyyy-MM-dd HH:mm:ss");
+                            }
+                        }
+
+                        var field = new SettingPropertyItem(t)
+                        {
+                            Value = val
+                        };
+                        
+                        return field;
+                    })
+                    .ToList()
             };
-
             return View("~/Administration/Views/Setting/Index.cshtml", model);
-        }
-
-        private PropertType GetPropertType(PropertyInfo propertyInfo)
-        {
-            if (propertyInfo.PropertyType == typeof(string)) return PropertType.STRING;
-
-            if (propertyInfo.PropertyType == typeof(bool)) return PropertType.BOOL;
-
-            if (propertyInfo.PropertyType == typeof(DateTime)) return PropertType.DATETIME;
-
-            if (propertyInfo.PropertyType == typeof(int)) return PropertType.INT;
-
-            if (propertyInfo.PropertyType == typeof(float)) return PropertType.FLOAT;
-
-            if (propertyInfo.PropertyType == typeof(double)) return PropertType.DOUBLE;
-
-            if (propertyInfo.PropertyType == typeof(decimal)) return PropertType.DECIMAL;
-
-            return PropertType.STRING;
-        }
-
-        private string GetPropertyDisplayName(PropertyInfo propertyInfo)
-        {
-            if (propertyInfo == null) return "--";
-            var displayAttr = propertyInfo.GetCustomAttribute<DisplayAttribute>();
-            return displayAttr == null ? propertyInfo.Name : displayAttr.Name;
         }
 
         public IActionResult Save(SaveModel model)
         {
             var typeInfo = TypeFinder
                 .FindClassesOfType<ISettings>()
-                .FirstOrDefault(t => t.Guid == model.Id);
+                .FirstOrDefault(t => t.UniqueId == model.Id);
 
             if (typeInfo == null)
                 return Json(new

@@ -142,7 +142,7 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
         _this.select = function (layId) {
             if (layId){
                 _this.currentLayId = layId;
-                $("#zui-admin-leftside .layui-nav dd").removeClass("layui-this");
+                $("#zui-admin-leftside .layui-nav .layui-this").removeClass("layui-this");
                 $("#zui-admin-leftside .layui-nav dd a[zui-href='"+_this.currentLayId+"']").parent().addClass("layui-this");
                 $("#zui-admin-content .item").hide();
                 $("#zui-admin-content .item[page-id='"+_this.currentLayId+"']").show();
@@ -249,8 +249,7 @@ layui.define(['layer', 'form','element','jquery'], function(exports){
     };
     let initUI = function($p){
         $("textarea.editor", $p).each(function () {
-            if (CKEDITOR)
-                CKEDITOR.replace( this );
+            if (CKEDITOR) CKEDITOR.replace( this );
         });
     };
 

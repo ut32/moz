@@ -5,8 +5,14 @@ namespace Moz.Core
 {
     public interface IWorkContext
     {
+        /// <summary>
+        /// 当前用户
+        /// </summary>
         SimpleMember CurrentMember { get; }
-        bool IsAdmin { get; }
+        
+        /// <summary>
+        /// 语言
+        /// </summary>
         Language WorkingLanguage { get; }
     }
 }

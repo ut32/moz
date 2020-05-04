@@ -7,9 +7,9 @@ using Moz.Admin.Layui.Models.ScheduleTasks;
 using Moz.Auth.Attributes;
 using Moz.Bus.Dtos.ScheduleTasks;
 using Moz.Bus.Services.ScheduleTasks;
+using Moz.Common.Types;
 using Moz.Core.Config;
 using Moz.Exceptions;
-using Moz.Utils.Types;
 using Quartz;
 
 namespace Moz.Admin.Layui.Controllers
