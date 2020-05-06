@@ -39,12 +39,12 @@ namespace Moz.DataBase
             return client;
         }
         
-        public static bool CheckInstalled(AppConfig mozOptions) 
+        public static bool CheckInstalled(AppConfig appConfig) 
         {
             if(_isInstalled != null && _isInstalled.Value) return true;
             try 
             {
-                var dbOption = mozOptions.Db.FirstOrDefault(it => it.Name.Equals("default", StringComparison.OrdinalIgnoreCase));
+                var dbOption = appConfig.Db.FirstOrDefault(it => it.Name.Equals("default", StringComparison.OrdinalIgnoreCase));
                 
                 if (dbOption == null)
                     return false;
@@ -64,7 +64,6 @@ namespace Moz.DataBase
             }
             catch (Exception ex) 
             {
-                Console.WriteLine(ex);
                 return false;
             }
         }

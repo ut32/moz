@@ -2,7 +2,7 @@
 
 namespace Moz.Common
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
+    
     public class GenericCache<T>
     {
         private GenericCache()

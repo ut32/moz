@@ -41,18 +41,11 @@ namespace Moz.Common.Types
 
         public string TypeName { get; }
 
-        public bool IsDefined<T>(bool inherit = true)
-        {
-            return _type.IsDefined(typeof(T), inherit);
-        }
-
         public bool? IsInterface { get; }
 
         public string FullName { get; }
 
         public string DisplayName { get; }
-
-        
 
         public Type Type { get;  }
         
@@ -62,6 +55,11 @@ namespace Moz.Common.Types
 
         #region Methods 
  
+        public bool IsDefined<T>(bool inherit = true)
+        {
+            return _type.IsDefined(typeof(T), inherit);
+        }
+        
         private string GetDisplayName(Type type) 
         {
             if (type == null) 
@@ -82,8 +80,8 @@ namespace Moz.Common.Types
             var desc = descAttribute?.Description;
             return  string.IsNullOrEmpty(desc) ? type.Name : desc;
         }
-        
-        public int GetOrder(Type type)
+
+        private int GetOrder(Type type)
         {
             if (type == null) 
                 return 0;
