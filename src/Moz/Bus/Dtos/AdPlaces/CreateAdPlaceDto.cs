@@ -37,8 +37,7 @@ namespace Moz.Bus.Dtos.AdPlaces
         public CreateAdPlaceDtoValidator(ILocalizationService localizationService)
         {
             RuleFor(x => x.Title).NotEmpty().WithMessage("标题不能为空");
-            //RuleFor(x => x.Code).NotEmpty().WithMessage("不能为空");
-            //RuleFor(x => x.Desc).NotEmpty().WithMessage("不能为空");
+            RuleFor(x => x.Code).NotEmpty().WithMessage("标识码不能为空");
         }
     }
     

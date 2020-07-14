@@ -7,7 +7,13 @@
 }
 <style>
     .setting-body{
-        padding: 30px 100px 20px 10px;
+        padding: 30px 20px 20px 10px;
+    }
+    .setting-body .layui-form-item{ margin-bottom: 20px;}
+    .setting-body .layui-form-item p.tip{
+        padding: 10px 0;
+        color:#666;
+        font-size: 14px;
     }
     .setting-body .layui-form-label {
         width: 100px;
@@ -20,56 +26,71 @@
     <div class="layui-card">
         <div class="layui-card-header" style="padding: 0 15px">@Model.Title</div>
         <div class="layui-card-body">
-            <div class="setting-body">
-                <form class="layui-form"
-                  method="post"
-                  action="@Url.Action("save", "setting")"
-                  onBeforePost=""
-                  onSuccessCallBack=""
-                  lay-filter="form-@guid">
+            @if (Model.SettingPropertyItems!=null && Model.SettingPropertyItems.Any())
+            {
+                <div class="setting-body">
+                    <form class="layui-form"
+                          method="post"
+                          action="@Url.Action("save", "setting")"
+                          onBeforePost=""
+                          onSuccessCallBack=""
+                          lay-filter="form-@guid">
 
-                <input type="hidden" name="id" value="@Model.UniqueId"/>
+                        <input type="hidden" name="id" value="@Model.UniqueId"/>
 
-                @foreach (var item in Model.SettingPropertyItems.OrderBy(it=>it.Order))
-                {
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">@item.DisplayName</label>
-                        <div class="layui-input-block">
-                            @if (item.FieldType == FormFieldType.Select)
-                            {
-                                <select name="Setting[@Model.TypeName.@item.TypeName]" lay-verify="required">
-                                    <option value=""></option>
-                                    @foreach (var select in item.Data)
+                        @foreach (var item in Model.SettingPropertyItems.OrderBy(it => it.Order))
+                        {
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">@item.DisplayName</label>
+                                <div class="layui-input-block">
+                                    @if (item.FieldType == FormFieldType.Select)
                                     {
-                                        <option value="@select.Value">@select.Key</option>
+                                        <select name="Setting[@Model.TypeName.@item.TypeName]" lay-verify="required">
+                                            <option value=""></option>
+                                            @foreach (var select in item.Data)
+                                            {
+                                                var selected = "";
+                                                if (select.Value.Equals(item.Value, StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    selected = "selected";
+                                                }
+                                                <option value="@select.Value" @selected>@select.Key</option>
+                                            }
+                                        </select>
                                     }
-                                </select>
-                            }else if (item.FieldType == FormFieldType.MultipleRowsTextInput)
-                            {
-                                <textarea name="Setting[@Model.TypeName.@item.TypeName]" placeholder="请输入" class="layui-textarea">@item.Value</textarea>
-                            }else if (item.FieldType == FormFieldType.Switch)
-                            {
-                                var chk = "true".Equals(item.Value, StringComparison.OrdinalIgnoreCase) ? "checked" : "";
-                                <input type="hidden" value="@item.Value" name="Setting[@Model.TypeName.@item.TypeName]" id="switch-@item.TypeName-@guid-value">
-                                <input type="checkbox" class="switch-input" @chk lay-skin="switch" lay-filter="switch-@item.TypeName-@guid" lay-text="ON|OFF">
-                            }else if (item.FieldType == FormFieldType.DateTimeInput)
-                            {
-                                <input type="text" name="Setting[@Model.TypeName.@item.TypeName]" lay-verify="datetime" value="@item.Value" placeholder="请输入" class="layui-input datetime-input">
-                            }
-                            else
-                            {
-                                <input type="text" name="Setting[@Model.TypeName.@item.TypeName]" value="@item.Value" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
-                            }
+                                    else if (item.FieldType == FormFieldType.MultipleRowsTextInput)
+                                    {
+                                        <textarea name="Setting[@Model.TypeName.@item.TypeName]" placeholder="请输入" class="layui-textarea">@item.Value</textarea>
+                                    }
+                                    else if (item.FieldType == FormFieldType.Switch)
+                                    {
+                                        var chk = "true".Equals(item.Value, StringComparison.OrdinalIgnoreCase) ? "checked" : "";
+                                        <input type="hidden" value="@item.Value" name="Setting[@Model.TypeName.@item.TypeName]" id="switch-@item.TypeName-@guid-value">
+                                        <input type="checkbox" class="switch-input" @chk lay-skin="switch" lay-filter="switch-@item.TypeName-@guid" lay-text="是|否">
+                                    }
+                                    else if (item.FieldType == FormFieldType.DateTimeInput)
+                                    {
+                                        <input type="text" name="Setting[@Model.TypeName.@item.TypeName]" lay-verify="datetime" value="@item.Value" placeholder="请输入" class="layui-input datetime-input">
+                                    }
+                                    else
+                                    {
+                                        <input type="text" name="Setting[@Model.TypeName.@item.TypeName]" value="@item.Value" placeholder="请输入" autocomplete="off" class="layui-input">
+                                    }
+                                    @if (!string.IsNullOrEmpty(item.Description))
+                                    {
+                                        <p class="tip">@Html.Raw(item.Description)</p>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-submit="" lay-filter="">保存</button>
+                            </div>
                         </div>
-                    </div>
-                }
-                <div class="layui-form-item">
-                    <div class="layui-input-block">
-                        <button class="layui-btn" lay-submit="" lay-filter="">保存</button>
-                    </div>
+                    </form>
                 </div>
-            </form>
-            </div>
+            }
         </div>
     </div>
 </div>

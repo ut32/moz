@@ -1,11 +1,10 @@
 using Moz.Bus.Dtos;
-using Moz.Bus.Dtos.Request.Members;
-using Moz.Bus.Dtos.Result.Members;
+using Moz.Bus.Dtos.Members;
 
 namespace Moz.Bus.Services.Members
 {
     public interface IRegistrationService
     {
-        ServResult<RegistrationResult> Register(ServRequest<ExternalRegistrationRequest> request); 
+        PublicResult<RegistrationResult> Register(ExternalRegistrationDto request); 
     }
 }

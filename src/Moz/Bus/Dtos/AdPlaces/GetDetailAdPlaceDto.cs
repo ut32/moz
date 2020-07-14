@@ -15,7 +15,7 @@ namespace Moz.Bus.Dtos.AdPlaces
     }
     
     
-    public class GetAdPlaceDetailApo
+    public class GetAdPlaceDetailInfo
     {
         /// <summary>
         /// 

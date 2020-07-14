@@ -34,7 +34,7 @@ namespace Moz.Bus.Services.Localization
             if (entityId == 0 || string.IsNullOrEmpty(localeKeyGroup))
                 return new List<LocalizedProperty>();
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 return client.Queryable<LocalizedProperty>()
                     .Where(lp => lp.EntityId == entityId && lp.LocaleKeyGroup == localeKeyGroup).OrderBy(o => o.Id)
@@ -61,7 +61,7 @@ namespace Moz.Bus.Services.Localization
             if (localizedProperty == null)
                 throw new ArgumentNullException(nameof(localizedProperty));
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 client.Insertable(localizedProperty).ExecuteCommand();
             }
@@ -78,7 +78,7 @@ namespace Moz.Bus.Services.Localization
             if (localizedProperty == null)
                 throw new ArgumentNullException(nameof(localizedProperty));
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 client.Updateable(localizedProperty).ExecuteCommand();
             }
@@ -97,7 +97,7 @@ namespace Moz.Bus.Services.Localization
             if (localizedProperty == null)
                 throw new ArgumentNullException(nameof(localizedProperty));
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 client.Deleteable(localizedProperty).ExecuteCommand();
             }
@@ -114,7 +114,7 @@ namespace Moz.Bus.Services.Localization
         /// <returns>Localized property</returns>
         public virtual LocalizedProperty GetLocalizedPropertyById(long localizedPropertyId)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 return client.Queryable<LocalizedProperty>().InSingle(localizedPropertyId);
             }

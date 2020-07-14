@@ -28,10 +28,10 @@ using Moz.DataBase;
 using Moz.Events;
 using Moz.Events.Publishers;
 using Moz.Exceptions;
+using Moz.FileStorage;
 using Moz.Settings;
 using Moz.TaskSchedule;
 using Moz.Utils;
-using Moz.Utils.FileManage;
 using Moz.Validation;
 using Quartz;
 using Quartz.Spi;
@@ -146,12 +146,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<IWorkContext, WebWorkContext>();
-            services.AddSingleton<IFileManager, DefaultFileManager>();
+            services.AddSingleton<IFileUploader, LocalFileUploader>();
             services.AddTransient<HttpContextHelper>();
             services.AddSingleton<IEventPublisher, DefaultEventPublisher>();
             services.AddSingleton<ITaskScheduleManager, TaskScheduleManager>();
             services.AddSingleton<IAuthorizationHandler, DefaultAuthorizationHandler>();
             services.AddSingleton<IJobFactory, JobFactory>();
+            services.AddTransient<FileStorageDataSource>();
+            services.AddTransient<IFileManager, DefaultFileManager>();
 
             //注入服务类 查找所有Service结尾的类进行注册
             var allServiceInterfaces = TypeFinder.GetAllTypes()
@@ -167,6 +169,11 @@ namespace Microsoft.Extensions.DependencyInjection
             var jobTypes = TypeFinder.FindClassesOfType<IJob>().ToList();
             foreach (var jobType in jobTypes)
                 services.AddTransient(jobType.Type);
+            
+            //注入所有Uploader类
+            var uploaderTypes = TypeFinder.FindClassesOfType<IFileUploader>();
+            foreach (var uploaderType in uploaderTypes)
+                services.AddTransient(uploaderType.Type);
 
             //注册settings
             var settingTypes = TypeFinder.FindClassesOfType(typeof(ISettings)).ToList();

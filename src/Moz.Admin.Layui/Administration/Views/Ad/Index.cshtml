@@ -24,8 +24,8 @@
             </div>
         </div>
         <div class="layui-card-body">
-            <div class="layui-btn-group">
-                <a class="layui-btn" href="javascript:;" zui-href="@Url.Action("create", "Ad",new { AdPlaceId = @Model.AdPlaceId })" zui-type="dialog" zui-width="800px" zui-height="400px" title="添加"><i class="layui-icon">&#xe654;</i> 添加</a>
+            <div class="">
+                <a class="layui-btn" href="javascript:;" zui-href="@Url.Action("create", "Ad",new { AdPlaceId = @Model.AdPlaceId })" zui-type="dialog" zui-width="600px" zui-height="400px" title="添加"><i class="layui-icon">&#xe654;</i> 添加</a>
             </div>
             <table class="layui-hide" id="table_@(guid)" lay-filter="table_@(guid)"></table>
         </div>
@@ -33,7 +33,7 @@
 </div>
 
 <script type="text/html" id="toolbar_@(guid)">
-    <a class="layui-btn layui-btn-normal layui-btn-xs" href="javascript:;" zui-href="@Url.Action("update", "Ad")?id={{d.Id}}" zui-type="dialog"  zui-width="800px" zui-height="400px" title="编辑">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" href="javascript:;" zui-href="@Url.Action("update", "Ad")?id={{d.Id}}" zui-type="dialog"  zui-width="600px" zui-height="400px" title="编辑">
         <i class="layui-icon layui-icon-edit"></i>编辑
     </a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" href="javascript:;" zui-href="@Url.Action("delete", "Ad")?id={{d.Id}}" zui-type="ajax" zui-confirm="你确认删除此条信息(ID={{d.Id}})吗？">

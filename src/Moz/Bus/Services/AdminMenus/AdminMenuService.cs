@@ -12,6 +12,9 @@ using SqlSugar;
 namespace Moz.Bus.Services.AdminMenus
 {
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class AdminMenuService : BaseService,IAdminMenuService
     {
         private readonly IEventPublisher _eventPublisher;
@@ -24,19 +27,19 @@ namespace Moz.Bus.Services.AdminMenus
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult CreateAdminMenu(ServRequest<CreateAdminMenuDto> request)
+        public PublicResult CreateAdminMenu(CreateAdminMenuDto dto)
         {
             var adminMenu = new AdminMenu
             {
-                Name = request.Data.Name,
-                ParentId = request.Data.ParentId,
-                Link = request.Data.Link,
-                OrderIndex = request.Data.OrderIndex,
-                Icon = request.Data.Icon
+                Name = dto.Name,
+                ParentId = dto.ParentId,
+                Link = dto.Link,
+                OrderIndex = dto.OrderIndex,
+                Icon = dto.Icon
             };
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 adminMenu.Id = client.Insertable(adminMenu).ExecuteReturnBigIdentity();
             }
@@ -50,15 +53,14 @@ namespace Moz.Bus.Services.AdminMenus
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        /// <exception cref="MozException"></exception>
-        public ServResult UpdateAdminMenu(ServRequest<UpdateAdminMenuDto> request)
+        public PublicResult UpdateAdminMenu(UpdateAdminMenuDto dto)
         {
             AdminMenu adminMenu;
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                adminMenu = client.Queryable<AdminMenu>().InSingle(request.Data.Id);
+                adminMenu = client.Queryable<AdminMenu>().InSingle(dto.Id);
                 if (adminMenu == null)
                 {
                     return Error("找不到该条信息");
@@ -69,31 +71,28 @@ namespace Moz.Bus.Services.AdminMenus
                     return Error("不能编辑内置菜单");
                 }
 
-                adminMenu.Name = request.Data.Name;
-                adminMenu.ParentId = request.Data.ParentId;
-                adminMenu.Link = request.Data.Link;
-                adminMenu.OrderIndex = request.Data.OrderIndex;
-                adminMenu.Icon = request.Data.Icon;
+                adminMenu.Name = dto.Name;
+                adminMenu.ParentId = dto.ParentId;
+                adminMenu.Link = dto.Link;
+                adminMenu.Icon = dto.Icon;
+                
                 client.Updateable(adminMenu).ExecuteCommand();
             }
-
             _eventPublisher.EntityUpdated(adminMenu);
-            
             return Ok();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        /// <exception cref="MozException"></exception>
-        public ServResult DeleteAdminMenu(ServRequest<DeleteAdminMenuDto> request)
+        public PublicResult DeleteAdminMenu(DeleteAdminMenuDto dto)
         {
             AdminMenu adminMenu;
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                adminMenu = client.Queryable<AdminMenu>().InSingle(request.Data.Id);
+                adminMenu = client.Queryable<AdminMenu>().InSingle(dto.Id);
                 if (adminMenu == null)
                 {
                     return Error("找不到该条信息");
@@ -101,10 +100,10 @@ namespace Moz.Bus.Services.AdminMenus
 
                 if (adminMenu.IsSystem)
                 {
-                    return Error("不能编辑内置菜单");
+                    return Error("不能删除内置菜单");
                 }
 
-                client.Deleteable<AdminMenu>(request.Data.Id).ExecuteCommand();
+                client.Deleteable<AdminMenu>(dto.Id).ExecuteCommand();
             }
 
             _eventPublisher.EntityDeleted(adminMenu);
@@ -114,20 +113,18 @@ namespace Moz.Bus.Services.AdminMenus
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        /// <exception cref="MozException"></exception>
-        public ServResult SetAdminMenuOrderIndex(ServRequest<SetAdminMenuOrderIndexDto> request)
+        public PublicResult SetAdminMenuOrderIndex(SetAdminMenuOrderIndexDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                var menu = client.Queryable<AdminMenu>().InSingle(request.Data.Id);
+                var menu = client.Queryable<AdminMenu>().InSingle(dto.Id);
                 if (menu == null)
                 {
                     return Error("找不到该条信息");
                 }
-
-                menu.OrderIndex = int.Parse(request.Data.OrderIndex);
+                menu.OrderIndex = int.Parse(dto.OrderIndex);
                 client.Updateable(menu).UpdateColumns(t => new {t.OrderIndex}).ExecuteCommand();
                 return Ok();
             }
@@ -137,14 +134,14 @@ namespace Moz.Bus.Services.AdminMenus
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult<QueryChildrenByParentIdApo> QueryChildrenByParentId(ServRequest<QueryChildrenByParentIdDto> request)
+        public PublicResult<QueryChildrenByParentIdApo> QueryChildrenByParentId(QueryChildrenByParentIdDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var list = client.Queryable<AdminMenu>().ToList();
-                var menus = GetAllSubAdminMenus(list, request.Data.ParentId);
+                var menus = GetAllSubAdminMenus(list, dto.ParentId);
                 return new QueryChildrenByParentIdApo()
                 {
                     AllSubs = menus
@@ -177,19 +174,19 @@ namespace Moz.Bus.Services.AdminMenus
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult<GetAdminMenuDetailApo> GetAdminMenuDetail(ServRequest<GetAdminMenuDetailDto> request)
+        public PublicResult<GetAdminMenuDetailInfo> GetAdminMenuDetail(GetAdminMenuDetailDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                var adminMenu = client.Queryable<AdminMenu>().InSingle(request.Data.Id);
+                var adminMenu = client.Queryable<AdminMenu>().InSingle(dto.Id);
                 if (adminMenu == null)
                 {
                     return Error("找不到信息");
                 }
 
-                var resp = new GetAdminMenuDetailApo
+                var resp = new GetAdminMenuDetailInfo
                 {
                     Id = adminMenu.Id,
                     Name = adminMenu.Name,
@@ -206,17 +203,17 @@ namespace Moz.Bus.Services.AdminMenus
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult<PagedList<QueryAdminMenuItem>> PagedQueryAdminMenus(ServRequest<PagedQueryAdminMenusDto> request)
+        public PublicResult<PagedList<QueryAdminMenuItem>> PagedQueryAdminMenus(PagedQueryAdminMenusDto dto)
         {
-            var page = request.Data.Page ?? 1;
-            var pageSize = request.Data.PageSize ?? 20;
-            using (var client = DbFactory.GetClient())
+            var page = 1;
+            var pageSize = 1000;
+            using (var client = DbFactory.CreateClient())
             {
                 var total = 0;
                 var list = client.Queryable<AdminMenu>()
-                    .WhereIF(!request.Data.Keyword.IsNullOrEmpty(), t => t.Name.Contains(request.Data.Keyword))
+                    .WhereIF(!dto.Keyword.IsNullOrEmpty(), t => t.Name.Contains(dto.Keyword))
                     .Select(t => new QueryAdminMenuItem()
                     {
                         Id = t.Id,
@@ -238,41 +235,5 @@ namespace Moz.Bus.Services.AdminMenus
                 };
             }
         }
-
-        /*
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public GetMenusByRoleApo GetMenusByRole(GetMenusByRoleDto request)
-        {
-            using (var client = DbFactory.GetClient())
-            {
-                var list = client.Queryable<RoleMenu, AdminMenu>((rm, m) => new object[]
-                    {
-                        JoinType.Left, rm.MenuId==m.Id
-                    })
-                    .Where((rm, m) => rm.RoleId == request.RoleId)
-                    .Select((rm, m) => new AdminMenu()
-                    {
-                        Icon = m.Icon,
-                        Id = m.Id,
-                        IsSystem = m.IsSystem,
-                        Link = m.Link,
-                        Name = m.Name,
-                        OrderIndex = m.OrderIndex,
-                        ParentId = m.ParentId
-                    })
-                    .OrderBy("order_index ASC, id ASC")
-                    .ToList();
-                
-                return new GetMenusByRoleApo()
-                {
-                    Menus = list
-                };
-            }
-        }
-        */
     }
 }

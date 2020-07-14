@@ -7,30 +7,114 @@ namespace Moz.Bus.Services.Ads
     public interface IAdService
     {
         #region 广告位置
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult CreateAdPlace(CreateAdPlaceDto dto);
         
-        ServResult CreateAdPlace(ServRequest<CreateAdPlaceDto> request);
-        ServResult UpdateAdPlace(ServRequest<UpdateAdPlaceDto> request);
-        ServResult DeleteAdPlace(ServRequest<DeleteAdPlaceDto> request);
-        ServResult BulkDeleteAdPlaces(ServRequest<BulkDeleteAdPlacesDto> request);
-        ServResult<GetAdPlaceDetailApo> GetAdPlaceDetail(ServRequest<GetAdPlaceDetailDto> request);
-        ServResult<PagedList<QueryAdPlaceItem>> PagedQueryAdPlaces(ServRequest<PagedQueryAdPlaceDto> request);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult UpdateAdPlace(UpdateAdPlaceDto dto);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult DeleteAdPlace(DeleteAdPlaceDto dto);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult BulkDeleteAdPlaces(BulkDeleteAdPlacesDto dto);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult<GetAdPlaceDetailInfo> GetAdPlaceDetail(GetAdPlaceDetailDto dto);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult<PagedList<QueryAdPlaceItem>> PagedQueryAdPlaces(PagedQueryAdPlaceDto dto); 
         
         #endregion
         
         #region 广告
 
-        ServResult CreateAd(ServRequest<CreateAdDto> request);
-        ServResult UpdateAd(ServRequest<UpdateAdDto> request);
-        ServResult DeleteAd(ServRequest<DeleteAdDto> request);
-        ServResult BulkDeleteAds(ServRequest<BulkDeleteAdsDto> request);
-        ServResult<GetAdDetailApo> GetAdDetail(ServRequest<GetAdDetailDto> request);
-        ServResult<PagedList<QueryAdItem>> PagedQueryAds(ServRequest<PagedQueryAdsDto> request);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult CreateAd(CreateAdDto dto); 
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult UpdateAd(UpdateAdDto dto);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult DeleteAd(DeleteAdDto dto);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult BulkDeleteAds(BulkDeleteAdsDto dto);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult<GetAdDetailInfo> GetAdDetail(GetAdDetailDto dto);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult<PagedList<QueryAdItem>> PagedQueryAds(PagedQueryAdsDto dto); 
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult SetAdOrder(SetAdOrderDto dto);
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult SetAdIsShow(SetAdIsShowDto dto);
 
-        ServResult SetAdOrder(ServRequest<SetAdOrderDto> request);
-
-        ServResult SetAdIsShow(ServRequest<SetAdIsShowDto> request);
-
-        ServResult<GetAdsByCodeApo> GetAdsByCode(ServRequest<GetAdsByCodeDto> request);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult<GetAdsByCodeInfo> GetAdsByCode(GetAdsByCodeDto dto); 
 
         #endregion
     }

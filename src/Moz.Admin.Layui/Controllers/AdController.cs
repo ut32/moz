@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
 using Moz.Admin.Layui.Models.Ads;
 using Moz.Auth.Attributes;
 using Moz.Bus.Dtos.Ads;
 using Moz.Bus.Services.Ads;
-using Moz.Exceptions;
 
 namespace Moz.Admin.Layui.Controllers
 {
@@ -28,9 +28,9 @@ namespace Moz.Admin.Layui.Controllers
         }
         
         [AdminAuth(Permissions = "admin.ad.index")]
-        public IActionResult PagedList(PagedQueryAdsDto request)
+        public IActionResult PagedList(PagedQueryAdsDto dto)
         {
-            var list = _adService.PagedQueryAds(request);
+            var list = _adService.PagedQueryAds(dto);
             var result = new
             {
                 Code = 0,
@@ -50,7 +50,6 @@ namespace Moz.Admin.Layui.Controllers
             };
             return View("~/Administration/Views/Ad/Create.cshtml",model);
         }
-        
 
         [HttpPost]
         [AdminAuth(Permissions = "admin.ad.create")]
@@ -75,7 +74,6 @@ namespace Moz.Admin.Layui.Controllers
             return View("~/Administration/Views/Ad/Update.cshtml",model);
         }
         
-
         [HttpPost]
         [AdminAuth(Permissions = "admin.ad.update")]
         public IActionResult Update(UpdateAdDto dto)

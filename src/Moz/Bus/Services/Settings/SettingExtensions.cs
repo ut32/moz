@@ -21,15 +21,11 @@ namespace Moz.Bus.Services.Settings
         {
             var member = keySelector.Body as MemberExpression;
             if (member == null)
-                throw new ArgumentException(string.Format(
-                    "Expression '{0}' refers to a method, not a property.",
-                    keySelector));
+                throw new ArgumentException($"Expression '{keySelector}' refers to a method, not a property.");
 
             var propInfo = member.Member as PropertyInfo;
             if (propInfo == null)
-                throw new ArgumentException(string.Format(
-                    "Expression '{0}' refers to a field, not a property.",
-                    keySelector));
+                throw new ArgumentException($"Expression '{keySelector}' refers to a field, not a property.");
 
             var key = typeof(T).Name + "." + propInfo.Name;
             return key;

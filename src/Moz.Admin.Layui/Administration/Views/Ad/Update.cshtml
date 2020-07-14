@@ -1,6 +1,4 @@
-﻿
-
-@model Moz.Admin.Layui.Models.Ads.UpdateModel
+﻿@model Moz.Admin.Layui.Models.Ads.UpdateModel
 @{
   Layout = null;
   var guid = Guid.NewGuid().ToString("N");
@@ -51,7 +49,7 @@
 <script>
   layui.use(['form','upload','layer'],
     function() {
-      var form = layui.form, upload = layui.upload, layer = layui.layer;
+      let form = layui.form, upload = layui.upload, layer = layui.layer;
 
       form.render(null, "form-@guid");
       
@@ -60,12 +58,12 @@
         ,url: '@Url.Action("index","upload")'
         ,field:'file'
         ,accept: 'file' //普通文件
-        ,exts: 'jpg|png|jpeg' //只允许上传压缩文件
+        ,exts: 'jpg|png|jpeg|gif'
         ,done: function(res) {
           if (res.Code === 0) {
-            var $this = this.item;
-            var rel = $this.attr("rel");
-            $('input[name=' + rel + ']').val(res.Data.RelativePath);
+            let $this = this.item;
+            let rel = $this.attr("rel");
+            $('input[name=' + rel + ']').val(res.Data.Path);
           } else {
             layer.alert(res.Message);
           }

@@ -6,12 +6,17 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
 using Moz.Admin.Layui.Models.Settings;
+using Moz.Auth.Attributes;
 using Moz.Bus.Services.Settings;
 using Moz.Common.Types;
 using Moz.Settings;
 
 namespace Moz.Admin.Layui.Controllers
 {
+    /// <summary>
+    /// 设置中心
+    /// </summary>
+    [AdminAuth(Permissions = "admin.setting")]
     public class SettingController : AdminBaseController
     {
         private readonly ISettingService _settingService;
@@ -21,6 +26,11 @@ namespace Moz.Admin.Layui.Controllers
             _settingService = settingService;
         }
 
+        /// <summary>
+        /// 展示页
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public IActionResult Index(string id)
         {
             var typeInfo = TypeFinder
@@ -59,6 +69,11 @@ namespace Moz.Admin.Layui.Controllers
             return View("~/Administration/Views/Setting/Index.cshtml", model);
         }
 
+        /// <summary>
+        /// 保存设置
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public IActionResult Save(SaveModel model)
         {
             var typeInfo = TypeFinder

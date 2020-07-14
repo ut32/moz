@@ -4,7 +4,7 @@ namespace Moz.Admin.Layui.Models.AdPlaces
 {
     public class UpdateModel
     {
-         public GetAdPlaceDetailApo AdPlace { get; set; }
+         public GetAdPlaceDetailInfo AdPlace { get; set; }
     }
     
 }

@@ -17,7 +17,7 @@ namespace Moz.DataBase
     {
         private static bool? _isInstalled = false;
 
-        public static DbClient GetClient(string name = "default")
+        public static DbClient CreateClient(string name = "default")
         {
 
             var options = EngineContext.Current.Resolve<IOptions<AppConfig>>()?.Value;

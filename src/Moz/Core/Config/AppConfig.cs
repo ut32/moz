@@ -8,18 +8,26 @@ namespace Moz.Core.Config
     {
         public AppConfig()
         {
-            Admin = new AdminConfig();
-            ErrorPage = new ErrorPageConfig();
+            ErrorPage = new ErrorPageConfig
+            {
+                HttpErrors = new List<HttpError>()
+            };
             Db = new List<DbConfig>();
             Token = new TokenConfig();
         }
-
-
-        /// <summary>
-        /// 是否开启定时任务 默认不开启
-        /// </summary>
-        public bool IsEnableScheduling { get; set; } 
         
+        /// <summary>
+        /// 后台路径
+        /// </summary>
+        public string AdminPath { get; set; }
+        
+        
+        /// <summary>
+        /// 工具箱路径
+        /// </summary>
+        public string ToolsPath { get; set; }
+        
+
         /// <summary>
         /// 是否开启性能监测
         /// </summary>
@@ -29,18 +37,13 @@ namespace Moz.Core.Config
         /// AppSecret, 要求为16-32位 ，关系到应用安全，非常重要
         /// 在线生成 https://ut32.com/tool/pwd
         /// </summary>
-        public string AppSecret { get; set; } 
+        public string AppSecret { get; set; }  
 
         /// <summary>
         /// 数据库相关配置
         /// </summary>
-        public List<DbConfig> Db { get; }  
-        
-        /// <summary>
-        /// 后台配置
-        /// </summary>
-        public AdminConfig Admin { get; }
-        
+        public List<DbConfig> Db { get; }
+
         /// <summary>
         /// 错误页面配置
         /// </summary>
@@ -49,7 +52,7 @@ namespace Moz.Core.Config
         /// <summary>
         /// JWT配置
         /// </summary>
-        public TokenConfig Token { get; set; }
+        public TokenConfig Token { get; }
         
         /// <summary>
         /// 异常Http Code处理
@@ -64,6 +67,8 @@ namespace Moz.Core.Config
         { 
             StatusCodePageHandlerType = typeof(T);
         }
+        
+        
         
     }
 }

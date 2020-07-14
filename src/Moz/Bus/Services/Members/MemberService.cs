@@ -44,7 +44,7 @@ namespace Moz.Bus.Services.Members
         private IEnumerable<Role> GetRolesByMemberId(long memberId)
         {
             var dt = DateTime.Now;
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 return client.Queryable<MemberRole, Role>((mr, r) => new object[]
                     {
@@ -81,20 +81,20 @@ namespace Moz.Bus.Services.Members
         /// <summary>
         /// 获取详细
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult<GetMemberDetailApo> GetMemberDetail(ServRequest<GetMemberDetailDto> request)
+        public PublicResult<GetMemberDetailApo> GetMemberDetail(GetMemberDetailDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                var member = client.Queryable<Member>().InSingle(request.Data.Id);
+                var member = client.Queryable<Member>().InSingle(dto.Id);
                 if (member == null)
                 {
                     return Error("找不着信息");
                 }
 
                 var roles = client.Queryable<MemberRole>()
-                    .Where(it => it.MemberId == request.Data.Id)
+                    .Where(it => it.MemberId == dto.Id)
                     .Select(it => new {it.RoleId})
                     .ToList()
                     .Select(it => it.RoleId).ToArray();
@@ -142,7 +142,7 @@ namespace Moz.Bus.Services.Members
         {
             SimpleMember GetSimpleMember(string newUid) 
             {
-                using (var client = DbFactory.GetClient())
+                using (var client = DbFactory.CreateClient())
                 {
                     var member = client.Queryable<Member>().Select(t => new
                     {
@@ -189,20 +189,20 @@ namespace Moz.Bus.Services.Members
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult ResetPassword(ServRequest<ResetPasswordDto> request)
+        public PublicResult ResetPassword(ResetPasswordDto dto)
         {
-            using (var db = DbFactory.GetClient())
+            using (var db = DbFactory.CreateClient())
             {
                 var members = db.Queryable<Member>()
                     .Select(it => new Member {Id = it.Id, Password = it.Password, PasswordSalt = it.PasswordSalt})
-                    .Where(it => request.Data.MemberIds.Contains(it.Id))
+                    .Where(it => dto.MemberIds.Contains(it.Id))
                     .ToList();
 
                 var saltKey = _encryptionService.CreateSaltKey(6);
                 var newPassword = _encryptionService
-                    .CreatePasswordHash(request.Data.NewPassword, saltKey, "SHA512");
+                    .CreatePasswordHash(dto.NewPassword, saltKey, "SHA512");
 
                 members.ForEach(it =>
                 {
@@ -224,21 +224,21 @@ namespace Moz.Bus.Services.Members
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult<CreateMemberApo> CreateMember(ServRequest<CreateMemberDto> request)
+        public PublicResult<CreateMemberApo> CreateMember(CreateMemberDto dto)
         {
             var member = new Member
             {
                 UId = Guid.NewGuid().ToString("N"),
                 Address = null,
-                Avatar = request.Data.Avatar,
-                Nickname = request.Data.Nickname,
+                Avatar = dto.Avatar,
+                Nickname = dto.Nickname,
                 Birthday = null,
                 CannotLoginUntilDate = null,
                 Email = null,
                 FailedLoginAttempts = 0,
-                Gender = request.Data.Gender,
+                Gender = dto.Gender,
                 Geohash = null,
                 IsActive = true,
                 IsDelete = false,
@@ -257,63 +257,61 @@ namespace Moz.Bus.Services.Members
                 RegionCode = null,
                 RegisterDatetime = DateTime.Now,
                 RegisterIp = null,
-                Username = request.Data.Username
+                Username = dto.Username
             };
-            using (var db = DbFactory.GetClient())
+            using (var db = DbFactory.CreateClient())
             {
-                
-                
                 {
                     var isExist = db.Queryable<Member>()
-                        .Where(it => it.Username.Equals(request.Data.Username))
+                        .Where(it => it.Username.Equals(dto.Username))
                         .Select(it => new {it.Id})
                         .ToList()
                         .Any();
                     if (isExist)
                     {
-                        return Error($"此用户名 {request.Data.Username} 已存在");
+                        return Error($"此用户名 {dto.Username} 已存在");
                     }
 
-                    member.Username = request.Data.Username;
+                    member.Username = dto.Username;
                 }
                 
                 {
                     var saltKey = _encryptionService.CreateSaltKey(6);
                     var newPassword = _encryptionService
-                        .CreatePasswordHash(request.Data.Password, saltKey, "SHA512");
+                        .CreatePasswordHash(dto.Password, saltKey, "SHA512");
 
                     member.Password = newPassword;
                     member.PasswordSalt = saltKey;
                 }
 
-                if (!request.Data.Email.IsNullOrEmpty())
+                if (!dto.Email.IsNullOrEmpty())
                 {
                     var isExist = db.Queryable<Member>()
-                        .Where(it => it.Email.Equals(request.Data.Email))
+                        .Where(it => it.Email.Equals(dto.Email))
                         .Select(it => new {it.Id})
                         .ToList()
                         .Any();
                     if (isExist)
                     {
-                        return Error($"此邮箱 {request.Data.Email} 已存在");
+                        return Error($"此邮箱 {dto.Email} 已存在");
                     }
 
-                    member.Email = request.Data.Email;
+                    member.Email = dto.Email;
                 }
 
-                if (!request.Data.Mobile.IsNullOrEmpty())
+                if (!dto.Mobile.IsNullOrEmpty())
                 {
                     var isExist = db.Queryable<Member>()
-                        .Where(it => it.Mobile.Equals(request.Data.Mobile))
+                        .Where(it => it.Mobile.Equals(dto.Mobile))
                         .Select(it => new {it.Id})
                         .ToList()
                         .Any();
                     if (isExist)
                     {
-                        return Error($"此手机 {request.Data.Mobile} 已存在");
+                        return Error($"此手机 {dto.Mobile} 已存在");
                     }
 
-                    member.Mobile = request.Data.Mobile;
+                    member.Mobile = dto.Mobile;
                 }
 
                 db.UseTran(tran =>
@@ -341,79 +339,78 @@ namespace Moz.Bus.Services.Members
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        /// <exception cref="MozException"></exception>
-        public ServResult UpdateMember(ServRequest<UpdateMemberDto> request)
+        public PublicResult UpdateMember(UpdateMemberDto dto)
         {
-            using (var db = DbFactory.GetClient())
+            using (var db = DbFactory.CreateClient())
             {
-                var member = db.Queryable<Member>().InSingle(request.Data.Id);
+                var member = db.Queryable<Member>().InSingle(dto.Id);
                 if (member == null)
                 {
                     return Error("找不到该用户");
                 }
 
-                if (!member.Username.Equals(request.Data.Username, StringComparison.OrdinalIgnoreCase))
+                if (!member.Username.Equals(dto.Username, StringComparison.OrdinalIgnoreCase))
                 {
                     var isExist = db.Queryable<Member>()
-                        .Where(it => it.Username.Equals(request.Data.Username))
+                        .Where(it => it.Username.Equals(dto.Username))
                         .Select(it => new {it.Id})
                         .ToList()
                         .Any();
                     if (isExist)
                     {
-                        return Error($"此用户名 {request.Data.Username} 已存在");
+                        return Error($"此用户名 {dto.Username} 已存在");
                     }
 
-                    member.Username = request.Data.Username;
+                    member.Username = dto.Username;
                 }
 
-                if (!request.Data.Password.Equals("******"))
+                if (!dto.Password.Equals("******"))
                 {
                     var saltKey = _encryptionService.CreateSaltKey(6);
                     var newPassword = _encryptionService
-                        .CreatePasswordHash(request.Data.Password, saltKey, "SHA512");
+                        .CreatePasswordHash(dto.Password, saltKey, "SHA512");
 
                     member.Password = newPassword;
                     member.PasswordSalt = saltKey;
                 }
 
-                if (!request.Data.Email.IsNullOrEmpty() &&
-                    !request.Data.Email.Equals(member.Email, StringComparison.OrdinalIgnoreCase))
+                if (!dto.Email.IsNullOrEmpty() &&
+                    !dto.Email.Equals(member.Email, StringComparison.OrdinalIgnoreCase))
                 {
                     var isExist = db.Queryable<Member>()
-                        .Where(it => it.Email.Equals(request.Data.Email))
+                        .Where(it => it.Email.Equals(dto.Email))
                         .Select(it => new {it.Id})
                         .ToList()
                         .Any();
                     if (isExist)
                     {
-                        return Error($"此邮箱 {request.Data.Email} 已存在");
+                        return Error($"此邮箱 {dto.Email} 已存在");
                     }
-                    member.Email = request.Data.Email;
+                    member.Email = dto.Email;
                 }
 
-                if (!request.Data.Mobile.IsNullOrEmpty() &&
-                    !request.Data.Mobile.Equals(member.Mobile, StringComparison.OrdinalIgnoreCase))
+                if (!dto.Mobile.IsNullOrEmpty() &&
+                    !dto.Mobile.Equals(member.Mobile, StringComparison.OrdinalIgnoreCase))
                 {
                     var isExist = db.Queryable<Member>()
-                        .Where(it => it.Mobile.Equals(request.Data.Mobile))
+                        .Where(it => it.Mobile.Equals(dto.Mobile))
                         .Select(it => new {it.Id})
                         .ToList()
                         .Any();
                     if (isExist)
                     {
-                        return Error($"此手机 {request.Data.Mobile} 已存在");
+                        return Error($"此手机 {dto.Mobile} 已存在");
                     }
 
-                    member.Mobile = request.Data.Mobile;
+                    member.Mobile = dto.Mobile;
                 }
 
-                member.Nickname = request.Data.Nickname;
-                member.Avatar = request.Data.Avatar;
-                member.Gender = request.Data.Gender;
-                member.Birthday = request.Data.BirthDay;
+                member.Nickname = dto.Nickname;
+                member.Avatar = dto.Avatar;
+                member.Gender = dto.Gender;
+                member.Birthday = dto.BirthDay;
                 
                 db.UseTran(tran =>
                 {
@@ -432,9 +429,9 @@ namespace Moz.Bus.Services.Members
 
                     tran.Deleteable<MemberRole>().Where(it => it.MemberId == member.Id).ExecuteCommand();
 
-                    if (request.Data.Roles != null && request.Data.Roles.Length > 0)
+                    if (dto.Roles != null && dto.Roles.Length > 0)
                     {
-                        var newRoles = request.Data.Roles.Select(it => new MemberRole
+                        var newRoles = dto.Roles.Select(it => new MemberRole
                         {
                             ExpireDate = null,
                             MemberId = member.Id,
@@ -455,27 +452,26 @@ namespace Moz.Bus.Services.Members
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        /// <exception cref="MozException"></exception>
-        public ServResult ChangePassword(ServRequest<ChangePasswordDto> request)
+        public PublicResult ChangePassword(ChangePasswordDto dto)
         {
-            using (var db = DbFactory.GetClient())
+            using (var db = DbFactory.CreateClient())
             {
-                var member = db.Queryable<Member>().InSingle(request.Data.MemberId);
+                var member = db.Queryable<Member>().InSingle(dto.MemberId);
                 if (member == null)
                 {
                     return Error("找不到该用户");
                 }
                 
-                var inputEncryptOldPassword = _encryptionService.CreatePasswordHash(request.Data.OldPassword, member.PasswordSalt, "SHA512");
+                var inputEncryptOldPassword = _encryptionService.CreatePasswordHash(dto.OldPassword, member.PasswordSalt, "SHA512");
                 if (!inputEncryptOldPassword.Equals(member.Password, StringComparison.OrdinalIgnoreCase))
                 {
                     return Error("原密码不正确");
                 }
 
                 var saltKey = _encryptionService.CreateSaltKey(6);
-                var newPassword = _encryptionService.CreatePasswordHash(request.Data.NewPassword, saltKey, "SHA512");
+                var newPassword = _encryptionService.CreatePasswordHash(dto.NewPassword, saltKey, "SHA512");
 
                 member.Password = newPassword;
                 member.PasswordSalt = saltKey;
@@ -493,17 +489,17 @@ namespace Moz.Bus.Services.Members
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult<PagedList<QueryMemberItem>> PagedQueryMembers(ServRequest<PagedQueryMemberDto> request)
+        public PublicResult<PagedList<QueryMemberItem>> PagedQueryMembers(PagedQueryMemberDto dto)
         {
-            var page = request.Data.Page ?? 1;
-            var pageSize = request.Data.PageSize ?? 20;
-            using (var client = DbFactory.GetClient())
+            var page = dto.Page ?? 1;
+            var pageSize = dto.PageSize ?? 20;
+            using (var client = DbFactory.CreateClient())
             {
                 var total = 0;
                 var list = client.Queryable<Member>()
-                    .WhereIF(!request.Data.Keyword.IsNullOrEmpty(), t => t.Username.Contains(request.Data.Keyword))
+                    .WhereIF(!dto.Keyword.IsNullOrEmpty(), t => t.Username.Contains(dto.Keyword))
                     .Select(t => new QueryMemberItem()
                     {
                         Id = t.Id,

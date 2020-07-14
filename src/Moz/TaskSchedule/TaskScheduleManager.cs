@@ -28,7 +28,7 @@ namespace Moz.TaskSchedule
         
         public async Task Init()
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var list = client.Queryable<ScheduleTask>().Where(t => t.IsEnable).ToList();
                 if (list.Any())
@@ -132,7 +132,7 @@ namespace Moz.TaskSchedule
             scheduleTask.JobKey = "";
             scheduleTask.JobGroup = "";
             
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 await client.Updateable(scheduleTask).ExecuteCommandAsync();
             }
@@ -209,7 +209,7 @@ namespace Moz.TaskSchedule
 
             end:
             {
-                using (var client = DbFactory.GetClient())
+                using (var client = DbFactory.CreateClient())
                 {
                     await client.Updateable(scheduleTask).ExecuteCommandAsync();
                 }

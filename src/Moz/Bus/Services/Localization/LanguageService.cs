@@ -42,7 +42,7 @@ namespace Moz.Bus.Services.Localization
             if (language == null)
                 throw new ArgumentNullException(nameof(language));
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var entity = client.Insertable(language).ExecuteReturnEntity();
                 _eventPublisher.EntityDeleted(entity);
@@ -60,7 +60,7 @@ namespace Moz.Bus.Services.Localization
             if (language == null)
                 throw new ArgumentNullException(nameof(language));
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 client.Updateable(language).ExecuteCommand();
             }
@@ -79,7 +79,7 @@ namespace Moz.Bus.Services.Localization
             if (language == null)
                 throw new ArgumentNullException(nameof(language));
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 client.Deleteable(language).ExecuteCommand();
             }
@@ -95,7 +95,7 @@ namespace Moz.Bus.Services.Localization
         {
             return _distributedCache.GetOrSet("LANGUAGE_ALL_CACHE", () =>
             {
-                using (var client = DbFactory.GetClient())
+                using (var client = DbFactory.CreateClient())
                 {
                     return client.Queryable<Language>().ToList();
                 }
@@ -109,7 +109,7 @@ namespace Moz.Bus.Services.Localization
         /// <exception cref="ArgumentNullException"></exception>
         public virtual Language GetLanguageById(long languageId)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 return client.Queryable<Language>().InSingle(languageId);
             }

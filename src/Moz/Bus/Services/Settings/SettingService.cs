@@ -44,7 +44,7 @@ namespace Moz.Bus.Services.Settings
         {
             return _distributedCache.GetOrSet(SETTING_CACHE_KEY_ALL, () =>
             {
-                using (var client = DbFactory.GetClient())
+                using (var client = DbFactory.CreateClient())
                 {
                     return client.Queryable<Setting>().ToList();
                 }
@@ -57,7 +57,7 @@ namespace Moz.Bus.Services.Settings
         /// <returns>Settings</returns>
         protected virtual List<Setting> GetAllSettings()
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             { 
                 return client.Queryable<Setting>().ToList();
             }
@@ -90,7 +90,7 @@ namespace Moz.Bus.Services.Settings
             if (setting == null)
                 throw new ArgumentNullException(nameof(setting));
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 setting.Id = client.Insertable(setting).ExecuteReturnBigIdentity();
             }
@@ -107,7 +107,7 @@ namespace Moz.Bus.Services.Settings
             if (setting == null)
                 throw new ArgumentNullException(nameof(setting));
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 client.Updateable(setting).ExecuteCommand();
             }
@@ -124,7 +124,7 @@ namespace Moz.Bus.Services.Settings
             if (setting == null)
                 throw new ArgumentNullException(nameof(setting));
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 client.Deleteable(setting).ExecuteCommand();
             }
@@ -145,7 +145,7 @@ namespace Moz.Bus.Services.Settings
             if (settings.Count == 0)
                 return;
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 client.Deleteable<Setting>(settings).ExecuteCommand();
             }
@@ -282,8 +282,7 @@ namespace Moz.Bus.Services.Settings
                     continue;
 
                 var value = TypeDescriptor.GetConverter(prop.PropertyType).ConvertFromInvariantString(setting.Value);
-
-                //set property
+                
                 prop.SetValue(settings, value, null);
             }
 
@@ -316,6 +315,7 @@ namespace Moz.Bus.Services.Settings
         }
 
         /// <summary>
+        /// 
         /// </summary>
         /// <param name="type"></param>
         /// <param name="dictionary"></param>
@@ -356,14 +356,14 @@ namespace Moz.Bus.Services.Settings
             }
 
             if (insertSettings.Count > 0)
-                using (var client = DbFactory.GetClient())
+                using (var client = DbFactory.CreateClient())
                 {
                     client.Insertable(insertSettings).ExecuteCommand();
                     _distributedCache.Remove(SETTING_CACHE_KEY_ALL);
                 }
 
             if (updateSettings.Count > 0)
-                using (var client = DbFactory.GetClient())
+                using (var client = DbFactory.CreateClient())
                 {
                     client.Updateable(updateSettings).ExecuteCommand();
                     _distributedCache.Remove(SETTING_CACHE_KEY_ALL);

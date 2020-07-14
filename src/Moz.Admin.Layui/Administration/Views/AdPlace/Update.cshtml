@@ -17,36 +17,28 @@
             
 
                 <div class="layui-form-item">
-                  <label class="layui-form-label">title</label>
-                  <div class="layui-input-inline">
+                  <label class="layui-form-label">标题</label>
+                  <div class="layui-input-block">
                     <input type="text" name="title" value="@Model.AdPlace.Title" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
                   </div>
-                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
+                  <div class="layui-form-mid layui-word-aux"></div>
                 </div>
              
                 <div class="layui-form-item">
-                  <label class="layui-form-label">code</label>
+                  <label class="layui-form-label">标识码</label>
                   <div class="layui-input-inline">
                     <input type="text" name="code" value="@Model.AdPlace.Code" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
                   </div>
-                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
+                  <div class="layui-form-mid layui-word-aux"></div>
                 </div>
              
                 <div class="layui-form-item">
-                  <label class="layui-form-label">desc</label>
+                  <label class="layui-form-label">描述</label>
                   <div class="layui-input-block">
-                    <textarea class="editor">@Model.AdPlace.Desc</textarea>
+                    <input type="text" name="desc" value="@Model.AdPlace.Desc" placeholder="请输入" autocomplete="off" class="layui-input">
                   </div>
-                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
-                </div>
-             
-                <div class="layui-form-item">
-                  <label class="layui-form-label">addtime</label>
-                  <div class="layui-input-inline">
-                    <input type="text" name="addtime" value="@Model.AdPlace.AddTime" lay-verify="required|date" placeholder="请输入" autocomplete="off" class="layui-date">
-                  </div>
-                  <div class="layui-form-mid layui-word-aux">辅助文字</div>
-                </div>   
+                  <div class="layui-form-mid layui-word-aux"></div>
+                </div> 
              
 
         <div class="layui-form-item">
@@ -65,9 +57,7 @@
 <script>
   layui.use(['form'],
     function() {
-      var form = layui.form;
-
+      let form = layui.form;
       form.render(null, "form-@guid");
-
     });
 </script>

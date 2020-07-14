@@ -8,51 +8,51 @@ namespace Moz.Bus.Services.ScheduleTasks
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult CreateScheduleTask(ServRequest<CreateScheduleTaskDto> request);
+        PublicResult CreateScheduleTask(CreateScheduleTaskDto dto);
         
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult UpdateScheduleTask(ServRequest<UpdateScheduleTaskDto> request);
+        PublicResult UpdateScheduleTask(UpdateScheduleTaskDto dto);
         
         /// <summary>
         /// 删除
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult DeleteScheduleTask(ServRequest<DeleteScheduleTaskDto> request);
+        PublicResult DeleteScheduleTask(DeleteScheduleTaskDto dto);
 
         /// <summary>
         /// 获取单条数据
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult<ScheduleTaskDetailApo> GetScheduleTaskDetail(ServRequest<GetScheduleTaskDetailDto> request);
+        PublicResult<ScheduleTaskDetailApo> GetScheduleTaskDetail(GetScheduleTaskDetailDto dto);
         
         /// <summary> 
         /// 分页查询
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult<PagedList<QueryScheduleTaskItem>> PagedQueryScheduleTasks(ServRequest<PagedQueryScheduleTaskDto> request);
+        PublicResult<PagedList<QueryScheduleTaskItem>> PagedQueryScheduleTasks(PagedQueryScheduleTaskDto dto);
  
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult ExecuteScheduleTask(ServRequest<ExecuteScheduleTaskDto> request);
+        PublicResult ExecuteScheduleTask(ExecuteScheduleTaskDto dto);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult SetIsEnableScheduleTask(ServRequest<SetIsEnableScheduleTaskDto> request);
+        PublicResult SetIsEnableScheduleTask(SetIsEnableScheduleTaskDto dto);
     }
 }

@@ -46,7 +46,7 @@ namespace Moz.Administration.Controllers
         [AdminAuth(Permissions = "admin.performanceMonitor.deleteall")]
         public IActionResult DeleteAll()
         {
-            using (var db = DbFactory.GetClient())
+            using (var db = DbFactory.CreateClient())
             {
                 db.Deleteable<ServicePerformanceMonitor>().ExecuteCommand();
             }

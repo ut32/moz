@@ -16,7 +16,8 @@
     <PackageTags>Moz.Admin,极速网站开发框架</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIconUrl>http://t0.qlogo.cn/mbloghead/7623b068c0d72423b8b0/180</PackageIconUrl>
-    <AssemblyVersion>1.0.4</AssemblyVersion>
+    <AssemblyVersion>1.0.5</AssemblyVersion>
+    <PackageVersion>1.0.5</PackageVersion>
   </PropertyGroup> 
   <ItemGroup>
     <ProjectReference Include="..\Moz\Moz.csproj" />

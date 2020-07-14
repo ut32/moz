@@ -1,6 +1,4 @@
-﻿using Moz.Utils.FileManage;
-
-namespace Moz.Utils
+namespace Moz.FileStorage
 {
     public interface IFileManager
     {

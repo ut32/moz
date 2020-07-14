@@ -2,7 +2,14 @@
 {
     public class HttpError
     {
-       
+
+        public HttpError(int statusCode, string path, ResponseMode mode)
+        {
+            StatusCode = statusCode;
+            Path = path;
+            Mode = mode;
+        }
+
         /// <summary>
         /// 状态码
         /// </summary>

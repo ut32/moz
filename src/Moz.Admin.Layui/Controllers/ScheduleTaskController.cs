@@ -29,9 +29,7 @@ namespace Moz.Admin.Layui.Controllers
         public IActionResult Index()
         {
             var model = new IndexModel();
-            if(_mozOptions.IsEnableScheduling)
-                return View("~/Administration/Views/ScheduleTask/Index.cshtml",model);
-            return View("~/Administration/Views/ScheduleTask/Disable.cshtml",model);
+            return View("~/Administration/Views/ScheduleTask/Index.cshtml",model);
         }
         
         [AdminAuth(Permissions = "admin.scheduleTask.index")]

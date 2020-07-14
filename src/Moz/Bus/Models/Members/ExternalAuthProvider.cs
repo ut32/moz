@@ -11,6 +11,7 @@ namespace Moz.Bus.Models.Members
         Twitter = 7,
         Github = 8,
         TencentUnion = 9,
-        Guest = 10
+        Guest = 10,
+        Other = 99
     }
 }

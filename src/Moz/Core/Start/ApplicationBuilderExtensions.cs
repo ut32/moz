@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.Builder
             application.UseMiddleware<JwtInHeaderMiddleware>();
             
             //定时任务
-            if (options.IsEnableScheduling && DbFactory.CheckInstalled(options))
+            if (DbFactory.CheckInstalled(options))
             {
                 var taskScheduleManager = application.ApplicationServices.GetService(typeof(ITaskScheduleManager)) as ITaskScheduleManager;
                 taskScheduleManager?.Init();

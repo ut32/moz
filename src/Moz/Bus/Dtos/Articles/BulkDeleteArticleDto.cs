@@ -4,7 +4,7 @@ using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
 using Moz.Validation;
 
-namespace Moz.Biz.Dtos.Articles
+namespace Moz.Bus.Dtos.Articles
 {
     /// <summary>
     /// tab_article

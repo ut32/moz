@@ -11,42 +11,42 @@ namespace Moz.Auth
         /// 
         /// </summary>
         /// <returns></returns>
-        ServResult<string> GetAuthenticatedUId();
+        PublicResult<string> GetAuthenticatedUId();
         
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        ServResult<SimpleMember> GetAuthenticatedMember();
+        PublicResult<SimpleMember> GetAuthenticatedMember();
 
         /// <summary>
         /// 用户名密码登录
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult<MemberLoginApo> LoginWithUsernamePassword(ServRequest<LoginWithUsernamePasswordDto> request);
+        PublicResult<MemberLoginInfo> LoginWithUsernamePassword(LoginWithUsernamePasswordDto dto);
 
         /// <summary>
         /// 三方授权登录
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param> 
         /// <returns></returns>
-        ServResult<MemberLoginApo> ExternalAuth(ServRequest<ExternalAuthInfo> request); 
+        PublicResult<MemberLoginInfo> ExternalAuth(ExternalAuthInfo dto); 
  
  
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult SetAuthCookie(ServRequest<SetAuthCookieDto> request);
+        PublicResult SetAuthCookie(SetAuthCookieDto dto);
 
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        ServResult RemoveAuthCookie();
+        PublicResult RemoveAuthCookie();
 
     }
 }

@@ -1,4 +1,4 @@
-namespace Moz.Bus.Dtos.Result.Members
+namespace Moz.Bus.Dtos.Members
 {
     public class RegistrationResult
     {

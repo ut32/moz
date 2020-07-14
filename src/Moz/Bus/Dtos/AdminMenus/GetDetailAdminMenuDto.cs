@@ -15,7 +15,7 @@ namespace Moz.Bus.Dtos.AdminMenus
     }
     
     
-    public class GetAdminMenuDetailApo
+    public class GetAdminMenuDetailInfo
     {
         /// <summary>
         /// 

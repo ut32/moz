@@ -1,6 +1,6 @@
 namespace Moz.Bus.Dtos.Auth
 {
-    public class MemberLoginApo
+    public class MemberLoginInfo
     {
         public string AccessToken { get; set; }
         

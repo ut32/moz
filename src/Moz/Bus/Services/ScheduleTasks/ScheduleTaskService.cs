@@ -44,34 +44,36 @@ namespace Moz.Bus.Services.ScheduleTasks
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult<ScheduleTaskDetailApo> GetScheduleTaskDetail(ServRequest<GetScheduleTaskDetailDto> request)
+        public PublicResult<ScheduleTaskDetailApo> GetScheduleTaskDetail(GetScheduleTaskDetailDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                var scheduleTask = client.Queryable<ScheduleTask>().InSingle(request.Data.Id);
+                var scheduleTask = client.Queryable<ScheduleTask>().InSingle(dto.Id);
                 if (scheduleTask == null)
                 {
                     return Error("找不到该数据");
                 }
 
-                var resp = new ScheduleTaskDetailApo();
-                resp.Id = scheduleTask.Id;
-                resp.Name = scheduleTask.Name;
-                resp.Status = scheduleTask.Status;
-                resp.StatusDesc = scheduleTask.StatusDesc;
-                resp.JobKey = scheduleTask.JobKey;
-                resp.JobGroup = scheduleTask.JobGroup;
-                resp.TriggerKey = scheduleTask.TriggerKey;
-                resp.TriggerGroup = scheduleTask.TriggerGroup;
-                resp.IsEnable = scheduleTask.IsEnable;
-                resp.Type = scheduleTask.Type;
-                resp.Cron = scheduleTask.Cron;
-                resp.Interval = scheduleTask.Interval;
-                resp.LastStartTime = scheduleTask.LastStartTime;
-                resp.LastEndTime = scheduleTask.LastEndTime;
-                resp.LastSuccessTime = scheduleTask.LastSuccessTime;
+                var resp = new ScheduleTaskDetailApo
+                {
+                    Id = scheduleTask.Id,
+                    Name = scheduleTask.Name,
+                    Status = scheduleTask.Status,
+                    StatusDesc = scheduleTask.StatusDesc,
+                    JobKey = scheduleTask.JobKey,
+                    JobGroup = scheduleTask.JobGroup,
+                    TriggerKey = scheduleTask.TriggerKey,
+                    TriggerGroup = scheduleTask.TriggerGroup,
+                    IsEnable = scheduleTask.IsEnable,
+                    Type = scheduleTask.Type,
+                    Cron = scheduleTask.Cron,
+                    Interval = scheduleTask.Interval,
+                    LastStartTime = scheduleTask.LastStartTime,
+                    LastEndTime = scheduleTask.LastEndTime,
+                    LastSuccessTime = scheduleTask.LastSuccessTime
+                };
                 return resp;
             }
         }
@@ -79,15 +81,15 @@ namespace Moz.Bus.Services.ScheduleTasks
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult CreateScheduleTask(ServRequest<CreateScheduleTaskDto> request)
+        public PublicResult CreateScheduleTask(CreateScheduleTaskDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var scheduleTask = new ScheduleTask
                 {
-                    Name = request.Data.Name,
+                    Name = dto.Name,
                     Status = TaskRunningStatus.Pending,
                     StatusDesc = "",
                     JobKey = Guid.NewGuid().ToString("N"),
@@ -95,8 +97,8 @@ namespace Moz.Bus.Services.ScheduleTasks
                     TriggerKey = Guid.NewGuid().ToString("N"),
                     TriggerGroup = Guid.NewGuid().ToString("N"),
                     IsEnable = false,
-                    Type = request.Data.Type,
-                    Cron = request.Data.Cron,
+                    Type = dto.Type,
+                    Cron = dto.Cron,
                     Interval = null,
                     LastStartTime = null,
                     LastEndTime = null,
@@ -115,13 +117,13 @@ namespace Moz.Bus.Services.ScheduleTasks
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult UpdateScheduleTask(ServRequest<UpdateScheduleTaskDto> request)
+        public PublicResult UpdateScheduleTask(UpdateScheduleTaskDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                var scheduleTask = client.Queryable<ScheduleTask>().InSingle(request.Data.Id);
+                var scheduleTask = client.Queryable<ScheduleTask>().InSingle(dto.Id);
                 if (scheduleTask == null)
                 {
                     return Error("找不到该条信息");
@@ -132,8 +134,8 @@ namespace Moz.Bus.Services.ScheduleTasks
                     return Error("请先关闭定时任务再删除");
                 }
 
-                scheduleTask.Name = request.Data.Name;
-                scheduleTask.Cron = request.Data.Cron;
+                scheduleTask.Name = dto.Name;
+                scheduleTask.Cron = dto.Cron;
                 client.Updateable(scheduleTask).UpdateColumns(t => new
                 {
                     t.Name,
@@ -149,13 +151,13 @@ namespace Moz.Bus.Services.ScheduleTasks
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult DeleteScheduleTask(ServRequest<DeleteScheduleTaskDto> request)
+        public PublicResult DeleteScheduleTask(DeleteScheduleTaskDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                var scheduleTask = client.Queryable<ScheduleTask>().InSingle(request.Data.Id);
+                var scheduleTask = client.Queryable<ScheduleTask>().InSingle(dto.Id);
                 if (scheduleTask == null)
                 {
                     return Error("找不到该条信息");
@@ -166,7 +168,7 @@ namespace Moz.Bus.Services.ScheduleTasks
                     return Error("请先关闭定时任务再删除");
                 }
 
-                client.Deleteable<ScheduleTask>(request.Data.Id).ExecuteCommand();
+                client.Deleteable<ScheduleTask>(dto.Id).ExecuteCommand();
 
                 _eventPublisher.EntityDeleted(scheduleTask);
 
@@ -177,18 +179,18 @@ namespace Moz.Bus.Services.ScheduleTasks
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult<PagedList<QueryScheduleTaskItem>> PagedQueryScheduleTasks(
-            ServRequest<PagedQueryScheduleTaskDto> request)
+        public PublicResult<PagedList<QueryScheduleTaskItem>> PagedQueryScheduleTasks(
+            PagedQueryScheduleTaskDto dto)
         {
-            var page = request.Data.Page ?? 1;
-            var pageSize = request.Data.PageSize ?? 20;
-            using (var client = DbFactory.GetClient())
+            var page = dto.Page ?? 1;
+            var pageSize = dto.PageSize ?? 20;
+            using (var client = DbFactory.CreateClient())
             {
                 var total = 0;
                 var list = client.Queryable<ScheduleTask>()
-                    .WhereIF(!request.Data.Keyword.IsNullOrEmpty(), t => t.Name.Contains(request.Data.Keyword))
+                    .WhereIF(!dto.Keyword.IsNullOrEmpty(), t => t.Name.Contains(dto.Keyword))
                     .Select(t => new QueryScheduleTaskItem()
                     {
                         Id = t.Id,
@@ -218,13 +220,13 @@ namespace Moz.Bus.Services.ScheduleTasks
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult ExecuteScheduleTask(ServRequest<ExecuteScheduleTaskDto> request)
+        public PublicResult ExecuteScheduleTask(ExecuteScheduleTaskDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                var scheduleTask = client.Queryable<ScheduleTask>().InSingle(request.Data.Id);
+                var scheduleTask = client.Queryable<ScheduleTask>().InSingle(dto.Id);
                 if (scheduleTask == null)
                 {
                     throw new Exception("找不到数据");
@@ -243,12 +245,12 @@ namespace Moz.Bus.Services.ScheduleTasks
         }
 
 
-        public ServResult SetIsEnableScheduleTask(ServRequest<SetIsEnableScheduleTaskDto> request)
+        public PublicResult SetIsEnableScheduleTask(SetIsEnableScheduleTaskDto dto)
         {
             ScheduleTask scheduleTask = null;
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                scheduleTask = client.Queryable<ScheduleTask>().InSingle(request.Data.Id);
+                scheduleTask = client.Queryable<ScheduleTask>().InSingle(dto.Id);
             }
 
             if (scheduleTask == null)
@@ -256,7 +258,7 @@ namespace Moz.Bus.Services.ScheduleTasks
                 throw new Exception("没有找到数据");
             }
 
-            if (request.Data.IsEnable)
+            if (dto.IsEnable)
             {
                 if (scheduleTask.Type.IsNullOrEmpty())
                 {

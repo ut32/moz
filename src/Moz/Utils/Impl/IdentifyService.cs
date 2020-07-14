@@ -8,7 +8,7 @@ namespace Moz.Utils.Impl
     {
         public long GetUnqId()
         {
-            using (var db = DbFactory.GetClient())
+            using (var db = DbFactory.CreateClient())
             {
                 return db.Insertable(new Identify()).ExecuteReturnBigIdentity();
             }

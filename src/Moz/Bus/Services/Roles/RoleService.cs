@@ -49,7 +49,7 @@ namespace Moz.Bus.Services.Roles
         {
             return _distributedCache.GetOrSet(CACHE_ROLE_ALL_KEY, () =>
             {
-                using (var client = DbFactory.GetClient())
+                using (var client = DbFactory.CreateClient())
                 {
                     return client.Queryable<Role>().OrderBy("id ASC").ToList();
                 }
@@ -64,14 +64,14 @@ namespace Moz.Bus.Services.Roles
         /// <summary>
         /// 获取详细
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult<RoleDetailApo> GetRoleDetail(ServRequest<GetRoleDetailDto> request)
+        public PublicResult<RoleDetailApo> GetRoleDetail(GetRoleDetailDto dto)
         {
             Role role = null;
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                 role = client.Queryable<Role>().InSingle(request.Data.Id);
+                 role = client.Queryable<Role>().InSingle(dto.Id);
             }
             if(role == null)
             {
@@ -93,19 +93,19 @@ namespace Moz.Bus.Services.Roles
         /// <summary>
         /// 插入
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult CreateRole(ServRequest<CreateRoleDto> request)
+        public PublicResult CreateRole(CreateRoleDto dto)
         {
             var role = new Role
             {
-                Name = request.Data.Name,
-                IsActive = request.Data.IsActive,
-                Code = request.Data.Code,
-                IsAdmin = request.Data.IsAdmin,
+                Name = dto.Name,
+                IsActive = dto.IsActive,
+                Code = dto.Code,
+                IsAdmin = dto.IsAdmin,
                 IsSystem = false
             };
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 role.Id = client.Insertable(role).ExecuteReturnBigIdentity();
             }
@@ -118,14 +118,14 @@ namespace Moz.Bus.Services.Roles
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult UpdateRole(ServRequest<UpdateRoleDto> request)
+        public PublicResult UpdateRole(UpdateRoleDto dto)
         {
             Role role = null;
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                role = client.Queryable<Role>().InSingle(request.Data.Id);
+                role = client.Queryable<Role>().InSingle(dto.Id);
                 if (role == null)
                 {
                     return Error("找不到该条信息");
@@ -136,10 +136,10 @@ namespace Moz.Bus.Services.Roles
                     return Error("内置用户不能修改");
                 }
 
-                role.Name = request.Data.Name;
-                role.IsActive = request.Data.IsActive;
-                role.Code = request.Data.Code;
-                role.IsAdmin = request.Data.IsAdmin;
+                role.Name = dto.Name;
+                role.IsActive = dto.IsActive;
+                role.Code = dto.Code;
+                role.IsAdmin = dto.IsAdmin;
                 client.Updateable(role).ExecuteCommand();
             }
             _distributedCache.Remove(PermissionService.CACHE_ROLE_PERMISSION_ALL_KEY);
@@ -151,14 +151,14 @@ namespace Moz.Bus.Services.Roles
         /// <summary>
         /// 删除
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult DeleteRole(ServRequest<DeleteRoleDto> request)
+        public PublicResult DeleteRole(DeleteRoleDto dto)
         {
             Role role = null;
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                role = client.Queryable<Role>().InSingle(request.Data.Id);
+                role = client.Queryable<Role>().InSingle(dto.Id);
                 if (role == null)
                 {
                     return Error("找不到该条信息");
@@ -167,7 +167,7 @@ namespace Moz.Bus.Services.Roles
                 {
                     return Error("内置用户不能删除");
                 }
-                client.Deleteable<Role>(request.Data.Id).ExecuteCommand();
+                client.Deleteable<Role>(dto.Id).ExecuteCommand();
             }
             _distributedCache.Remove(PermissionService.CACHE_ROLE_PERMISSION_ALL_KEY);
             _distributedCache.Remove(CACHE_ROLE_ALL_KEY);
@@ -178,13 +178,13 @@ namespace Moz.Bus.Services.Roles
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult SetIsActive(ServRequest<SetIsActiveRoleDto> request)
+        public PublicResult SetIsActive(SetIsActiveRoleDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                var role = client.Queryable<Role>().InSingle(request.Data.Id);
+                var role = client.Queryable<Role>().InSingle(dto.Id);
                 if (role == null)
                 {
                     return Error("找不到该条信息");
@@ -200,7 +200,7 @@ namespace Moz.Bus.Services.Roles
                     {
                         IsActive = !it.IsActive
                     })
-                    .Where(it => it.Id == request.Data.Id)
+                    .Where(it => it.Id == dto.Id)
                     .ExecuteCommand();
             }
             _distributedCache.Remove(PermissionService.CACHE_ROLE_PERMISSION_ALL_KEY);
@@ -212,13 +212,13 @@ namespace Moz.Bus.Services.Roles
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult SetIsAdmin(ServRequest<SetIsAdminRoleDto> request)
+        public PublicResult SetIsAdmin(SetIsAdminRoleDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                var role = client.Queryable<Role>().InSingle(request.Data.Id);
+                var role = client.Queryable<Role>().InSingle(dto.Id);
                 if (role == null)
                 {
                     return Error("找不到该条信息");
@@ -234,7 +234,7 @@ namespace Moz.Bus.Services.Roles
                     {
                         IsAdmin = !it.IsAdmin
                     })
-                    .Where(it => it.Id == request.Data.Id)
+                    .Where(it => it.Id == dto.Id)
                     .ExecuteCommand();
             }
             _distributedCache.Remove(PermissionService.CACHE_ROLE_PERMISSION_ALL_KEY);
@@ -246,17 +246,17 @@ namespace Moz.Bus.Services.Roles
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult<PagedList<QueryRoleItem>> PagedQueryRoles(ServRequest<PagedQueryRoleDto> request)
+        public PublicResult<PagedList<QueryRoleItem>> PagedQueryRoles(PagedQueryRoleDto dto)
         {
-            var page = request.Data.Page ?? 1;
-            var pageSize = request.Data.PageSize ?? 20;
-            using (var client = DbFactory.GetClient())
+            var page = dto.Page ?? 1;
+            var pageSize = dto.PageSize ?? 20;
+            using (var client = DbFactory.CreateClient())
             {
                 var total = 0;
                 var list = client.Queryable<Role>()
-                    .WhereIF(!string.IsNullOrEmpty(request.Data.Keyword), t => t.Name.Contains(request.Data.Keyword))
+                    .WhereIF(!string.IsNullOrEmpty(dto.Keyword), t => t.Name.Contains(dto.Keyword))
                     .Select(t=>new QueryRoleItem()
                     {
                         Id = t.Id, 
@@ -282,17 +282,17 @@ namespace Moz.Bus.Services.Roles
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult<GetPermissionsByRoleApo> GetPermissionsByRole(ServRequest<GetPermissionsByRoleDto> request)
+        public PublicResult<GetPermissionsByRoleApo> GetPermissionsByRole(GetPermissionsByRoleDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var list = client.Queryable<RolePermission, Permission>((rp, p) => new object[]
                     {
                         JoinType.Left, rp.PermissionId == p.Id
                     })
-                    .Where((rp, p) => rp.RoleId == request.Data.RoleId)
+                    .Where((rp, p) => rp.RoleId == dto.RoleId)
                     .Select((rp, p) => new Permission()
                     {
                         Code = p.Code,
@@ -314,17 +314,17 @@ namespace Moz.Bus.Services.Roles
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult ConfigPermission(ServRequest<ConfigPermissionDto> request)
+        public PublicResult ConfigPermission(ConfigPermissionDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var list = client.Queryable<RolePermission, Permission>((rp, p) => new object[]
                     {
                         JoinType.Left, rp.PermissionId == p.Id
                     })
-                    .Where((rp, p) => rp.RoleId == request.Data.RoleId)
+                    .Where((rp, p) => rp.RoleId == dto.RoleId)
                     .Select((rp, p) => new
                     {
                         PermissionId = p.Id,
@@ -334,17 +334,17 @@ namespace Moz.Bus.Services.Roles
 
                 client.UseTran(tran =>
                 {
-                    var willAddPermissions = request.Data.ConfigedPermissions
+                    var willAddPermissions = dto.ConfigedPermissions
                         .Where(t => list.All(x => x.PermissionId != t.Id))
                         .Select(t => new RolePermission()
                         {
                             PermissionId = t.Id,
-                            RoleId = request.Data.RoleId
+                            RoleId = dto.RoleId
                         })
                         .ToList();
 
                     var willRemovePermissions = list
-                        .Where(t => request.Data.ConfigedPermissions.All(x => x.Id != t.PermissionId))
+                        .Where(t => dto.ConfigedPermissions.All(x => x.Id != t.PermissionId))
                         .Select(t => t.RolePermissonId)
                         .ToList();
 
@@ -364,17 +364,17 @@ namespace Moz.Bus.Services.Roles
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult<GetMenusByRoleApo> GetMenusByRole(ServRequest<GetMenusByRoleDto> request)
+        public PublicResult<GetMenusByRoleApo> GetMenusByRole(GetMenusByRoleDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var list = client.Queryable<RoleMenu, AdminMenu>((rm, m) => new object[]
                     {
                         JoinType.Left, rm.MenuId==m.Id
                     })
-                    .Where((rm, m) => rm.RoleId == request.Data.RoleId)
+                    .Where((rm, m) => rm.RoleId == dto.RoleId)
                     .Select((rm, m) => new AdminMenu()
                     {
                         Icon = m.Icon,
@@ -399,17 +399,17 @@ namespace Moz.Bus.Services.Roles
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult ConfigMenu(ServRequest<ConfigMenuDto> request)
+        public PublicResult ConfigMenu(ConfigMenuDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var list = client.Queryable<RoleMenu, AdminMenu>((rm, m) => new object[]
                     {
                         JoinType.Left, rm.MenuId == m.Id
                     })
-                    .Where((rm, m) => rm.RoleId == request.Data.RoleId)
+                    .Where((rm, m) => rm.RoleId == dto.RoleId)
                     .Select((rm, m) => new
                     {
                         MenuId = m.Id,
@@ -419,17 +419,17 @@ namespace Moz.Bus.Services.Roles
 
                 client.UseTran(tran =>
                 {
-                    var willAddMenus = request.Data.ConfigedMenus
+                    var willAddMenus = dto.ConfigedMenus
                         .Where(t => list.All(x => x.MenuId != t.Id))
                         .Select(t => new RoleMenu()
                         {
                             MenuId = t.Id,
-                            RoleId = request.Data.RoleId
+                            RoleId = dto.RoleId
                         })
                         .ToList();
 
                     var willRemoveMenus = list
-                        .Where(t => request.Data.ConfigedMenus.All(x => x.Id != t.MenuId))
+                        .Where(t => dto.ConfigedMenus.All(x => x.Id != t.MenuId))
                         .Select(t => t.RoleMenuId)
                         .ToList();
 
@@ -451,7 +451,7 @@ namespace Moz.Bus.Services.Roles
         /// 
         /// </summary>
         /// <returns></returns>
-        public ServResult<List<Role>> GetAvailableRoles()
+        public PublicResult<List<Role>> GetAvailableRoles()
         {
             var list = GetRolesListCached();
             return list.Where(it => it.IsActive).ToList();

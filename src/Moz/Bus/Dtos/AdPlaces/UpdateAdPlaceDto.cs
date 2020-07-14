@@ -33,10 +33,6 @@ namespace Moz.Bus.Dtos.AdPlaces
         /// </summary>
         public string Desc { get;set; } 
         
-        /// <summary>
-        /// 
-        /// </summary>
-        public System.DateTime Addtime { get;set; } 
         
         #endregion     
     }
@@ -45,9 +41,9 @@ namespace Moz.Bus.Dtos.AdPlaces
     {
         public UpdateAdPlaceDtoValidator(ILocalizationService localizationService)
         {
-            RuleFor(x => x.Id).Must(t => true).WithMessage("发生错误");
+            RuleFor(x => x.Id).GreaterThan(0).WithMessage("ID错误");
             RuleFor(x => x.Title).NotEmpty().WithMessage("标题不能为空");
-
+            RuleFor(x => x.Code).NotEmpty().WithMessage("标识码不能为空");
         }
     }
     

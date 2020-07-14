@@ -15,7 +15,7 @@ namespace Moz.TaskSchedule
             try
             {
                 var jobKey = context.JobDetail.Key.Name;
-                using (var client = DbFactory.GetClient())
+                using (var client = DbFactory.CreateClient())
                 {
                     await client.Updateable<ScheduleTask>()
                         .SetColumns(it => new ScheduleTask()
@@ -48,7 +48,7 @@ namespace Moz.TaskSchedule
                 }
 
                 var jobKey = context.JobDetail.Key.Name;
-                using (var client = DbFactory.GetClient())
+                using (var client = DbFactory.CreateClient())
                 {
                     var scheduleTask = await client.Queryable<ScheduleTask>()
                         .SingleAsync(t => t.JobKey == jobKey);

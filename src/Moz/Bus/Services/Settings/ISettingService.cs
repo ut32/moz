@@ -36,7 +36,6 @@ namespace Moz.Bus.Services.Settings
 
         void SaveSetting<T>(T settings) where T : ISettings, new();
         void SaveSetting(Type type, Dictionary<string, string> dictionary);
-
         void DeleteSetting<T>() where T : ISettings, new();
         void DeleteSetting<T, TPropType>(Expression<Func<T, TPropType>> keySelector) where T : ISettings, new();
     }

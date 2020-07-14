@@ -10,63 +10,63 @@ namespace Moz.Bus.Services.Permissions
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult CreatePermission(ServRequest<CreatePermissionDto> request);
+        PublicResult CreatePermission(CreatePermissionDto dto);
         
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult UpdatePermission(ServRequest<UpdatePermissionDto> request);
+        PublicResult UpdatePermission(UpdatePermissionDto dto); 
         
         /// <summary>
         /// 删除
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult DeletePermission(ServRequest<DeletePermissionDto> request);
+        PublicResult DeletePermission(DeletePermissionDto dto);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult SetOrderIndex(ServRequest<SetOrderIndexPermissionDto> request);
+        PublicResult SetOrderIndex(SetOrderIndexPermissionDto dto);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult SetIsActive(ServRequest<SetIsActivePermissionDto> request);
+        PublicResult SetIsActive(SetIsActivePermissionDto dto);
         
         /// <summary>
         /// 获取单条数据
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult<PermissionDetailApo> GetPermissionDetail(ServRequest<GetPermissionDetailDto> request);
+        PublicResult<PermissionDetailApo> GetPermissionDetail(GetPermissionDetailDto dto);
         
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult<PagedList<QueryPermissionItem>> PagedQueryPermissions(ServRequest<PagedQueryPermissionDto> request);
+        PublicResult<PagedList<QueryPermissionItem>> PagedQueryPermissions(PagedQueryPermissionDto dto);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult<List<PermissionTree>> QuerySubPermissionsByParentId(ServRequest<long?> request);
+        PublicResult<List<PermissionTree>> QuerySubPermissionsByParentId(long? dto);
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        ServResult<List<AvailablePermission>> GetAvailablePermissions(); 
+        PublicResult<List<AvailablePermission>> GetAvailablePermissions(); 
     }
 }

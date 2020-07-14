@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using Moz.Common.Form;
+using Moz.Core;
 
 namespace Moz.Settings
 {
@@ -19,6 +20,11 @@ namespace Moz.Settings
         /// 显示名称
         /// </summary>
         public string DisplayName { get;  }
+        
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string Description { get; }
         
         /// <summary>
         /// 排序
@@ -40,17 +46,22 @@ namespace Moz.Settings
         /// </summary>
         public Dictionary<string,string> Data { get; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="propertyInfo"></param>
         public SettingPropertyItem(PropertyInfo propertyInfo)
         {
             TypeName = propertyInfo.Name;
             DisplayName = propertyInfo.Name;
             FieldType = GetFormFieldType(propertyInfo);
             Data = new Dictionary<string, string>();
-            
+
             var formItemAttr = propertyInfo.GetCustomAttribute<FormItemAttribute>();
             if (formItemAttr != null)
             {
                 DisplayName = formItemAttr.Name;
+                Description = formItemAttr.Description;
                 Order = formItemAttr.Order;
                 FieldType = formItemAttr.FieldType;
                 if (FieldType == default)
@@ -70,6 +81,19 @@ namespace Moz.Settings
                                 var descAttr = fieldInfo.GetCustomAttribute<DescriptionAttribute>();
                                 var @enum = Enum.Parse(formItemAttr.DataSource, fieldInfo.Name, true);
                                 Data.Add(descAttr?.Description ?? fieldInfo.Name, ((int) @enum).ToString());
+                            }
+                        }
+                    }else if (formItemAttr.DataSource.GetInterfaces().Contains(typeof(ISelectDataSource)))
+                    {
+                        if (EngineContext.Current.Resolve(formItemAttr.DataSource) is ISelectDataSource ds)
+                        {
+                            var selectItems = ds.GetDataSource();
+                            if (selectItems != null)
+                            {
+                                foreach (var selectItem in selectItems)
+                                {
+                                    Data.Add(selectItem.Name,selectItem.Value);
+                                }
                             }
                         }
                     }
@@ -101,6 +125,11 @@ namespace Moz.Settings
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="propertyInfo"></param>
+        /// <returns></returns>
         private FormFieldType GetFormFieldType(PropertyInfo propertyInfo)
         {
             if (propertyInfo.PropertyType == typeof(string)) return FormFieldType.SingleRowTextInput;

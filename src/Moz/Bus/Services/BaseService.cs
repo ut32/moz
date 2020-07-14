@@ -4,14 +4,14 @@ namespace Moz.Bus.Services
 {
     public class BaseService
     {
-        protected ServOkResult Ok()
+        protected OkResult Ok()
         {
-            return new ServOkResult();
+            return new OkResult();
         }
 
-        protected ServErrorResult Error(string msg = "发生错误", int code = 600)
+        protected ErrorResult Error(string msg = "发生错误", int code = 600)
         {
-            return new ServErrorResult(msg, code);
+            return new ErrorResult(msg, code);
         }
     }
 }

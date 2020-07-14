@@ -21,45 +21,45 @@ namespace Moz.Bus.Services.Members
         /// <summary> 
         /// 重置密码
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult ResetPassword(ServRequest<ResetPasswordDto> request);
+        PublicResult ResetPassword(ResetPasswordDto dto);
 
         /// <summary>
         /// 获取用户详细
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns> 
-        ServResult<GetMemberDetailApo> GetMemberDetail(ServRequest<GetMemberDetailDto> request);
+        PublicResult<GetMemberDetailApo> GetMemberDetail(GetMemberDetailDto dto);
 
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult<CreateMemberApo> CreateMember(ServRequest<CreateMemberDto> request);
+        PublicResult<CreateMemberApo> CreateMember(CreateMemberDto dto);
         
         /// <summary> 
         /// 更新用户
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult UpdateMember(ServRequest<UpdateMemberDto> request);
+        PublicResult UpdateMember(UpdateMemberDto dto);
 
 
         /// <summary>
         /// 修改密码
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult ChangePassword(ServRequest<ChangePasswordDto> request);
+        PublicResult ChangePassword(ChangePasswordDto dto);
 
         
         /// <summary>
-        /// 
+        /// 分页查询
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult<PagedList<QueryMemberItem>> PagedQueryMembers(ServRequest<PagedQueryMemberDto> request);
+        PublicResult<PagedList<QueryMemberItem>> PagedQueryMembers(PagedQueryMemberDto dto);
     }
 }

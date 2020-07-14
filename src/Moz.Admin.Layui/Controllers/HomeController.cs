@@ -8,29 +8,28 @@ using Moz.Auth;
 using Moz.Bus.Dtos.Auth;
 using Moz.Core.Config;
 using Moz.Exceptions;
+using Moz.Settings;
 
 namespace Moz.Admin.Layui.Controllers
 {
     public class HomeController : AdminBaseController
     {
         private readonly IAuthService _authService;
-        private readonly IOptions<AppConfig> _mozOptions;
+        private readonly AdminSettings _adminSettings;
 
         public HomeController(IAuthService passportService,
-            IAuthService authenticationService,
-            IHttpContextAccessor httpContextAccessor,
-            IOptions<AppConfig> mozOptions)
+            AdminSettings adminSettings)
         {
             _authService = passportService;
-            _mozOptions = mozOptions;
+            _adminSettings = adminSettings;
         }
 
         [HttpGet]
         public IActionResult Index()
         {
-            var path = string.IsNullOrEmpty(_mozOptions.Value.Admin.LoginView) 
+            var path = string.IsNullOrEmpty(_adminSettings.AdminLoginView) 
                 ? "~/Administration/Views/Home/Index.cshtml"
-                : _mozOptions.Value.Admin.LoginView;           
+                : _adminSettings.AdminLoginView;           
             return View(path);
         }
         

@@ -17,7 +17,7 @@ namespace Moz.Bus.Dtos.Ads
     }
     
     
-    public class GetAdsByCodeApo
+    public class GetAdsByCodeInfo
     {
         public List<GetAdsByCodeItem> Ads { get; set; }
     }
@@ -27,8 +27,6 @@ namespace Moz.Bus.Dtos.Ads
         public long Id { get; set; }
         public string Title { get; set; }
         public string ImagePath { get; set; }
-
-        public string FullImagePath => ImagePath.GetFullPath();
         public string TargetUrl { get; set; } 
     }
     

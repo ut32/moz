@@ -26,7 +26,7 @@ namespace Moz.Aop.Filters
             {
                 var httpContextAccessor = EngineContext.Current.Resolve<IHttpContextAccessor>();
                 var requestId = httpContextAccessor?.HttpContext?.TraceIdentifier;
-                using (var client = DbFactory.GetClient())
+                using (var client = DbFactory.CreateClient())
                 {
                     var servicePerformance = new ServicePerformanceMonitor
                     {

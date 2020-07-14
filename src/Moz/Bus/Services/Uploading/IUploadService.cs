@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Moz.Utils.FileManage;
+using Moz.FileStorage;
 
-namespace Moz.Service.Uploading
+namespace Moz.Bus.Services.Uploading
 {
     public interface IUploadService
     {

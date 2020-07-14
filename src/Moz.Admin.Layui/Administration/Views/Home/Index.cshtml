@@ -1,16 +1,15 @@
-﻿@using Microsoft.Extensions.Options
-@using Moz.Core.Config
+﻿@using Moz.Admin.Layui.Common
 @{
     Layout = null;
 }
-@inject IOptions<AppConfig> Options
+@inject AdminSettings AdminSettings  
 <!DOCTYPE html>
 <html lang="zh-cn">
 <head>
     <meta charset="UTF-8">
-    <title>@Options.Value.Admin.Title</title>
+    <title>@AdminSettings.AdminTitle</title>
     <style>
-        html,
+        html, 
         body {
             background: #f0f0f0;
             color: #333;

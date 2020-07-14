@@ -4,6 +4,6 @@ namespace Moz.Admin.Layui.Models.AdminMenus
 {
     public class UpdateModel
     {
-        public GetAdminMenuDetailApo Detail { get; set; }
+        public GetAdminMenuDetailInfo Detail { get; set; }
     }
 }

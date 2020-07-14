@@ -1,7 +1,6 @@
 using System;
 using Moz.Bus.Dtos;
-using Moz.Bus.Dtos.Request.Members;
-using Moz.Bus.Dtos.Result.Members;
+using Moz.Bus.Dtos.Members;
 using Moz.Bus.Models.Common;
 using Moz.Bus.Models.Members;
 using Moz.DataBase;
@@ -19,15 +18,15 @@ namespace Moz.Bus.Services.Members
         }
 
         /// <summary>
-        /// 注册
+        /// 三方平台注册
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public ServResult<RegistrationResult> Register(ServRequest<ExternalRegistrationRequest> request)
+        public PublicResult<RegistrationResult> Register(ExternalRegistrationDto dto)
         {
             var memberUId = string.Empty;
             var memberId = 0L;
-            using (var db = DbFactory.GetClient())
+            using (var db = DbFactory.CreateClient())
             {
                 db.UseTran(tran =>
                 {
@@ -37,8 +36,8 @@ namespace Moz.Bus.Services.Members
                     {
                         UId = memberUId,
                         Address = null,
-                        Avatar = request.Data.UserInfo?.Avatar,
-                        Nickname = request.Data.UserInfo?.Nickname,
+                        Avatar = dto.UserInfo?.Avatar,
+                        Nickname = dto.UserInfo?.Nickname,
                         Birthday = null,
                         CannotLoginUntilDate = null,
                         Email = null,
@@ -62,7 +61,7 @@ namespace Moz.Bus.Services.Members
                         RegionCode = null,
                         RegisterDatetime = DateTime.Now,
                         RegisterIp = null,
-                        Username = $"{request.Data.Provider.ToString()}_{identify}"
+                        Username = $"{dto.Provider.ToString()}_{identify}"
                     };
                     memberId = tran.Insertable(member).ExecuteReturnBigIdentity();
                     tran.Insertable(new MemberRole
@@ -73,12 +72,12 @@ namespace Moz.Bus.Services.Members
                     }).ExecuteCommand();
                     tran.Insertable(new ExternalAuthentication()
                     {
-                        Openid = request.Data.OpenId,
-                        Provider = request.Data.Provider,
-                        AccessToken = request.Data.AccessToken,
-                        ExpireDt = request.Data.ExpireDt,
+                        Openid = dto.OpenId,
+                        Provider = dto.Provider,
+                        AccessToken = dto.AccessToken,
+                        ExpireDt = dto.ExpireDt,
                         MemberId = memberId,
-                        RefreshToken = request.Data.RefreshToken
+                        RefreshToken = dto.RefreshToken
                     }).ExecuteCommand();
                 });
             }

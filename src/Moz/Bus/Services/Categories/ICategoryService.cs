@@ -10,30 +10,30 @@ namespace Moz.Bus.Services.Categories
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult CreateCategory(ServRequest<CreateCategoryDto> request);
+        PublicResult CreateCategory(CreateCategoryDto dto);
         
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult UpdateCategory(ServRequest<UpdateCategoryDto> request);
+        PublicResult UpdateCategory(UpdateCategoryDto dto);
         
         /// <summary>
         /// 删除
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult DeleteCategory(ServRequest<DeleteCategoryDto> request);
+        PublicResult DeleteCategory(DeleteCategoryDto dto);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult SetOrderIndex(ServRequest<SetOrderIndexDto> request);
+        PublicResult SetOrderIndex(SetOrderIndexDto dto);
         
         /*
         /// <summary>
@@ -47,36 +47,36 @@ namespace Moz.Bus.Services.Categories
         /// <summary>
         /// 获取单条数据
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult<CategoryDetail> GetCategoryDetail(ServRequest<GetCategoryDetailDto> request);
+        PublicResult<CategoryDetail> GetCategoryDetail(GetCategoryDetailDto dto);
         
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult<PagedList<QueryCategoryItem>> PagedQueryCategories(ServRequest<PagedQueryCategoryDto> request);
+        PublicResult<PagedList<QueryCategoryItem>> PagedQueryCategories(PagedQueryCategoryDto dto);
 
         /// <summary>
         /// 查询所有子分类
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="parentId"></param>
         /// <returns></returns>
-        ServResult<List<CategoryTree>> QuerySubCategoriesByParentId(ServRequest<long?> request);
+        PublicResult<List<CategoryTree>> QuerySubCategoriesByParentId(long? parentId); 
         
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="alias"></param>
         /// <returns></returns>
-        ServRequest<string> GetCategoryPathByAlias(ServRequest<string> request);
+        PublicResult<string> GetCategoryPathByAlias(string alias); 
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="alias"></param>
         /// <returns></returns>
-        ServResult<string> GetCategoryNameByAlias(ServResult<string> request);
+        PublicResult<string> GetCategoryNameByAlias(string alias);
     }
 }

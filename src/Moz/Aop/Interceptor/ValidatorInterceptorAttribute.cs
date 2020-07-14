@@ -10,8 +10,9 @@ using Moz.Exceptions;
 
 namespace Moz.Aop.Interceptor
 {
-    /// <inheritdoc />
-    // ReSharper disable once ClassNeverInstantiated.Global
+    /// <summary>
+    /// 
+    /// </summary>
     public class ValidateInterceptorAttribute : AbstractInterceptorAttribute
     {
         public override async Task Invoke(AspectContext context, AspectDelegate next)

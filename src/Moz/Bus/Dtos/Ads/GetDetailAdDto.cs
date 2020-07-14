@@ -15,9 +15,9 @@ namespace Moz.Bus.Dtos.Ads
     }
     
     
-    public class GetAdDetailApo
+    public class GetAdDetailInfo
     {
-        /// <summary>
+        /// <summary> 
         /// 
         /// </summary>
         public long Id { get;set; } 

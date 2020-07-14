@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Moz.FileStorage;
 using Moz.Utils;
-using Moz.Utils.FileManage;
 
-namespace Moz.Service.Uploading
+namespace Moz.Bus.Services.Uploading
 {
     public class UploadService : IUploadService
     {
-        private readonly IFileManager _uploadManager;
+        private readonly IFileUploader _uploadManager;
 
-        public UploadService(IFileManager uploadManager)
+        public UploadService(IFileUploader uploadManager)
         {
             _uploadManager = uploadManager;
         }

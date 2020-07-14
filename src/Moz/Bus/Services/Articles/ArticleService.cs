@@ -51,7 +51,7 @@ namespace Moz.Bus.Services.Articles
         /// <returns></returns>
         public GetArticleDetailResponse GetArticleDetail(GetArticleDetailRequest request)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                  var article = client.Queryable<Article>().InSingle(request.Id);
                  if(article == null)
@@ -116,7 +116,7 @@ namespace Moz.Bus.Services.Articles
         /// <returns></returns>
         public CreateArticleResponse CreateArticle(CreateArticleRequest request)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var article = new Article
                 {
@@ -184,7 +184,7 @@ namespace Moz.Bus.Services.Articles
         /// <returns></returns>
         public UpdateArticleResponse UpdateArticle(UpdateArticleRequest request)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var article = client.Queryable<Article>().InSingle(request.Id);
                 if (article == null)
@@ -251,7 +251,7 @@ namespace Moz.Bus.Services.Articles
         /// <returns></returns>
         public DeleteArticleResponse DeleteArticle(DeleteArticleRequest request)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var article = client.Queryable<Article>().InSingle(request.Id);
                 if (article == null)
@@ -275,7 +275,7 @@ namespace Moz.Bus.Services.Articles
         /// <returns></returns>
         public BulkDeleteArticlesResponse BulkDeleteArticles(BulkDeleteArticlesRequest request)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 client.Deleteable<Article>().In(request.Ids).ExecuteCommand();
                 
@@ -300,7 +300,7 @@ namespace Moz.Bus.Services.Articles
             var pageSize = request.PageSize ?? 20;
 
             ArticleModel model = null;
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 model = client.Queryable<ArticleModel>().InSingle(request.ArticleModelId);
             }
@@ -329,7 +329,7 @@ namespace Moz.Bus.Services.Articles
             //if (request.CategoryId > 0)
             //    categories = _categoryService.GetChildrenIdsByParentId(request.CategoryId).ToArray();
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var total = 0;
                 
@@ -412,7 +412,7 @@ namespace Moz.Bus.Services.Articles
         /// <returns></returns>
         public GetArticleModelDetailResponse GetArticleModelDetail(GetArticleModelDetailRequest request)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                  var articleModel = client.Queryable<ArticleModel>().InSingle(request.Id);
                  if(articleModel == null)
@@ -436,7 +436,7 @@ namespace Moz.Bus.Services.Articles
         /// <returns></returns>
         public CreateArticleModelResponse CreateArticleModel(CreateArticleModelRequest request)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var articleModel = new ArticleModel
                 {
@@ -463,7 +463,7 @@ namespace Moz.Bus.Services.Articles
         /// <returns></returns>
         public UpdateArticleModelResponse UpdateArticleModel(UpdateArticleModelRequest request)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var articleModel = client.Queryable<ArticleModel>().InSingle(request.Id);
                 if (articleModel == null)
@@ -491,7 +491,7 @@ namespace Moz.Bus.Services.Articles
         /// <returns></returns>
         public DeleteArticleModelResponse DeleteArticleModel(DeleteArticleModelRequest request)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var articleModel = client.Queryable<ArticleModel>().InSingle(request.Id);
                 if (articleModel == null)
@@ -517,7 +517,7 @@ namespace Moz.Bus.Services.Articles
         {
             var page = request.Page ?? 1;
             var pageSize = request.PageSize ?? 20;
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var total = 0;
                 var list = client.Queryable<ArticleModel>()

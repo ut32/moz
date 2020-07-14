@@ -12,7 +12,8 @@
     <PackageProjectUrl>https://ut32.com/category/opensource/moz</PackageProjectUrl>
     <PackageTags>极速网站开发框架</PackageTags>
     <PackageIconUrl>http://t0.qlogo.cn/mbloghead/7623b068c0d72423b8b0/180</PackageIconUrl>
-    <AssemblyVersion>1.0.4</AssemblyVersion>
+    <AssemblyVersion>1.0.5</AssemblyVersion>
+    <PackageVersion>1.0.5</PackageVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AspectCore.Extensions.DependencyInjection" Version="2.0.0" />
@@ -33,5 +34,8 @@
     <Reference Include="Moz, Version=1.0.4.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\..\customer\mpqianshan\src\MpQianShan\WebApp\bin\Debug\netcoreapp3.1\Moz.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Bus\Dtos\Result\Members" />
   </ItemGroup>
 </Project>

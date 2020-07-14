@@ -33,7 +33,7 @@ namespace Moz.Bus.Models.Members
         /// 用户信息
         /// </summary>
         public ExternalAuthUserInfo UserInfo { get; set; } 
-    }
+    } 
     
     public class ExternalAuthUserInfo
     {

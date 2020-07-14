@@ -53,11 +53,9 @@
 <script>
     layui.use(['form', 'treetable','admin','jquery'],
         function() {
-            var form = layui.form,admin=layui.admin,$ = layui.jquery;
-            
+            let form = layui.form,admin=layui.admin,$ = layui.jquery;
             form.render(null, "form-@guid");
-            
-            var treetable = layui.treetable;
+            let treetable = layui.treetable;
 
             // 渲染表格
             treetable.render({
@@ -94,7 +92,7 @@
 
             //监听单元格编辑
             treetable.on('edit(table_@(guid))',function(obj) {
-                var value = obj.value, data = obj.data, field = obj.field;
+                let value = obj.value, data = obj.data, field = obj.field;
                 admin.onCellEdit("@Url.Action("SetOrderIndex", "Menu")",{ "Id": data.Id, "OrderIndex": value });
             });
         });

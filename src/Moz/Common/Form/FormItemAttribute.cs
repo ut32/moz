@@ -3,12 +3,18 @@ using System.Collections.Generic;
 
 namespace Moz.Common.Form
 {
+    
     public class FormItemAttribute:Attribute
     {
         /// <summary>
         /// 名称
         /// </summary>
         public string Name { get; set; }
+        
+        /// <summary>
+        /// 说明
+        /// </summary>
+        public string Description { get; set; }
         
         /// <summary>
         /// 排序

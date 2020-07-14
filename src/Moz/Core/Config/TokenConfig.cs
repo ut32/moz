@@ -15,6 +15,6 @@ namespace Moz.Core.Config
         /// <summary>
         /// 过期(以天为单位，默认为30天)
         /// </summary>
-        public int Expire { get; set; } = 30;
+        public int Expire { get; set; } = 30;  
     }
 }

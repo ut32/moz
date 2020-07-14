@@ -15,7 +15,7 @@ namespace Moz.Admin.Layui.Common
 
         private static string GetAdminPath()
         {
-            return EngineContext.Current.Resolve<IOptions<AppConfig>>()?.Value?.Admin.Path ?? "myadmin";
+            return EngineContext.Current.Resolve<IOptions<AppConfig>>()?.Value?.AdminPath ?? "myadmin";
         }
     }
 }

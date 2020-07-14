@@ -82,7 +82,7 @@ namespace Moz.Bus.Services.Localization
             if (localeStringResource == null)
                 throw new ArgumentNullException(nameof(localeStringResource));
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 client.Insertable(localeStringResource).ExecuteCommand();
             }
@@ -96,7 +96,7 @@ namespace Moz.Bus.Services.Localization
             if (localeStringResource == null)
                 throw new ArgumentNullException(nameof(localeStringResource));
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 client.Updateable(localeStringResource).ExecuteCommand();
             }
@@ -110,7 +110,7 @@ namespace Moz.Bus.Services.Localization
             if (resources == null)
                 throw new ArgumentNullException(nameof(resources));
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 client.Insertable(resources).ExecuteCommand();
             }
@@ -126,7 +126,7 @@ namespace Moz.Bus.Services.Localization
             if (resources == null)
                 throw new ArgumentNullException(nameof(resources));
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 client.Updateable(resources).ExecuteCommand();
             }
@@ -140,7 +140,7 @@ namespace Moz.Bus.Services.Localization
             if (localeStringResource == null)
                 throw new ArgumentNullException(nameof(localeStringResource));
 
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 client.Deleteable(localeStringResource).ExecuteCommand();
             }
@@ -152,7 +152,7 @@ namespace Moz.Bus.Services.Localization
 
         public virtual LocaleStringResource GetLocaleStringResourceById(long localeStringResourceId)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 return client.Queryable<LocaleStringResource>().InSingle(localeStringResourceId);
             }
@@ -171,7 +171,7 @@ namespace Moz.Bus.Services.Localization
         public virtual LocaleStringResource GetLocaleStringResourceByName(string name, long languageId,
             bool logIfNotFound = true)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var localeStringResource = client.Queryable<LocaleStringResource>().First(lsr =>
                     lsr.LanguageId == languageId && lsr.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
@@ -188,7 +188,7 @@ namespace Moz.Bus.Services.Localization
         /// <returns></returns>
         public virtual List<LocaleStringResource> GetAllResources(long languageId)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 return client.Queryable<LocaleStringResource>().Where(lan => lan.LanguageId == languageId).ToList();
             }
@@ -202,7 +202,7 @@ namespace Moz.Bus.Services.Localization
         {
             var lsr = _distributedCache.GetOrSet(string.Format(ALL_RESOURCE_VALUES_BY_LANGUAGE_ID, languageId), () =>
             {
-                using (var client = DbFactory.GetClient())
+                using (var client = DbFactory.CreateClient())
                 {
                     return client.Queryable<LocaleStringResource>().Where(it => it.LanguageId == languageId)
                         .ToList();

@@ -38,7 +38,7 @@ namespace Moz.Bus.Services.ServicePerformances
         /// <returns></returns>
         public CreateServicePerformanceResponse CreateServicePerformance(CreateServicePerformanceRequest request)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var servicePerformance = new ServicePerformanceMonitor();
                 servicePerformance.Name = request.Name;
@@ -63,7 +63,7 @@ namespace Moz.Bus.Services.ServicePerformances
         {
             var page = request.Page ?? 1;
             var pageSize = request.PageSize ?? 20;
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
                 var total = 0;
                 var list = client.Queryable<ServicePerformanceMonitor>()

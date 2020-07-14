@@ -10,87 +10,87 @@ namespace Moz.Bus.Services.Roles
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult CreateRole(ServRequest<CreateRoleDto> request);
+        PublicResult CreateRole(CreateRoleDto dto);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult UpdateRole(ServRequest<UpdateRoleDto> request);
+        PublicResult UpdateRole(UpdateRoleDto dto);
 
         /// <summary>
         /// 删除
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult DeleteRole(ServRequest<DeleteRoleDto> request);
+        PublicResult DeleteRole(DeleteRoleDto dto);
 
         /// <summary>
         /// 获取单条数据
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult<RoleDetailApo> GetRoleDetail(ServRequest<GetRoleDetailDto> request);
+        PublicResult<RoleDetailApo> GetRoleDetail(GetRoleDetailDto dto);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult SetIsActive(ServRequest<SetIsActiveRoleDto> request);
+        PublicResult SetIsActive(SetIsActiveRoleDto dto);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult SetIsAdmin(ServRequest<SetIsAdminRoleDto> request);
+        PublicResult SetIsAdmin(SetIsAdminRoleDto dto);
 
 
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult<PagedList<QueryRoleItem>> PagedQueryRoles(ServRequest<PagedQueryRoleDto> request);
+        PublicResult<PagedList<QueryRoleItem>> PagedQueryRoles(PagedQueryRoleDto dto);
 
         
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult<GetPermissionsByRoleApo> GetPermissionsByRole(ServRequest<GetPermissionsByRoleDto> request);
+        PublicResult<GetPermissionsByRoleApo> GetPermissionsByRole(GetPermissionsByRoleDto dto);
 
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult ConfigPermission(ServRequest<ConfigPermissionDto> request);
+        PublicResult ConfigPermission(ConfigPermissionDto dto);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult<GetMenusByRoleApo> GetMenusByRole(ServRequest<GetMenusByRoleDto> request);
+        PublicResult<GetMenusByRoleApo> GetMenusByRole(GetMenusByRoleDto dto);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        ServResult ConfigMenu(ServRequest<ConfigMenuDto> request);
+        PublicResult ConfigMenu(ConfigMenuDto dto);
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        ServResult<List<Role>> GetAvailableRoles();
+        PublicResult<List<Role>> GetAvailableRoles();
     }
 }
