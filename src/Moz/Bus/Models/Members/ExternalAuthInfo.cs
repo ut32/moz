@@ -4,7 +4,7 @@ namespace Moz.Bus.Models.Members
 {
     public class ExternalAuthInfo
     {
-        /// <summary>
+        /// <summary> 
         /// Access Token
         /// </summary>
         public string AccessToken { get; set; }

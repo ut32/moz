@@ -16,7 +16,7 @@ namespace Moz.Admin.Api.Common
 
         static ApiAdminRouteAttribute()
         {
-            AdminPath = EngineContext.Current.Resolve<IOptions<AppConfig>>()?.Value?.Admin.Path ?? "myadmin";
+            AdminPath = EngineContext.Current.Resolve<IOptions<AppConfig>>()?.Value?.AdminPath ?? "myadmin";
         }
     }
 }

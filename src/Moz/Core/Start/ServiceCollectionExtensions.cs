@@ -119,10 +119,8 @@ namespace Microsoft.Extensions.DependencyInjection
             });
 
             //添加MVC
-            services.AddMvc(options =>
-                {
-                    
-                })
+            services.AddMvc(options => { })
+                .ConfigureApiBehaviorOptions(options => { options.SuppressModelStateInvalidFilter = true; })
                 .AddRazorRuntimeCompilation()
                 .AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = null; })
                 .AddFluentValidation(options =>
@@ -133,13 +131,14 @@ namespace Microsoft.Extensions.DependencyInjection
                 });
 
 
-
+            /*
             services.AddApiVersioning(o =>
             {
                 o.ReportApiVersions = true;
                 o.AssumeDefaultVersionWhenUnspecified = true;
                 o.DefaultApiVersion = new ApiVersion(1, 0);
             });
+            */
 
             #region 依赖注入
 
@@ -164,12 +163,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 var service = TypeFinder.FindClassesOfType(serviceInterface.Type)?.FirstOrDefault();
                 if (service != null) services.AddTransient(serviceInterface.Type, service.Type);
             }
-            
+
             //注入所有Job类
             var jobTypes = TypeFinder.FindClassesOfType<IJob>().ToList();
             foreach (var jobType in jobTypes)
                 services.AddTransient(jobType.Type);
-            
+
             //注入所有Uploader类
             var uploaderTypes = TypeFinder.FindClassesOfType<IFileUploader>();
             foreach (var uploaderType in uploaderTypes)
@@ -189,7 +188,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     var instance = Activator.CreateInstance(settingType.Type);
                     return instance;
                 });
-            
+
             //注入 ExceptionHandler
             var exceptionHandlers = TypeFinder.FindClassesOfType(typeof(IExceptionHandler))
                 .Where(it => it.Type != typeof(ErrorHandlingMiddleware))

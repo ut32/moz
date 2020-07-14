@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Moz.Exceptions;
+using Moz.Validation;
 
 namespace Moz.Web.Api
 {
@@ -7,6 +8,7 @@ namespace Moz.Web.Api
     //[ValidationFilter]
     //[ServiceFilter]
     [ApiController]
+    [ValidationFilter]
     [TypeFilter(typeof(ApiActionFilterAttribute))]
     [Route("[controller]")]
     public class ApiBaseController : ControllerBase
