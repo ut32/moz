@@ -60,18 +60,17 @@
 <script>
   layui.use(['form', 'selectN', 'selectM'],
     function() {
-      var form = layui.form, selectN = layui.selectN, selectM = layui.selectM;
+      let form = layui.form, selectN = layui.selectN, selectM = layui.selectM;
 
       form.render(null,"form-@guid");
 
 
       //无限级分类-基本配置
-      var catIns1 = selectN({
+      let catIns1 = selectN({
         //元素容器【必填】
         elem: '#infinite_select_@guid',
         name:"ParentIdsStr",
         search: [false, true]
-        //候选数据【必填】
         ,data:  "@Url.Action("AllSubPermissions", "Permission")"
         ,field:{idName:'Id',titleName:'Name',childName:'Children'}
       });

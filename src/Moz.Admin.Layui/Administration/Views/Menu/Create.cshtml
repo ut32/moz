@@ -6,9 +6,8 @@
 </style>
 <div style="padding: 0; height: 100%;">
   <div style="padding-top: 40px; padding-right: 40px;">
-    <form class="layui-form" method="post"
+    <form class="layui-form pageForm" method="post"
           action="@Url.Action("Create", "menu")"
-          class="pageForm"
           onsubmit="return validateCallback(this, navTabAjaxDone);"
           novalidate="novalidate">
       <div class="layui-form-item">
@@ -32,7 +31,7 @@
       <div class="layui-form-item">
         <label class="layui-form-label">图标</label>
         <div class="layui-input-inline">
-          <input type="text" name="icon" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+          <input type="text" name="icon" placeholder="请输入" autocomplete="off" class="layui-input">
         </div>
       </div>
       <div class="layui-form-item">

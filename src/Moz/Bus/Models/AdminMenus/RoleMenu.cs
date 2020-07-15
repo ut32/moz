@@ -3,7 +3,7 @@
 namespace Moz.Bus.Models.AdminMenus
 {
     /// <summary>
-    ///     role_permisson
+    /// 
     /// </summary>
     [SugarTable("tab_role_menu")]
     public class RoleMenu : BaseModel

@@ -15,10 +15,8 @@ namespace Moz.Bus.Services.Categories
     {
         #region Constants
 
-        // ReSharper disable once InconsistentNaming
-        // ReSharper disable once MemberCanBePrivate.Global
-        public static readonly string CACHE_CATEGORY_ALL_KEY = "CACHE_CATEGORY_ALL_KEY";
-        
+        public const string CACHE_CATEGORY_ALL_KEY = "CACHE_CATEGORY_ALL_KEY";
+
         #endregion
 
         #region Fields
@@ -58,7 +56,7 @@ namespace Moz.Bus.Services.Categories
         /// 更新路径
         /// </summary>
         /// <param name="categoryId"></param>
-        private static void UpdatePathByCategoryId(long categoryId)
+        private void UpdatePathByCategoryId(long categoryId)
         {
             List<Category> categories; 
             using (var db = DbFactory.CreateClient())
@@ -222,7 +220,12 @@ namespace Moz.Bus.Services.Categories
                 {
                     return Error("找不到该条信息");
                 }
-                client.Deleteable<Category>(dto.Id).ExecuteCommand();
+
+                client.UseTran(tran =>
+                {
+                    tran.Ado.ExecuteCommand(@"DELETE FROM tab_category WHERE path LIKE @path", new { path = $"{category.Path}.%"});
+                    tran.Deleteable<Category>(dto.Id).ExecuteCommand();
+                });
             }
             _distributedCache.Remove(CACHE_CATEGORY_ALL_KEY);
             _eventPublisher.EntityDeleted(category);
@@ -301,6 +304,35 @@ namespace Moz.Bus.Services.Categories
         }
 
         /// <summary>
+        /// 查询所有子id
+        /// </summary>
+        /// <param name="parentId"></param>
+        /// <param name="includeParentId"></param>
+        /// <returns></returns>
+        public PublicResult<List<long>> QueryChildrenIdsByParentId(long? parentId, bool includeParentId = false)
+        {
+            var ids = new List<long>();
+            GetAllSubCategoryIds(parentId,ids);
+            if (includeParentId && parentId!=null)
+            {
+                ids.Add(parentId.Value);
+            }
+
+            return ids;
+        }
+        
+        private void GetAllSubCategoryIds(long? parentId,List<long> ids) 
+        { 
+            var list = GetCategoriesListCached(); 
+            var subCategories = list.Where(t => t.ParentId == parentId).ToList();
+            foreach (var subCategory in subCategories)
+            {
+                ids.Add(subCategory.Id);
+                GetAllSubCategoryIds(subCategory.Id, ids);
+            }
+        }
+
+        /// <summary>
         /// 根据别名获取路径
         /// </summary>
         /// <param name="alias"></param>
@@ -312,6 +344,8 @@ namespace Moz.Bus.Services.Categories
             return list.FirstOrDefault(it => it.Alias.Equals(alias, StringComparison.OrdinalIgnoreCase))
                 ?.Path;
         }
+        
+        
 
         /// <summary>
         /// 根据别名获取

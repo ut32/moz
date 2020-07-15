@@ -1,11 +1,11 @@
 ﻿using Moz.Biz.Dtos.Articles;
 using Moz.Biz.Dtos.Articles.ArticleModels;
+using Moz.Bus.Dtos;
 using Moz.Bus.Dtos.Articles;
 using Moz.Bus.Dtos.Articles.ArticleModels;
-using Moz.Domain.Dtos.Articles;
 using Moz.Domain.Dtos.Articles.ArticleModels;
 
-namespace Moz.Biz.Services.Articles
+namespace Moz.Bus.Services.Articles
 {
     public interface IArticleService
     {
@@ -27,7 +27,8 @@ namespace Moz.Biz.Services.Articles
         DeleteArticleResponse DeleteArticle(DeleteArticleRequest request);
         BulkDeleteArticlesResponse BulkDeleteArticles(BulkDeleteArticlesRequest request);
         GetArticleDetailResponse GetArticleDetail(GetArticleDetailRequest request);
-        PagedQueryArticleResponse PagedQueryArticles(PagedQueryArticleRequest request);
+        
+        PublicResult<PagedQueryArticles> PagedQueryArticles(PagedQueryArticleDto dto);
         
         #endregion
     }

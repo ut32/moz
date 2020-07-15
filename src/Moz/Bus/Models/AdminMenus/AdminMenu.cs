@@ -19,5 +19,7 @@ namespace Moz.Bus.Models.AdminMenus
         
         [SugarColumn(ColumnName = "is_system")]
         public bool IsSystem { get; set; } 
+        
+        public string Path { get; set; }
     }
 }

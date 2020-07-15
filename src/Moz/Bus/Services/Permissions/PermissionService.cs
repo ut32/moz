@@ -53,7 +53,74 @@ namespace Moz.Bus.Services.Permissions
             });
         }
         
+        /// <summary>
+        /// 更新路径
+        /// </summary>
+        /// <param name="permissionId"></param>
+        private void UpdatePathByPermissionId(long permissionId)
+        {
+            List<Permission> permissions;  
+            using (var db = DbFactory.CreateClient())
+            {
+                permissions = db.Queryable<Permission>().ToList();
+            }
 
+            if (!permissions.Any())
+            {
+                return;
+            }
+            
+            string GetPath(long currentId)
+            {
+                var curPermission = permissions.FirstOrDefault(it => it.Id == currentId);
+                var parentPermissionId = curPermission?.ParentId; 
+                if (parentPermissionId == null || 0 == parentPermissionId)
+                {
+                    return currentId.ToString();
+                }
+                return GetPath(parentPermissionId.Value)+"."+currentId;
+            }
+
+            var updatePermissionsList = new List<Permission>(); 
+            void UpdatePath(long currentId)
+            {
+                var curPermission = permissions.FirstOrDefault(it => it.Id == currentId);
+                if (curPermission == null)
+                {
+                    return;
+                }
+                
+                curPermission.Path = GetPath(currentId);
+                
+                updatePermissionsList.Add(curPermission);
+
+                var subPermissions = permissions.Where(it => it.ParentId == currentId).ToList();
+                if (!subPermissions.Any())
+                {
+                    return;
+                }
+
+                foreach (var subPermission in subPermissions)
+                {
+                    UpdatePath(subPermission.Id);
+                }
+            }
+            
+            UpdatePath(permissionId);
+            if (!updatePermissionsList.Any())
+            {
+                return;
+            }
+
+            using (var db = DbFactory.CreateClient())
+            {
+                db.Updateable(updatePermissionsList)
+                    .UpdateColumns(it => new { it.Path })
+                    .ExecuteCommand();
+            }
+            
+        }
+        
         #endregion
 
         #region Methods
@@ -63,7 +130,7 @@ namespace Moz.Bus.Services.Permissions
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public PublicResult<PermissionDetailApo> GetPermissionDetail(GetPermissionDetailDto dto)
+        public PublicResult<PermissionDetailInfo> GetPermissionDetail(GetPermissionDetailDto dto)
         {
             Permission permission = null;
             using (var client = DbFactory.CreateClient())
@@ -72,10 +139,10 @@ namespace Moz.Bus.Services.Permissions
             }
             if(permission == null)
             {
-                return null;
+                return Error("未找到对象");
             }
 
-            var res = new PermissionDetailApo
+            var res = new PermissionDetailInfo
             {
                 Id = permission.Id,
                 Name = permission.Name,
@@ -83,7 +150,8 @@ namespace Moz.Bus.Services.Permissions
                 IsActive = permission.IsActive,
                 ParentId = permission.ParentId,
                 OrderIndex = permission.OrderIndex,
-                IsSystem = permission.IsSystem
+                IsSystem = permission.IsSystem,
+                Path = permission.Path
             };
             return res;
         }
@@ -108,9 +176,13 @@ namespace Moz.Bus.Services.Permissions
             {
                 permission.Id = client.Insertable(permission).ExecuteReturnBigIdentity();
             }
+
+            this.UpdatePathByPermissionId(permission.Id);
+            
             _distributedCache.Remove(CACHE_ROLE_PERMISSION_ALL_KEY);
             _distributedCache.Remove(CACHE_PERMISSION_ALL_KEY);
             _eventPublisher.EntityCreated(permission);
+            
             return Ok();
         }
         
@@ -141,9 +213,13 @@ namespace Moz.Bus.Services.Permissions
                 permission.ParentId = dto.ParentId;
                 client.Updateable(permission).ExecuteCommand();
             }
+            
+            this.UpdatePathByPermissionId(permission.Id);
+            
             _distributedCache.Remove(CACHE_ROLE_PERMISSION_ALL_KEY);
             _distributedCache.Remove(CACHE_PERMISSION_ALL_KEY);
             _eventPublisher.EntityUpdated(permission);
+            
             return Ok();
         }
 
@@ -166,11 +242,18 @@ namespace Moz.Bus.Services.Permissions
                 {
                     return Error("内置信息不能删除");
                 }
-                client.Deleteable<Permission>(dto.Id).ExecuteCommand();
+                
+                client.UseTran(tran =>
+                {
+                    tran.Ado.ExecuteCommand(@"DELETE FROM tab_permission WHERE path LIKE @path", new { path = $"{permission.Path}.%"});
+                    tran.Deleteable<Permission>(dto.Id).ExecuteCommand();
+                });
             }
+            
             _distributedCache.Remove(CACHE_ROLE_PERMISSION_ALL_KEY);
             _distributedCache.Remove(CACHE_PERMISSION_ALL_KEY);
             _eventPublisher.EntityDeleted(permission);
+            
             return Ok();
         }
         
@@ -198,7 +281,6 @@ namespace Moz.Bus.Services.Permissions
                     OrderIndex = dto.OrderIndex
                 }).Where(it=>it.Id==dto.Id).ExecuteCommand();
             }
-            _eventPublisher.EntityDeleted(permission);
             return Ok();
         }
         
@@ -226,9 +308,10 @@ namespace Moz.Bus.Services.Permissions
                     IsActive = !it.IsActive
                 }).Where(it=>it.Id==dto.Id).ExecuteCommand();
             }
+            
             _distributedCache.Remove(CACHE_ROLE_PERMISSION_ALL_KEY);
             _distributedCache.Remove(CACHE_PERMISSION_ALL_KEY);
-            _eventPublisher.EntityDeleted(permission);
+            
             return Ok();
         }
 
@@ -260,6 +343,12 @@ namespace Moz.Bus.Services.Permissions
                     })
                     .OrderBy("order_index ASC,id ASC")
                     .ToPageList(page, pageSize,ref total);
+                /*
+                foreach (var item in list)
+                {
+                    UpdatePathByPermissionId(item.Id);
+                }
+                */
                 return new PagedList<QueryPermissionItem>
                 {
                     List = list,

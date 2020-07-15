@@ -63,20 +63,28 @@ namespace Moz.Bus.Services.Categories
         /// </summary>
         /// <param name="parentId"></param>
         /// <returns></returns>
-        PublicResult<List<CategoryTree>> QuerySubCategoriesByParentId(long? parentId); 
-        
+        PublicResult<List<CategoryTree>> QuerySubCategoriesByParentId(long? parentId);
+
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parentId"></param>
+        /// <param name="includeParentId"></param>
+        /// <returns></returns>
+        PublicResult<List<long>> QueryChildrenIdsByParentId(long? parentId, bool includeParentId = false);
+        
+        /// <summary> 
         /// 
         /// </summary>
         /// <param name="alias"></param>
         /// <returns></returns>
-        PublicResult<string> GetCategoryPathByAlias(string alias); 
+        //PublicResult<string> GetCategoryPathByAlias(string alias); 
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="alias"></param>
         /// <returns></returns>
-        PublicResult<string> GetCategoryNameByAlias(string alias);
+        //PublicResult<string> GetCategoryNameByAlias(string alias);
     }
 }

@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Linq;
+using FluentValidation;
 using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
 using Moz.Validation;
@@ -48,6 +49,18 @@ namespace Moz.Bus.Dtos.AdminMenus
         public string Icon { get;set; } 
         
         public bool IsSystem { get; set; }
+        
+        public string Path { get; set; }
+        
+        public string ParentIds
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Path)) return "";
+                if (!Path.Contains('.')) return "";
+                return string.Join(',',Path.Split('.').SkipLast(1).ToArray());
+            }
+        } 
     }
     
     

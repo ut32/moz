@@ -24,6 +24,101 @@ namespace Moz.Bus.Services.AdminMenus
             _eventPublisher = eventPublisher;
         }
 
+        #region Utils
+
+        /// <summary>
+        /// 更新路径
+        /// </summary>
+        /// <param name="menuId"></param>
+        private void UpdatePathByMenuId(long menuId)
+        {
+            List<AdminMenu> menus; 
+            using (var db = DbFactory.CreateClient())
+            {
+                menus = db.Queryable<AdminMenu>().ToList();
+            }
+
+            if (!menus.Any())
+            {
+                return;
+            }
+            
+            string GetPath(long currentId)
+            {
+                var curMenu = menus.FirstOrDefault(it => it.Id == currentId);
+                var parentMenuId = curMenu?.ParentId; 
+                if (parentMenuId == null || 0 == parentMenuId)
+                {
+                    return currentId.ToString();
+                }
+                return GetPath(parentMenuId.Value)+"."+currentId;
+            }
+
+            var updateMenusList = new List<AdminMenu>(); 
+            void UpdatePath(long currentId)
+            {
+                var curMenu = menus.FirstOrDefault(it => it.Id == currentId);
+                if (curMenu == null)
+                {
+                    return;
+                }
+                
+                curMenu.Path = GetPath(currentId);
+                
+                updateMenusList.Add(curMenu);
+
+                var subMenus = menus.Where(it => it.ParentId == currentId).ToList();
+                if (!subMenus.Any())
+                {
+                    return;
+                }
+
+                foreach (var subMenu in subMenus)
+                {
+                    UpdatePath(subMenu.Id);
+                }
+            }
+            
+            UpdatePath(menuId);
+            if (!updateMenusList.Any())
+            {
+                return;
+            }
+
+            using (var db = DbFactory.CreateClient())
+            {
+                db.Updateable(updateMenusList)
+                    .UpdateColumns(it => new { it.Path })
+                    .ExecuteCommand();
+            }
+            
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="parentId"></param>
+        /// <returns></returns>
+        private List<AdminMenuTree> GetAllSubAdminMenus(List<AdminMenu> list, long? parentId)
+        {
+            var selectedMenus = list.Where(t => t.ParentId == parentId).ToList();
+            var simpleAdminMenus = new List<AdminMenuTree>();
+            foreach (var adminMenu in selectedMenus)
+            {
+                simpleAdminMenus.Add(new AdminMenuTree()
+                {
+                    Id = adminMenu.Id,
+                    Name = adminMenu.Name,
+                    Children = GetAllSubAdminMenus(list, adminMenu.Id)
+                });
+            }
+            return simpleAdminMenus;
+        }
+        
+        #endregion
+
+        #region Methods
         /// <summary>
         /// 
         /// </summary>
@@ -43,7 +138,7 @@ namespace Moz.Bus.Services.AdminMenus
             {
                 adminMenu.Id = client.Insertable(adminMenu).ExecuteReturnBigIdentity();
             }
-
+            UpdatePathByMenuId(adminMenu.Id);
             _eventPublisher.EntityCreated(adminMenu);
             
             return Ok();
@@ -78,6 +173,7 @@ namespace Moz.Bus.Services.AdminMenus
                 
                 client.Updateable(adminMenu).ExecuteCommand();
             }
+            UpdatePathByMenuId(adminMenu.Id);
             _eventPublisher.EntityUpdated(adminMenu);
             return Ok();
         }
@@ -102,10 +198,14 @@ namespace Moz.Bus.Services.AdminMenus
                 {
                     return Error("不能删除内置菜单");
                 }
-
-                client.Deleteable<AdminMenu>(dto.Id).ExecuteCommand();
+                
+                client.UseTran(tran =>
+                {
+                    tran.Ado.ExecuteCommand(@"DELETE FROM tab_admin_menu WHERE path LIKE @path", new { path = $"{adminMenu.Path}.%"});
+                    tran.Deleteable<AdminMenu>(dto.Id).ExecuteCommand();
+                });
             }
-
+            
             _eventPublisher.EntityDeleted(adminMenu);
             return Ok();
         }
@@ -149,27 +249,7 @@ namespace Moz.Bus.Services.AdminMenus
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="list"></param>
-        /// <param name="parentId"></param>
-        /// <returns></returns>
-        private List<AdminMenuTree> GetAllSubAdminMenus(List<AdminMenu> list, long? parentId)
-        {
-            var selectedMenus = list.Where(t => t.ParentId == parentId).ToList();
-            var simpleAdminMenus = new List<AdminMenuTree>();
-            foreach (var adminMenu in selectedMenus)
-            {
-                simpleAdminMenus.Add(new AdminMenuTree()
-                {
-                    Id = adminMenu.Id,
-                    Name = adminMenu.Name,
-                    Children = GetAllSubAdminMenus(list, adminMenu.Id)
-                });
-            }
-            return simpleAdminMenus;
-        }
+        
 
         /// <summary>
         /// 
@@ -194,7 +274,8 @@ namespace Moz.Bus.Services.AdminMenus
                     Link = adminMenu.Link,
                     OrderIndex = adminMenu.OrderIndex,
                     Icon = adminMenu.Icon,
-                    IsSystem = adminMenu.IsSystem
+                    IsSystem = adminMenu.IsSystem,
+                    Path = adminMenu.Path
                 };
                 return resp;
             }
@@ -222,7 +303,8 @@ namespace Moz.Bus.Services.AdminMenus
                         Link = t.Link,
                         OrderIndex = t.OrderIndex,
                         Icon = t.Icon,
-                        IsSystem = t.IsSystem
+                        IsSystem = t.IsSystem,
+                        Path = t.Path
                     })
                     .OrderBy("order_index ASC, id ASC")
                     .ToPageList(page, pageSize, ref total);
@@ -235,5 +317,6 @@ namespace Moz.Bus.Services.AdminMenus
                 };
             }
         }
+        #endregion
     }
 }

@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Linq;
+using FluentValidation;
 using FluentValidation.Attributes;
 using Moz.Bus.Services.Localization;
 using Moz.Validation;
@@ -15,8 +16,8 @@ namespace Moz.Bus.Dtos.Permissions
     }
     
     
-    public class PermissionDetailApo
-    {
+    public class PermissionDetailInfo
+    { 
         /// <summary>
         /// 
         /// </summary>
@@ -52,6 +53,23 @@ namespace Moz.Bus.Dtos.Permissions
         /// </summary>
         public bool IsSystem { get;set; } 
         
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Path { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public string ParentIds
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Path)) return "";
+                if (!Path.Contains('.')) return "";
+                return string.Join(',',Path.Split('.').SkipLast(1).ToArray());
+            }
+        } 
     }
     
     

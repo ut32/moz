@@ -41,6 +41,12 @@
                                     <input type="text" name="@item.FiledName" value="@item.DefaultValue" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
                                 </div>
                             }
+                            else if (item.DisplayType == FormFieldType.MultipleRowsTextInput)
+                            {
+                                <div class="layui-input-block">
+                                    <textarea name="@item.FiledName" placeholder="请输入内容" class="layui-textarea"></textarea>
+                                </div>
+                            }
                             else if (item.DisplayType == FormFieldType.UploadSingleFile)
                             {
                                 <div class="layui-input-inline">
@@ -85,7 +91,7 @@
 <script>
   layui.use(['form','upload','layer','laydate','selectN'],
     function() {
-      var form = layui.form,
+      let form = layui.form,
       upload = layui.upload,
       layer  = layui.layer,
       laydate = layui.laydate,
@@ -101,9 +107,9 @@
           ,exts: 'jpg|png|jpeg' //只允许上传压缩文件
           ,done: function(res) {
             if (res.Code === 0) {
-              var $this = this.item;
-              var rel = $this.attr("rel");
-              $('input[name=' + rel + ']').val(res.Data.RelativePath);
+              let $this = this.item;
+              let rel = $this.attr("rel");
+              $('input[name=' + rel + ']').val(res.Data.Path);
             } else {
               layer.alert(res.Message);
             }
@@ -119,7 +125,7 @@
       {
           <text>
           //无限级分类-基本配置
-          var catIns1 = selectN({
+          let catIns1 = selectN({
               //元素容器【必填】
               elem: '#infinite_select_@guid',
               name:"ParentIdsStr",

@@ -6,6 +6,7 @@ namespace Moz.Bus.Models.AdminMenus
     {
         public long Id { get; set; }
         public string Name { get; set; }
+        
         public bool Status { get; set; }
         public List<AdminMenuTree> Children { get; set; }
     }

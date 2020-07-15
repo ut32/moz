@@ -139,17 +139,39 @@
                     
                     <li class="layui-nav-item">
                         <a href="@menu.Link">
-                            <i class="@menu.Icon"></i>
+                            <i class="@(string.IsNullOrEmpty(menu.Icon)?"layui-icon layui-icon-component":menu.Icon)"></i>
                             <cite>@menu.Name</cite>
                         </a>
                         <dl class="layui-nav-child">
                             @foreach (var item in list.Data.List.Where(t=>t.ParentId==menu.Id))
                             {
+                                var subMenus = list.Data.List.Where(t => t.ParentId == item.Id).ToList();
                                 <dd>
-                                    <a href="javascript:;" zui-href="@item.Link" zui-type="tab" title="@item.Name">
-                                        <i class="@item.Icon"></i>
-                                        <cite>@item.Name</cite>
-                                    </a>
+                                    @if (subMenus.Any())
+                                    {
+                                        <a href="javascript:;" title="@item.Name">
+                                            <i class="@(string.IsNullOrEmpty(item.Icon)?"layui-icon layui-icon-component":item.Icon)"></i>
+                                            <cite>@item.Name</cite>
+                                        </a>
+                                        <ol class="layui-nav-child">
+                                            @foreach (var subMenu in subMenus)
+                                            {
+                                                <li>
+                                                    <a href="javascript:;" zui-href="@subMenu.Link" title="@subMenu.Name" zui-type="tab">
+                                                        <i class="@(string.IsNullOrEmpty(subMenu.Icon)?"layui-icon layui-icon-component":subMenu.Icon)"></i>
+                                                        <cite>@subMenu.Name</cite>
+                                                    </a>
+                                                </li>
+                                            }
+                                        </ol>
+                                    }
+                                    else
+                                    {
+                                        <a href="javascript:;" zui-href="@item.Link" zui-type="tab" title="@item.Name">
+                                            <i class="@(string.IsNullOrEmpty(item.Icon)?"layui-icon layui-icon-component":item.Icon)"></i>
+                                            <cite>@item.Name</cite>
+                                        </a>
+                                    }
                                 </dd>
                             }
                         </dl>

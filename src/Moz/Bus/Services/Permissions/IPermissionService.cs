@@ -47,7 +47,7 @@ namespace Moz.Bus.Services.Permissions
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        PublicResult<PermissionDetailApo> GetPermissionDetail(GetPermissionDetailDto dto);
+        PublicResult<PermissionDetailInfo> GetPermissionDetail(GetPermissionDetailDto dto);
         
         /// <summary>
         /// 分页查询
@@ -59,9 +59,9 @@ namespace Moz.Bus.Services.Permissions
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="parentId"></param>
         /// <returns></returns>
-        PublicResult<List<PermissionTree>> QuerySubPermissionsByParentId(long? dto);
+        PublicResult<List<PermissionTree>> QuerySubPermissionsByParentId(long? parentId);
 
         /// <summary>
         /// 

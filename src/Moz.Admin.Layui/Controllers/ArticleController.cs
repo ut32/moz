@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Moz.Admin.Layui.Common;
 using Moz.Auth.Attributes;
 using Moz.Biz.Dtos.Articles;
-using Moz.Biz.Services.Articles;
 using Moz.Bus.Dtos.Articles;
+using Moz.Bus.Services.Articles;
 using Moz.Exceptions;
 
 namespace Moz.Admin.Layui.Controllers
@@ -38,15 +38,15 @@ namespace Moz.Admin.Layui.Controllers
         }
         
         //[AdminAuthorize(Permissions = "admin.article.index")]
-        public IActionResult PagedList(PagedQueryArticleRequest request)
+        public IActionResult PagedList(PagedQueryArticleDto request)
         {
-            var list = _articleService.PagedQueryArticles(request);
+            var pagedQueryArticlesResult = _articleService.PagedQueryArticles(request);
             var result = new
             {
                 Code = 0,
                 Message = "",
-                Total = list.TotalCount,
-                Data = list.List
+                Total = pagedQueryArticlesResult.Data.TotalCount,
+                Data = pagedQueryArticlesResult.Data.List
             };
             return Json(result);
         }

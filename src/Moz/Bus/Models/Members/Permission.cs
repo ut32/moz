@@ -42,6 +42,10 @@ namespace Moz.Bus.Models.Members
         [SugarColumn(ColumnName = "parent_id")]
         public long? ParentId { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Path { get; set; }
         #endregion
     }
 }

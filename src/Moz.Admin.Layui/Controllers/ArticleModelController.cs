@@ -5,8 +5,8 @@ using Moz.Exceptions;
 using Moz.Auth;
 using Moz.Auth.Attributes;
 using Moz.Biz.Dtos.Articles.ArticleModels;
-using Moz.Biz.Services.Articles;
 using Moz.Bus.Dtos.Articles.ArticleModels;
+using Moz.Bus.Services.Articles;
 
 namespace Moz.Administration.Controllers
 {

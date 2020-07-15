@@ -45,6 +45,8 @@ namespace Moz.Bus.Dtos.AdminMenus
         public string Icon { get;set; } 
         
         public bool IsSystem { get; set; }
+        
+        public string Path { get; set; }
     }
     
     public class PagedQueryAdminMenusDtoValidator : MozValidator<PagedQueryAdminMenusDto>
