@@ -256,13 +256,13 @@ namespace Moz.Bus.Services.Categories
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ServResult BulkDeleteCategories(ServRequest<BulkDeleteCategoriesDto> request)
+        public PublicResult BulkDeleteCategories(BulkDeleteCategoriesDto dto)
         {
-            using (var client = DbFactory.GetClient())
+            using (var client = DbFactory.CreateClient())
             {
-                client.Deleteable<Category>().In(request.Data.Ids).ExecuteCommand();
+                client.Deleteable<Category>().In(dto.Ids).ExecuteCommand();
             }
-            _eventPublisher.EntitiesDeleted<Category>(request.Data.Ids);
+            _eventPublisher.EntitiesDeleted<Category>(dto.Ids);
             return Ok();
         }
         */

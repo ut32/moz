@@ -186,7 +186,7 @@ namespace Moz.Auth.Impl
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public PublicResult<MemberLoginInfo> ExternalAuth(ExternalAuthInfo dto)
+        public PublicResult<MemberLoginInfo> ExternalAuth(ExternalAuthDto dto)
         {
             ExternalAuthentication externalAuthentication;
             string memberUId;

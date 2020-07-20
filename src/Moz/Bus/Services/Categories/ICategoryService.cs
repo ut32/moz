@@ -41,7 +41,7 @@ namespace Moz.Bus.Services.Categories
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        ServResult BulkDeleteCategories(ServRequest<BulkDeleteCategoriesDto> request);
+        PublicResult BulkDeleteCategories(BulkDeleteCategoriesDto dto);
         */
         
         /// <summary>
@@ -78,13 +78,13 @@ namespace Moz.Bus.Services.Categories
         /// </summary>
         /// <param name="alias"></param>
         /// <returns></returns>
-        //PublicResult<string> GetCategoryPathByAlias(string alias); 
+        PublicResult<string> GetCategoryPathByAlias(string alias); 
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="alias"></param>
         /// <returns></returns>
-        //PublicResult<string> GetCategoryNameByAlias(string alias);
+        PublicResult<string> GetCategoryNameByAlias(string alias);
     }
 }

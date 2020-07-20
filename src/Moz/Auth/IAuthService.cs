@@ -1,6 +1,7 @@
 ﻿using System;
 using Moz.Bus.Dtos;
 using Moz.Bus.Dtos.Auth;
+using Moz.Bus.Dtos.Members;
 using Moz.Bus.Models.Members;
 
 namespace Moz.Auth
@@ -31,7 +32,7 @@ namespace Moz.Auth
         /// </summary>
         /// <param name="dto"></param> 
         /// <returns></returns>
-        PublicResult<MemberLoginInfo> ExternalAuth(ExternalAuthInfo dto); 
+        PublicResult<MemberLoginInfo> ExternalAuth(ExternalAuthDto dto); 
  
  
         /// <summary>

@@ -138,7 +138,7 @@ namespace Moz.Bus.Services.Localization
                 .WithRemovePolicy<DeletePolicy>(key)
                 .WhenNotFound(() =>
                 {
-                    using (var client = DbFactory.GetClient())
+                    using (var client = DbFactory.CreateClient())
                     {
                         var entity = client.Queryable<LocalizedProperty>()
                             .First(lp => lp.LanguageId == languageId

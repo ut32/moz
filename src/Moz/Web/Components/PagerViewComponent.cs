@@ -4,6 +4,7 @@ using Moz.Bus.Dtos;
 
 namespace Moz.Web.Components
 {
+    [ViewComponent(Name = "Pager")]
     public class PagerViewComponent: ViewComponent
     {
         public Task<IViewComponentResult> InvokeAsync(PagedListBase result)
