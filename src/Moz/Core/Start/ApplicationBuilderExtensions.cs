@@ -82,7 +82,7 @@ namespace Microsoft.AspNetCore.Builder
             var startupConfigurations = TypeFinder.FindClassesOfType<IAppStartup>();
             var instances = startupConfigurations
                 .Select(startup => (IAppStartup)Activator.CreateInstance(startup.Type))
-                .OrderBy(startup => startup.Order);
+                .OrderBy(startup => startup?.Order);
             foreach (var instance in instances) 
                 instance.Configure(application,configuration, env, options);
             

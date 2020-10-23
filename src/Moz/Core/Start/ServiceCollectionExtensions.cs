@@ -230,9 +230,9 @@ namespace Microsoft.Extensions.DependencyInjection
             //执行各个模块的启动类
             var instances = startupConfigurations
                 .Select(startup => (IAppStartup) Activator.CreateInstance(startup.Type))
-                .OrderBy(startup => startup.Order);
+                .OrderBy(startup => startup?.Order);
             foreach (var instance in instances)
-                instance.ConfigureServices(services, configuration, webHostEnvironment, mozOptions);
+                instance?.ConfigureServices(services, configuration, webHostEnvironment, mozOptions);
 
             //services.
             return services.BuildServiceProvider();

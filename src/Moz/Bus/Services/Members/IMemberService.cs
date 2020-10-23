@@ -54,6 +54,19 @@ namespace Moz.Bus.Services.Members
         /// <returns></returns>
         PublicResult ChangePassword(ChangePasswordDto dto);
 
+        /// <summary>
+        /// 修改头像
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult UpdateAvatar(UpdateAvatarDto dto);
+
+        /// <summary>
+        /// 修改用户名
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        PublicResult UpdateUsername(UpdateUsernameDto dto);
         
         /// <summary>
         /// 分页查询

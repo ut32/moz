@@ -487,6 +487,67 @@ namespace Moz.Bus.Services.Members
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public PublicResult UpdateAvatar(UpdateAvatarDto dto)
+        {
+            using (var client = DbFactory.CreateClient())
+            {
+                var member = client.Queryable<Member>()
+                    .Select(it => new {it.Id, it.UId})
+                    .First(it => it.Id == dto.MemberId);
+                if (member == null)
+                    return Error("没找到对象");
+                
+                client.Updateable<Member>()
+                    .SetColumns(it => new Member() { Avatar = dto.Avatar })
+                    .Where(it=>it.Id==dto.MemberId)
+                    .ExecuteCommand();
+                
+                _distributedCache.Remove($"CACHE_MEMBER_{member.UId}");
+            }
+            
+            return Ok();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public PublicResult UpdateUsername(UpdateUsernameDto dto)
+        {
+            using (var client = DbFactory.CreateClient())
+            {
+                var member = client.Queryable<Member>()
+                    .Select(it => new {it.Id, it.UId, it.Username})
+                    .First(it => it.Id == dto.MemberId);
+                if (member == null)
+                    return Error("没找到对象");
+
+                if (member.Username.Equals(dto.Username, StringComparison.OrdinalIgnoreCase))
+                    return Error("用户名未变更");
+
+                var isExist = client.Queryable<Member>()
+                    .Select(it => new { it.Id,it.Username })
+                    .First(it => it.Username.Equals(dto.Username))!=null;
+                if (isExist)
+                    return Error($"此用户名 {dto.Username} 已存在");
+
+                client.Updateable<Member>()
+                    .SetColumns(it => new Member() { Username = dto.Username })
+                    .Where(it => it.Id == dto.MemberId)
+                    .ExecuteCommand();
+
+                _distributedCache.Remove($"CACHE_MEMBER_{member.UId}");
+            }
+
+            return Ok();
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="dto"></param>

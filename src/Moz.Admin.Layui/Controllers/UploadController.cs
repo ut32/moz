@@ -15,9 +15,9 @@ namespace Moz.Admin.Layui.Controllers
     {
         private readonly IWebHostEnvironment _environment;
         private readonly IWorkContext _workContext;
-        private readonly IFileUploader _fileManager;
+        private readonly IFileManager _fileManager;
 
-        public UploadController(IWebHostEnvironment env, IWorkContext workContext, IFileUploader fileManager)
+        public UploadController(IWebHostEnvironment env, IWorkContext workContext, IFileManager fileManager)
         {
             this._environment = env;
             this._workContext = workContext;
