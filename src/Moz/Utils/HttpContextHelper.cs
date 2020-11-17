@@ -52,9 +52,9 @@ namespace Moz.Utils
             if (!(_httpContextAccessor.HttpContext?.Request?.Headers?.TryGetValue(headerName, out var values) ?? false))
                 return default(T);
 
-            var rawValues = values.ToString();
-            if (!rawValues.IsNullOrEmpty())
-                return (T) Convert.ChangeType(rawValues, typeof(T));
+            //var rawValues = values.ToString();
+            //if (!rawValues.IsNullOrEmpty())
+            //    return (T) Convert.ChangeType(rawValues, typeof(T));
 
             return default(T);
         }

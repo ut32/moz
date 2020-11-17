@@ -2,6 +2,7 @@
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Moz.Core;
+using Moz.Utils;
 
 // ReSharper disable once CheckNamespace
 namespace System
@@ -65,6 +66,12 @@ namespace System
             }
         }
         
+        /// <summary>
+        /// 获取截取字符串
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
         public static string GetSubstring(this string value, int length)
         {
             if (value.IsNullOrEmpty()) return null;
@@ -74,6 +81,16 @@ namespace System
         public static string IfEmptyReturn(this string value, string defaultValue)
         {
             return value.IsNullOrEmpty() ? defaultValue : value; 
+        }
+
+        /// <summary>
+        /// 移除HTML标签
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string RemoveHtml(this string value)
+        {
+            return string.IsNullOrEmpty(value) ? value : StringHelper.RemoveHtml(value);
         }
     }
 }
