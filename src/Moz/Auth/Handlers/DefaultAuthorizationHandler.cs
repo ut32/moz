@@ -32,11 +32,20 @@ namespace Moz.Auth.Handlers
         /// <returns></returns>
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,DefaultAuthorizationRequirement requirement)
         {
-            if (!(context.Resource is Endpoint endpoint))
+            if (!(context.Resource is DefaultHttpContext defaultHttpContext))
             {
                 context.Fail();
                 return Task.CompletedTask;
             }
+
+            var endpoint = defaultHttpContext.GetEndpoint();
+            if (endpoint==null)
+            {
+                context.Fail();
+                return Task.CompletedTask;
+            }
+            
+            //context.Resource.
 
             //获取当前用户
             var member = _workContext.CurrentMember;

@@ -1,4 +1,4 @@
-namespace Moz.Administration.Models.Members
+namespace Moz.Admin.Layui.Models.Members
 {
     public class LoginModel
     {

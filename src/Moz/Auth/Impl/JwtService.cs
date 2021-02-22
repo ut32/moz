@@ -67,7 +67,7 @@ namespace Moz.Auth.Impl
         private string GenerateRefreshToken(string memberUId)
         {
             var guid = Guid.NewGuid().ToString("N");
-            var finalText = $"{_appConfig.Value.AppSecret}|{memberUId}|{guid}";
+            var finalText = $"{memberUId}|{guid}";
             return _encryptionService.EncryptText(finalText,_appConfig.Value.AppSecret);
         }
 

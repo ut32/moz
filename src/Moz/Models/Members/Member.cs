@@ -4,7 +4,7 @@ using SqlSugar;
 namespace Moz.Bus.Models.Members
 {
     /// <summary>
-    ///     member
+    /// user
     /// </summary>
     [SugarTable("tab_member")]
     public class Member : BaseModel

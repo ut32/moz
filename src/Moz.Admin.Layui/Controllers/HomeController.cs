@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moz.Admin.Layui.Common;
+using Moz.Admin.Layui.Models.Members;
 using Moz.Administration.Models.Members;
 using Moz.Auth;
 using Moz.Bus.Dtos.Auth;
